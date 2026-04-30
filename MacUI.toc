@@ -6,5 +6,7 @@
 ## SavedVariables: MacUIDB
 
 MacUI.lua
+Config.lua
 Square.lua
+PlayerHealth.lua
 WarriorTracker.lua

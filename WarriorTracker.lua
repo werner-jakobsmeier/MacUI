@@ -22,8 +22,9 @@ local SPELL_SHIELD_BLOCK = 2565
 -- Create Container Frame
 local tracker = CreateFrame("Frame", "MacUIWarriorTracker", UIParent)
 tracker:SetSize(150, 100)
--- Anchored slightly below the center of the screen
-tracker:SetPoint("CENTER", UIParent, "CENTER", 0, -100)
+-- Register for moving and scaling
+tracker.defaultPoint = {"CENTER", UIParent, "CENTER", 0, -100}
+table.insert(addonTable.MovableFrames, tracker)
 
 -- Helper to create FontStrings
 local function CreateTrackerText(parent, yOffset)
@@ -37,6 +38,7 @@ local rageText = CreateTrackerText(tracker, 0)
 local ipText = CreateTrackerText(tracker, -25)
 local sbChargesText = CreateTrackerText(tracker, -50)
 local sbBuffText = CreateTrackerText(tracker, -75)
+tracker.fontStrings = { rageText, ipText, sbChargesText, sbBuffText }
 
 -- Formatting helper for large numbers (e.g., 120k for Ignore Pain)
 local function FormatNumber(num)

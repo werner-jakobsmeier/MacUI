@@ -3,9 +3,9 @@ local addonName, addonTable = ...
 -- Create a custom square frame
 local squareFrame = CreateFrame("Frame", "MacUISquare", UIParent, "BackdropTemplate")
 squareFrame:SetSize(40, 40)
--- Point, RelativeFrame, RelativePoint, X-Offset, Y-Offset
-squareFrame:SetPoint("CENTER", UIParent, "CENTER", -200, 100)
-
+-- Register for slash commands moving
+squareFrame.defaultPoint = {"CENTER", UIParent, "CENTER", -200, 100}
+table.insert(addonTable.MovableFrames, squareFrame)
 -- Set up the black background and 4-pixel white border
 squareFrame:SetBackdrop({
     bgFile = "Interface\\Buttons\\WHITE8x8",

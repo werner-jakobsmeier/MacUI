@@ -103,8 +103,8 @@ addonTable.ClassMechanics = {
     },
     PALADIN = {
         [2] = { -- Protection
-            { id = 132403, type = "buff", label = "SotR Buff", color = {0.5, 0.5, 1}, point = {0, -150} },
-            { id = 188370, type = "totem", label = "Cons Duration", color = {0.97, 0.72, 0.19}, point = {0, -175} },
+            { id = 132403, type = "buff", label = "SotR Buff", color = {0.5, 0.5, 1}, point = {0, -150}, isBaseline = true },
+            { id = 188370, type = "totem", label = "Cons Duration", color = {0.97, 0.72, 0.19}, point = {0, -175}, isBaseline = true },
         }
     }
 }
@@ -122,7 +122,8 @@ addonTable.DefaultAbilities = {
         [2] = { -- Protection
             { spellID = 86659, type = "buff", name = "Guardian of Ancient Kings" },
             { spellID = 31850, type = "buff", name = "Ardent Defender" },
-            { spellID = 209202, type = "buff", name = "Eye of Tyr" },
+            { spellID = 389539, type = "buff", name = "Sentinel" },
+            { spellID = 31884, type = "buff", name = "Avenging Wrath" },
         }
     }
 }

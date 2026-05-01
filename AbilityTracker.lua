@@ -16,6 +16,7 @@ local ipairs = ipairs
 local pairs = pairs
 local table = table
 local PlaySound = PlaySound
+local IsPlayerSpell = IsPlayerSpell
 
 -- Invisible event-only frame
 local eventFrame = CreateFrame("Frame", "MacUIAbilityTrackerEvents", UIParent)
@@ -172,7 +173,9 @@ function RebuildTrackerUI()
     if specDefaults then
         for _, ability in ipairs(specDefaults) do
             if type(ability) == "table" and MacUIDB.trackedAbilities[ability.spellID] ~= false then
-                table.insert(abilitiesToTrack, ability)
+                if ability.isBaseline or IsPlayerSpell(ability.spellID) then
+                    table.insert(abilitiesToTrack, ability)
+                end
             end
         end
     end
@@ -182,7 +185,9 @@ function RebuildTrackerUI()
         local sortedCustom = {}
         for _, ability in pairs(MacUIDB.customAbilities) do
             if type(ability) == "table" and ability.spellID and MacUIDB.trackedAbilities[ability.spellID] == true then
-                table.insert(sortedCustom, ability)
+                if ability.isBaseline or IsPlayerSpell(ability.spellID) then
+                    table.insert(sortedCustom, ability)
+                end
             end
         end
         table.sort(sortedCustom, function(a, b) return a.name and b.name and a.name < b.name end)

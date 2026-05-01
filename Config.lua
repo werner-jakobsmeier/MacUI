@@ -5,6 +5,7 @@ local UIParent = UIParent
 local InCombatLockdown = InCombatLockdown
 local table = table
 local ipairs = ipairs
+local IsPlayerSpell = IsPlayerSpell
 local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 local PlaySound = PlaySound
 local print = print
@@ -571,7 +572,7 @@ end
 optionsPanel:HookScript("OnHide", function() audioDropdown:Hide() end)
 
 -- Helper: Create a brutalist checkbox row
-local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
+local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom, missingTalent)
     local row = CreateFrame("Button", nil, parent, "BackdropTemplate")
     row:SetSize(280, 44) -- Wider Module Design
     row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset)
@@ -591,10 +592,16 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     local nameText = row:CreateFontString(nil, "OVERLAY")
     nameText:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
     nameText:SetPoint("TOPLEFT", icon, "TOPRIGHT", 6, -1)
-    nameText:SetText(ability.name)
+    if missingTalent then
+        nameText:SetText(ability.name .. " |cFFFF3333(Missing Talent)|r")
+        row:SetAlpha(0.4)
+        row:EnableMouse(false)
+        icon:SetDesaturated(true)
+    else
+        nameText:SetText(ability.name)
+    end
 
     -- Sound Name (Bottom Line / Subtitle)
-    -- Anchored to the nameText to ensure a vertical stack without overlap
     local soundSubtitle = row:CreateFontString(nil, "OVERLAY")
     soundSubtitle:SetFont("Fonts\\ARIALN.TTF", 10)
     soundSubtitle:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -2)
@@ -615,7 +622,10 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     audioText:SetPoint("CENTER")
     audioText:SetText("AUDIO")
 
+    if missingTalent then audioBtn:Hide() end
+
     local function UpdateAudioVisual(soundID)
+        if missingTalent then return end
         local soundName = "None"
         if soundID then
             for _, opt in ipairs(SOUND_OPTIONS) do
@@ -637,6 +647,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     end
 
     local function UpdateVisual(isEnabled)
+        if missingTalent then return end
         if isEnabled then
             row:SetBackdropColor(0.12, 0.16, 0.23, 1)
             row:SetBackdropBorderColor(0.82, 0.84, 0.86, 1) -- Silver
@@ -655,6 +666,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     end
 
     row:SetScript("OnClick", function()
+        if missingTalent then return end
         if not MacUIDB then return end
         if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
         local current = MacUIDB.trackedAbilities[ability.spellID]
@@ -667,6 +679,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     end)
 
     audioBtn:SetScript("OnClick", function()
+        if missingTalent then return end
         if audioDropdown:IsShown() and audioDropdown.activeSpellID == ability.spellID then
             audioDropdown:Hide()
         else
@@ -749,7 +762,8 @@ local function BuildAbilityCheckboxes()
                 -- Normalize data structure for the checkbox builder
                 local ability = { spellID = mech.id, name = mech.label }
                 local yOffset = yOffsetBase - (visibleIndex * 46) -- Increased rhythm spacing
-                local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
+                local missingTalent = (not mech.isBaseline) and (not IsPlayerSpell(mech.id))
+                local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false, missingTalent)
                 table.insert(abilityCheckboxes, row)
                 
                 processedIDs[mech.id] = true
@@ -772,7 +786,8 @@ local function BuildAbilityCheckboxes()
         
         for _, ability in ipairs(specDefaults) do
             local yOffset = yOffsetBase - (visibleIndex * 46)
-            local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
+            local missingTalent = (not ability.isBaseline) and (not IsPlayerSpell(ability.spellID))
+            local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false, missingTalent)
             table.insert(abilityCheckboxes, row)
             visibleIndex = visibleIndex + 1
         end

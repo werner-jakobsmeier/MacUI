@@ -111,21 +111,11 @@ local function UpdateIndicator(indicator)
     end
 end
 
--- Collect all active indicators into an ordered list for iteration
-local function GetActiveIndicators()
-    local list = {}
-    for _, indicator in pairs(indicatorFrames) do
-        table.insert(list, indicator)
-    end
-    return list
-end
-
 -- Update ALL indicators
 local function UpdateAllIndicators()
     local needsAudioUpdate = false
-    local activeList = GetActiveIndicators()
 
-    for _, indicator in ipairs(activeList) do
+    for _, indicator in pairs(indicatorFrames) do
         UpdateIndicator(indicator)
         if indicator.isRed and MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[indicator.spellID] then
             needsAudioUpdate = true

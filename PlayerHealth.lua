@@ -7,18 +7,18 @@ local UnitHealthMax = UnitHealthMax
 local string = string
 local math = math
 local UIParent = UIParent
+local table = table
 
--- Create Container Frame
-local tracker = CreateFrame("Frame", "MacUIPlayerHealthTracker", UIParent)
-tracker:SetSize(100, 30)
--- Register for moving and scaling
-tracker.defaultPoint = {"CENTER", UIParent, "CENTER", 0, -60}
-table.insert(addonTable.MovableFrames, tracker)
+-- Create an independent, movable frame for the health text
+local frame = CreateFrame("Frame", "MacUIPlayerHealth", UIParent)
+frame:SetSize(150, 30)
+frame.defaultPoint = {"CENTER", UIParent, "CENTER", 0, -60}
+table.insert(addonTable.MovableFrames, frame)
 
 -- Create FontString
-local healthText = tracker:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-healthText:SetPoint("CENTER", tracker, "CENTER", 0, 0)
-tracker.fontStrings = { healthText }
+local healthText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+healthText:SetPoint("CENTER", frame, "CENTER", 0, 0)
+frame.fontStrings = { healthText }
 
 -- Update Function
 local function UpdateHealth()
@@ -31,17 +31,17 @@ local function UpdateHealth()
     -- Calculate percentage and round down to nearest whole number
     local percent = math.floor((health / maxHealth) * 100)
     
-    -- Green font (|cFF00FF00)
+    -- Green font
     healthText:SetText(string.format("|cFF00FF00Health: %d%%|r", percent))
 end
 
 -- Event Registration
-tracker:RegisterEvent("UNIT_HEALTH")
-tracker:RegisterEvent("UNIT_MAXHEALTH")
-tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("UNIT_HEALTH")
+frame:RegisterEvent("UNIT_MAXHEALTH")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 -- Event Handler
-tracker:SetScript("OnEvent", function(self, event, unit)
+frame:SetScript("OnEvent", function(self, event, unit)
     if event == "PLAYER_ENTERING_WORLD" then
         UpdateHealth()
     elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") and unit == "player" then

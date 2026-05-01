@@ -1,0 +1,19 @@
+# MacUI Development Rules
+
+## Critical: Read Before Coding
+Before writing or modifying ANY code, read `.github/AI_DEVELOPMENT_GUIDELINES.md` in full. It contains mandatory rules for this WoW 12.0.5 addon.
+
+## Key Rules Summary
+- Target API: WoW 12.0.5 (Midnight). Many APIs now return tables instead of positional values.
+- Upvalue ALL global API functions at the top of every file.
+- Never leak variables to the global namespace (use `local` or `self.varName`).
+- Class modules must early-return for non-matching classes.
+- Spec checks must happen at runtime via `addonTable.playerSpec`, not at load time.
+- `OnUpdate` scripts must be throttled and disabled when not needed.
+- Dynamically created frames must be pooled, not leaked.
+- `MacUIDB` (SavedVariables) is nil until ADDON_LOADED fires — always guard access.
+- `C_Spell.GetSpellInfo()` returns a TABLE with `.name`, `.iconID`, `.spellID` — NOT positional values.
+- `C_Spell.GetSpellCharges()` returns a TABLE with `.currentCharges` — NOT a raw number.
+
+## File: .github/AI_DEVELOPMENT_GUIDELINES.md
+Contains 11 sections covering API compliance, architecture, optimization, UI patterns, Lua pitfalls, and a pre-commit checklist. This is the single source of truth.

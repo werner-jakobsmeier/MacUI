@@ -15,37 +15,45 @@ local GetTime = GetTime
 local string = string
 local UIParent = UIParent
 local table = table
+local ipairs = ipairs
 
 -- Spell IDs
 local SPELL_SOTR = 132403
-local SPELL_CONSECRATION_BUFF = 188370 -- Buff gained while standing in Consecration
+local SPELL_CONSECRATION_BUFF = 188370
 
--- Create Container Frame
-local tracker = CreateFrame("Frame", "MacUIPaladinTracker", UIParent)
-tracker:SetSize(150, 100)
-tracker.defaultPoint = {"CENTER", UIParent, "CENTER", 0, -100}
-table.insert(addonTable.MovableFrames, tracker)
-tracker:Hide() -- Hide by default until spec is confirmed
+------------------------------------------------
+-- Helper: Create a named, movable text frame
+------------------------------------------------
+local function CreateTextFrame(frameName, defaultX, defaultY)
+    local frame = CreateFrame("Frame", frameName, UIParent)
+    frame:SetSize(150, 25)
+    frame.defaultPoint = {"CENTER", UIParent, "CENTER", defaultX, defaultY}
+    table.insert(addonTable.MovableFrames, frame)
 
--- Helper to create FontStrings
-local function CreateTrackerText(parent, yOffset)
-    local fs = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    fs:SetPoint("TOP", parent, "TOP", 0, yOffset)
-    return fs
+    local text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    text:SetPoint("CENTER", frame, "CENTER", 0, 0)
+    frame.fontStrings = { text }
+    frame.text = text
+
+    return frame
 end
 
--- FontStrings
-local holyPowerText = CreateTrackerText(tracker, 0)
-local sotrBuffText = CreateTrackerText(tracker, -25)
-local consecrationText = CreateTrackerText(tracker, -50)
-tracker.fontStrings = { holyPowerText, sotrBuffText, consecrationText }
+------------------------------------------------
+-- Create 3 independent frames
+------------------------------------------------
+local holyPowerFrame = CreateTextFrame("MacUIPaladinHolyPower", 0, -100)
+local sotrFrame = CreateTextFrame("MacUIPaladinSotR", 0, -125)
+local consecFrame = CreateTextFrame("MacUIPaladinConsecration", 0, -150)
 
+-- Invisible event-only frame (handles events + SotR OnUpdate timer)
+local eventFrame = CreateFrame("Frame", "MacUIPaladinTrackerEvents", UIParent)
+
+------------------------------------------------
 -- Update Functions
+------------------------------------------------
 local function UpdateHolyPower()
-    -- Holy Power is power type 9
     local hp = UnitPower("player", Enum.PowerType.HolyPower) or 0
-    -- Yellow/Gold font
-    holyPowerText:SetText(string.format("|cFFFFE680Holy Power: %d|r", hp))
+    holyPowerFrame.text:SetText(string.format("|cFFFFE680Holy Power: %d|r", hp))
 end
 
 local function UpdateSotRBuff()
@@ -59,26 +67,25 @@ local function UpdateSotRBuff()
         end
     end
     
-    -- Bright Yellow
-    sotrBuffText:SetText(string.format("|cFFFFFF00SotR Buff: %s|r", durationStr))
+    sotrFrame.text:SetText(string.format("|cFFFFFF00SotR Buff: %s|r", durationStr))
 
     -- Performance: only run OnUpdate when the buff is actually active
     if auraData then
-        if not tracker.onUpdateActive then
-            tracker:SetScript("OnUpdate", function(self, elapsed)
+        if not eventFrame.onUpdateActive then
+            eventFrame:SetScript("OnUpdate", function(self, elapsed)
                 if not self.updateTimer then self.updateTimer = 0 end
                 self.updateTimer = self.updateTimer + elapsed
-                if self.updateTimer > 0.1 then -- Throttle to 10 times a second
+                if self.updateTimer > 0.1 then
                     UpdateSotRBuff()
                     self.updateTimer = 0
                 end
             end)
-            tracker.onUpdateActive = true
+            eventFrame.onUpdateActive = true
         end
     else
-        if tracker.onUpdateActive then
-            tracker:SetScript("OnUpdate", nil)
-            tracker.onUpdateActive = false
+        if eventFrame.onUpdateActive then
+            eventFrame:SetScript("OnUpdate", nil)
+            eventFrame.onUpdateActive = false
         end
     end
 end
@@ -86,23 +93,27 @@ end
 local function UpdateConsecration()
     local auraData = C_UnitAuras.GetPlayerAuraBySpellID(SPELL_CONSECRATION_BUFF)
     if auraData then
-        consecrationText:SetText("|cFFFFFF00Consecration: Active|r")
+        consecFrame.text:SetText("|cFFFFFF00Consecration: Active|r")
     else
-        consecrationText:SetText("|cFF888888Consecration: Inactive|r")
+        consecFrame.text:SetText("|cFF888888Consecration: Inactive|r")
     end
 end
 
+------------------------------------------------
+-- Spec-aware rebuild: show only for Protection (spec 2)
+------------------------------------------------
+local allFrames = { holyPowerFrame, sotrFrame, consecFrame }
+
 local function RebuildTracker()
-    -- Only show these specific trackers if the player is Protection (spec 2)
     if addonTable.playerSpec == 2 then
-        tracker:Show()
+        for _, f in ipairs(allFrames) do f:Show() end
         UpdateHolyPower()
         UpdateSotRBuff()
         UpdateConsecration()
     else
-        tracker:Hide()
-        tracker:SetScript("OnUpdate", nil)
-        tracker.onUpdateActive = false
+        for _, f in ipairs(allFrames) do f:Hide() end
+        eventFrame:SetScript("OnUpdate", nil)
+        eventFrame.onUpdateActive = false
     end
 end
 
@@ -111,13 +122,14 @@ table.insert(addonTable.OnSpecChanged, function()
     RebuildTracker()
 end)
 
--- Event Registration
-tracker:RegisterEvent("UNIT_POWER_UPDATE")
-tracker:RegisterEvent("UNIT_AURA")
-tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
+------------------------------------------------
+-- Event Registration & Handler
+------------------------------------------------
+eventFrame:RegisterEvent("UNIT_POWER_UPDATE")
+eventFrame:RegisterEvent("UNIT_AURA")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
--- Event Handler
-tracker:SetScript("OnEvent", function(self, event, unit, powerType)
+eventFrame:SetScript("OnEvent", function(self, event, unit, powerType)
     if event == "PLAYER_ENTERING_WORLD" then
         RebuildTracker()
     elseif event == "UNIT_POWER_UPDATE" and unit == "player" and powerType == "HOLY_POWER" then

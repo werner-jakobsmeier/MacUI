@@ -4,7 +4,7 @@ This document contains rules and best practices that the AI assistant must verif
 
 ## 1. World of Warcraft API Compliance
 - **Target API Version:** Always write code compatible with the latest expansion (Version 12.0 / 12.0.5+ Midnight).
-- **Breaking Changes:** Reference `docs/Midnight_API_12_0_Reference.md` before touching combat logs, aura parsing, or raid markers.
+- **Breaking Changes:** Reference Section 6 ("API Version Compatibility") of this document before touching combat logs, aura parsing, or raid markers.
 - **Combat Lockdown:** Never attempt to dynamically create frames, move anchor points, or change secure states while the player is in combat (`InCombatLockdown()`). Use `SecureTemplates` if combat interaction is strictly necessary.
 
 ## 2. Architecture & File Structure
@@ -38,6 +38,21 @@ This document contains rules and best practices that the AI assistant must verif
 - **Use safe fallbacks for deprecated APIs:** When Blizzard moves an API from the global namespace into a `C_` namespace (e.g., `GetSpellCharges` → `C_Spell.GetSpellCharges`), use a fallback pattern: `local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges`. This ensures the addon works across patch boundaries.
 - **Verify API changes before each major patch:** Before a new WoW patch drops, search Blizzard's patch notes and the community API changelog for any renamed, moved, or removed functions that the addon currently uses.
 - **Check return value types after API migrations:** When an API migrates to a `C_` namespace, the return value often changes from positional returns to a table. For example, `C_Spell.GetSpellCharges()` returns a `chargesInfo` table with `.currentCharges`, `.maxCharges`, etc., NOT the raw numbers that the old `GetSpellCharges()` returned. Always verify the new return signature in the API docs.
+
+### 12.0 (Midnight) Restrictions & Breaking Changes
+- **Private Auras & Secret Values:** Blizzard flags specific boss debuffs, player cooldowns, and mechanics as "secret". Addons cannot read the duration, stacks, or existence of these auras using traditional `UnitAura` or `AuraUtil` methods. Attempting to track them will return nil.
+- **Combat Log Restrictions:** `COMBAT_LOG_EVENT_UNFILTERED` is heavily restricted. Do not rely on this event for catch-all combat parsing or tracking secret mechanics.
+- **Aura Filtering:** Manual whitelist/blacklist of exact Spell IDs for custom unit frames is restricted. You must use Blizzard's built-in curated aura categories (e.g., "Crowd Control", "Big Defensive", "Dispelable") for unit frame filtering.
+- **Combat Lockdown:** No dynamic raid marker setting via addons in combat. `InCombatLockdown()` must be strictly respected. You cannot create frames or change frame anchor points unless using Secure Templates.
+- **Boss Mod API (12.0.5):** Boss mods must hook into base UI elements for timeline bars, cast counts, and `SetEventSound`. Healers should use `UnitHealPredictionCalculator` for healing/absorb predictions instead of parsing raw events.
+
+### Reference Links
+- **12.0.0 API Changes (Midnight):** https://warcraft.wiki.gg/wiki/Patch_12.0.0/API_changes
+- **12.0.5 API Changes:** https://warcraft.wiki.gg/wiki/Patch_12.0.5/API_changes
+- **All API Change Summaries:** https://warcraft.wiki.gg/wiki/API_change_summaries
+- **WoW API Reference:** https://warcraft.wiki.gg/wiki/World_of_Warcraft_API
+- **Widget API:** https://warcraft.wiki.gg/wiki/Widget_API
+- **Events Reference:** https://warcraft.wiki.gg/wiki/Events
 
 ## 7. Frame Pooling & Dynamic UI
 - **Always pool dynamically created frames:** When UI elements are created and destroyed repeatedly (e.g., toggling tracked abilities), maintain a frame pool (`table.insert` on hide, `table.remove` on reuse). Never rely on creating new frames endlessly — the WoW client does not garbage-collect frames, so orphaned frames leak memory permanently.

@@ -2,16 +2,15 @@ local addonName, addonTable = ...
 
 local UnitClass = UnitClass
 
--- Only load if playing a Protection Warrior (spec 3)
+-- Only load if playing a Warrior
 local _, playerClass = UnitClass("player")
 if playerClass ~= "WARRIOR" then return end
 
--- Localize Globals for optimization (following our new guidelines)
+-- Localize Globals
 local CreateFrame = CreateFrame
 local UnitPower = UnitPower
 local Enum = Enum
 local C_UnitAuras = C_UnitAuras
--- C_Spell.GetSpellCharges replaces GetSpellCharges in 12.0.5+
 local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges
 local GetTime = GetTime
 local string = string
@@ -19,30 +18,9 @@ local tostring = tostring
 local UIParent = UIParent
 local table = table
 
--- Spell IDs for accurate tracking regardless of client language
+-- Spell IDs
 local SPELL_IGNORE_PAIN = 190456
 local SPELL_SHIELD_BLOCK = 2565
-
--- Create Container Frame
-local tracker = CreateFrame("Frame", "MacUIWarriorTracker", UIParent)
-tracker:SetSize(150, 100)
--- Register for moving and scaling
-tracker.defaultPoint = {"CENTER", UIParent, "CENTER", 0, -100}
-table.insert(addonTable.MovableFrames, tracker)
-
--- Helper to create FontStrings
-local function CreateTrackerText(parent, yOffset)
-    local fs = parent:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    fs:SetPoint("TOP", parent, "TOP", 0, yOffset)
-    return fs
-end
-
--- FontStrings
-local rageText = CreateTrackerText(tracker, 0)
-local ipText = CreateTrackerText(tracker, -25)
-local sbChargesText = CreateTrackerText(tracker, -50)
-local sbBuffText = CreateTrackerText(tracker, -75)
-tracker.fontStrings = { rageText, ipText, sbChargesText, sbBuffText }
 
 -- Formatting helper for large numbers (e.g., 120k for Ignore Pain)
 local function FormatNumber(num)
@@ -54,32 +32,57 @@ local function FormatNumber(num)
     return tostring(num)
 end
 
+------------------------------------------------
+-- Helper: Create a named, movable text frame
+------------------------------------------------
+local function CreateTextFrame(frameName, defaultX, defaultY)
+    local frame = CreateFrame("Frame", frameName, UIParent)
+    frame:SetSize(150, 25)
+    frame.defaultPoint = {"CENTER", UIParent, "CENTER", defaultX, defaultY}
+    table.insert(addonTable.MovableFrames, frame)
+
+    local text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    text:SetPoint("CENTER", frame, "CENTER", 0, 0)
+    frame.fontStrings = { text }
+    frame.text = text
+
+    return frame
+end
+
+------------------------------------------------
+-- Create 4 independent frames
+------------------------------------------------
+local rageFrame = CreateTextFrame("MacUIWarriorRage", 0, -100)
+local ipFrame = CreateTextFrame("MacUIWarriorIgnorePain", 0, -125)
+local sbChargesFrame = CreateTextFrame("MacUIWarriorSBCharges", 0, -150)
+local sbBuffFrame = CreateTextFrame("MacUIWarriorSBBuff", 0, -175)
+
+-- Invisible event-only frame (handles events + SB Buff OnUpdate timer)
+local eventFrame = CreateFrame("Frame", "MacUIWarriorTrackerEvents", UIParent)
+
+------------------------------------------------
 -- Update Functions
+------------------------------------------------
 local function UpdateRage()
-    -- Rage is power type 4, but Enum.PowerType.Rage is safer
     local rage = UnitPower("player", Enum.PowerType.Rage) or 0
-    -- Red font
-    rageText:SetText(string.format("|cFFFF0000Rage: %d|r", rage))
+    rageFrame.text:SetText(string.format("|cFFFF0000Rage: %d|r", rage))
 end
 
 local function UpdateIgnorePain()
     local auraData = C_UnitAuras.GetPlayerAuraBySpellID(SPELL_IGNORE_PAIN)
-    -- The absorb amount for Ignore Pain is typically in points[1]
     local absorb = (auraData and auraData.points and auraData.points[1]) or 0
     
-    -- Orange font
     if absorb > 0 then
-        ipText:SetText(string.format("|cFFFF8000Ignore Pain: %s|r", FormatNumber(absorb)))
+        ipFrame.text:SetText(string.format("|cFFFF8000Ignore Pain: %s|r", FormatNumber(absorb)))
     else
-        ipText:SetText("|cFFFF8000Ignore Pain: 0|r")
+        ipFrame.text:SetText("|cFFFF8000Ignore Pain: 0|r")
     end
 end
 
 local function UpdateShieldBlockCharges()
     local chargesInfo = GetSpellCharges(SPELL_SHIELD_BLOCK)
     local charges = chargesInfo and chargesInfo.currentCharges or 0
-    -- Silver/Blue
-    sbChargesText:SetText(string.format("|cFF88AAFFSB Charges: %d|r", charges))
+    sbChargesFrame.text:SetText(string.format("|cFF88AAFFSB Charges: %d|r", charges))
 end
 
 local function UpdateShieldBlockBuff()
@@ -93,13 +96,12 @@ local function UpdateShieldBlockBuff()
         end
     end
     
-    -- Silver/Blue
-    sbBuffText:SetText(string.format("|cFF88AAFFSB Buff: %s|r", durationStr))
+    sbBuffFrame.text:SetText(string.format("|cFF88AAFFSB Buff: %s|r", durationStr))
 
     -- Performance: only run OnUpdate when the buff is actually active
     if auraData then
-        if not tracker.onUpdateActive then
-            tracker:SetScript("OnUpdate", function(self, elapsed)
+        if not eventFrame.onUpdateActive then
+            eventFrame:SetScript("OnUpdate", function(self, elapsed)
                 if not self.updateTimer then self.updateTimer = 0 end
                 self.updateTimer = self.updateTimer + elapsed
                 if self.updateTimer > 0.1 then
@@ -107,28 +109,32 @@ local function UpdateShieldBlockBuff()
                     self.updateTimer = 0
                 end
             end)
-            tracker.onUpdateActive = true
+            eventFrame.onUpdateActive = true
         end
     else
-        if tracker.onUpdateActive then
-            tracker:SetScript("OnUpdate", nil)
-            tracker.onUpdateActive = false
+        if eventFrame.onUpdateActive then
+            eventFrame:SetScript("OnUpdate", nil)
+            eventFrame.onUpdateActive = false
         end
     end
 end
 
+------------------------------------------------
 -- Spec-aware rebuild: show only for Protection (spec 3)
+------------------------------------------------
+local allFrames = { rageFrame, ipFrame, sbChargesFrame, sbBuffFrame }
+
 local function RebuildTracker()
     if addonTable.playerSpec == 3 then
-        tracker:Show()
+        for _, f in ipairs(allFrames) do f:Show() end
         UpdateRage()
         UpdateIgnorePain()
         UpdateShieldBlockCharges()
         UpdateShieldBlockBuff()
     else
-        tracker:Hide()
-        tracker:SetScript("OnUpdate", nil)
-        tracker.onUpdateActive = false
+        for _, f in ipairs(allFrames) do f:Hide() end
+        eventFrame:SetScript("OnUpdate", nil)
+        eventFrame.onUpdateActive = false
     end
 end
 
@@ -137,14 +143,15 @@ table.insert(addonTable.OnSpecChanged, function()
     RebuildTracker()
 end)
 
--- Event Registration
-tracker:RegisterEvent("UNIT_POWER_UPDATE")
-tracker:RegisterEvent("UNIT_AURA")
-tracker:RegisterEvent("SPELL_UPDATE_CHARGES")
-tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
+------------------------------------------------
+-- Event Registration & Handler
+------------------------------------------------
+eventFrame:RegisterEvent("UNIT_POWER_UPDATE")
+eventFrame:RegisterEvent("UNIT_AURA")
+eventFrame:RegisterEvent("SPELL_UPDATE_CHARGES")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
--- Event Handler
-tracker:SetScript("OnEvent", function(self, event, unit, powerType)
+eventFrame:SetScript("OnEvent", function(self, event, unit, powerType)
     if event == "PLAYER_ENTERING_WORLD" then
         RebuildTracker()
     elseif event == "UNIT_POWER_UPDATE" and unit == "player" and powerType == "RAGE" then

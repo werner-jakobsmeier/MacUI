@@ -252,6 +252,13 @@ btnLock:SetScript("OnClick", function()
     addonTable.IsUnlocked = false
 end)
 
+local btnReload = CreatePillButton(optionsPanel, "RELOAD")
+btnReload:SetSize(260, 24)
+btnReload:SetPoint("BOTTOM", optionsPanel, "BOTTOM", 0, 16)
+btnReload:SetScript("OnClick", function()
+    ReloadUI()
+end)
+
 ------------------------------------------------
 -- Player Stats (Grid Tiles)
 ------------------------------------------------

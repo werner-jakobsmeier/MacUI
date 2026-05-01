@@ -1,0 +1,54 @@
+<svg width="300" height="360" viewBox="0 0 300 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Panel -->
+  <rect width="300" height="360" fill="#0F172A"/>
+  <rect x="1" y="1" width="298" height="358" stroke="#D1D5DB" stroke-width="2"/>
+  
+  <!-- Logo (20px margin, -14 baseline) -->
+  <text x="20" y="40" font-family="Arial Narrow" font-size="26" font-weight="900" fill="#D1D5DB" style="paint-order: stroke; stroke: #D1D5DB; stroke-width: 1px;">Mac</text>
+  <text x="66" y="40" font-family="Arial Narrow" font-size="18" fill="#6B7280">UI</text>
+  
+  <!-- System Buttons (Top Right) -->
+  <rect x="116" y="14" width="58" height="18" stroke="#6B7280" fill="none"/>
+  <text x="145" y="27" font-family="Arial Narrow" font-size="8" fill="#D1D5DB" text-anchor="middle">LOCKED</text>
+  
+  <rect x="180" y="14" width="48" height="18" stroke="#6B7280" fill="none"/>
+  <text x="204" y="27" font-family="Arial Narrow" font-size="8" fill="#D1D5DB" text-anchor="middle">RELOAD</text>
+  
+  <rect x="236" y="14" width="48" height="18" stroke="#6B7280" fill="none"/>
+  <text x="260" y="27" font-family="Arial Narrow" font-size="8" fill="#D1D5DB" text-anchor="middle">CLOSE</text>
+
+  <!-- Description (20px margin, -48 y) -->
+  <text x="20" y="60" font-family="Arial Narrow" font-size="9" fill="#6B7280">
+    <tspan x="20" dy="0">Minimalist combat tracking for critical player stats,</tspan>
+    <tspan x="20" dy="12">resources, and active defensive abilities.</tspan>
+  </text>
+
+  <!-- Stats Grid (20px margin, -84 y) -->
+  <rect x="20" y="84" width="80" height="40" stroke="#D1D5DB" fill="#020617"/>
+  <text x="60" y="100" font-family="Arial Narrow" font-size="8" fill="#6B7280" text-anchor="middle">Health</text>
+  <text x="60" y="116" font-family="Arial Narrow" font-size="9" fill="#00FF00" text-anchor="middle">Health</text>
+
+  <rect x="110" y="84" width="80" height="40" stroke="#D1D5DB" fill="#020617"/>
+  <text x="150" y="100" font-family="Arial Narrow" font-size="8" fill="#6B7280" text-anchor="middle">Resource</text>
+  <text x="150" y="116" font-family="Arial Narrow" font-size="9" fill="#D1D5DB" text-anchor="middle">Rage</text>
+
+  <rect x="200" y="84" width="80" height="40" stroke="#D1D5DB" fill="#020617"/>
+  <text x="240" y="100" font-family="Arial Narrow" font-size="8" fill="#6B7280" text-anchor="middle">Power</text>
+  <text x="240" y="116" font-family="Arial Narrow" font-size="9" fill="#D1D5DB" text-anchor="middle">Ignore Pain</text>
+
+  <!-- Abilities (-148 y) -->
+  <rect x="20" y="148" width="12" height="12" stroke="#D1D5DB" fill="none"/>
+  <text x="26" y="158" font-family="Arial Narrow" font-size="10" fill="#D1D5DB" text-anchor="middle">X</text>
+  <rect x="38" y="146" width="16" height="16" fill="#1E293B"/>
+  <text x="60" y="158" font-family="Arial Narrow" font-size="11" fill="#D1D5DB">Shield Block</text>
+
+  <rect x="20" y="172" width="12" height="12" stroke="#6B7280" fill="none"/>
+  <rect x="38" y="170" width="16" height="16" fill="#1E293B" opacity="0.3"/>
+  <text x="60" y="182" font-family="Arial Narrow" font-size="11" fill="#6B7280" opacity="0.3">Spell Block</text>
+
+  <!-- Rhythmic Grid Guide Lines -->
+  <line x1="0" y1="48" x2="300" y2="48" stroke="#00FF00" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="0" y1="84" x2="300" y2="84" stroke="#00FF00" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="0" y1="124" x2="300" y2="124" stroke="#00FF00" stroke-dasharray="4,4" opacity="0.3"/>
+  <line x1="0" y1="148" x2="300" y2="148" stroke="#00FF00" stroke-dasharray="4,4" opacity="0.3"/>
+</svg>

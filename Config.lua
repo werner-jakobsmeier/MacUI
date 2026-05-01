@@ -166,7 +166,7 @@ optionsPanel:SetBackdropBorderColor(0.82, 0.84, 0.86, 1)
 -- Split-weight title: bold "MAC" + thin "UI"
 local titleBold = optionsPanel:CreateFontString(nil, "OVERLAY")
 titleBold:SetFont("Fonts\\ARIALN.TTF", 26, "THICKOUTLINE")
-titleBold:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 16, -12)
+titleBold:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -14) -- 20px margin, -14 baseline
 titleBold:SetText("|cFFD1D5DBMac|r")
 
 local titleThin = optionsPanel:CreateFontString(nil, "OVERLAY")
@@ -177,8 +177,8 @@ titleThin:SetText("UI")
 
 -- Introductory Description
 local descText = optionsPanel:CreateFontString(nil, "OVERLAY")
-descText:SetFont("Fonts\\ARIALN.TTF", 9) -- Bumped to 9pt
-descText:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 18, -44)
+descText:SetFont("Fonts\\ARIALN.TTF", 9)
+descText:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -48) -- 20px margin, 24px gap from logo
 descText:SetWidth(260)
 descText:SetJustifyH("LEFT")
 descText:SetTextColor(0.42, 0.45, 0.50) -- Slate
@@ -327,7 +327,7 @@ statsLabel:Hide() -- Removed for testing
 local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColor)
     local tile = CreateFrame("Button", nil, parent, "BackdropTemplate")
     tile:SetSize(80, 40)
-    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -74) -- Shifted up to header's spot
+    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -84) -- 24px gap from desc
     tile:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -438,7 +438,7 @@ end
 -- Section label
 local abilitiesLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 abilitiesLabel:SetFont("Fonts\\ARIALN.TTF", 10)
-abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -132) 
+abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -148) 
 abilitiesLabel:SetText("ABILITIES")
 abilitiesLabel:Hide() -- Removed for testing
 
@@ -504,7 +504,7 @@ optionsPanel:HookScript("OnHide", function() audioDropdown:Hide() end)
 local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     local row = CreateFrame("Button", nil, parent)
     row:SetSize(220, 20)
-    row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset - 4) -- Shifted up for tighter flow
+    row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset) -- Base alignment
 
     -- Checkbox square
     local checkbox = CreateFrame("Frame", nil, row, "BackdropTemplate")
@@ -675,7 +675,7 @@ local function BuildAbilityCheckboxes()
     if specDefaults then
         for _, ability in ipairs(specDefaults) do
             visibleIndex = visibleIndex + 1
-            local yOffset = -150 - ((visibleIndex - 1) * 24) -- 18px gap from label
+            local yOffset = -148 - ((visibleIndex - 1) * 24) -- Unified 24px rhythm
             local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
             table.insert(abilityCheckboxes, row)
         end

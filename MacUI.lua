@@ -84,8 +84,8 @@ addonTable.ClassMechanics = {
     },
     PALADIN = {
         [2] = { -- Protection
-            { id = 132403, type = "buff", label = "SotR Buff", color = {1, 1, 0}, point = {0, -125} },
-            { id = 188370, type = "active", label = "Consecration", color = {1, 1, 0}, point = {0, -150} },
+            { id = 132403, type = "buff", label = "SotR Buff", color = {1, 1, 0}, point = {0, -150} },
+            { id = 188370, type = "active", label = "Consecration", color = {1, 1, 0}, point = {0, -175} },
         }
     }
 }

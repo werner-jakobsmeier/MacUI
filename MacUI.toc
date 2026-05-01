@@ -14,7 +14,6 @@ Config.lua
 Animations.lua
 AbilityTracker.lua
 Square.lua
-PlayerHealth.lua
 PlayerStats.lua
 ClassMechanics.lua
 MinimapButton.lua

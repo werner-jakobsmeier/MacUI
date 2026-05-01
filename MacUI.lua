@@ -6,6 +6,7 @@ local UIParent = UIParent
 local UnitClass = UnitClass
 local GetSpecialization = GetSpecialization
 local table = table
+local ipairs = ipairs
 
 -- Cache player class at load time (never changes)
 local _, playerClass = UnitClass("player")

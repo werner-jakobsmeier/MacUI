@@ -2,10 +2,14 @@ local addonName, addonTable = ...
 
 local CreateFrame = CreateFrame
 local UnitPower = UnitPower
+local UnitHealth = UnitHealth
+local UnitHealthMax = UnitHealthMax
 local Enum = Enum
 local string = string
+local math = math
 local UIParent = UIParent
 local table = table
+local ipairs = ipairs
 
 local classInfo = addonTable.ClassDisplayInfo and addonTable.ClassDisplayInfo[addonTable.playerClass]
 if not classInfo then return end -- Should never happen, but safety first
@@ -25,6 +29,7 @@ local function CreateStatFrame(id, defaultX, defaultY)
     return frame
 end
 
+local healthFrame = CreateStatFrame("Health", 0, -60)
 local resourceFrame, powerFrame
 if classInfo.resource then
     resourceFrame = CreateStatFrame("Resource", 0, -100)
@@ -52,6 +57,17 @@ local function GetPowerTypeByName(name)
     return nil
 end
 
+local function UpdateHealth()
+    if not healthFrame then return end
+    
+    local health = UnitHealth("player") or 0
+    local maxHealth = UnitHealthMax("player") or 1
+    if maxHealth <= 0 then maxHealth = 1 end
+    
+    local percent = math.floor((health / maxHealth) * 100)
+    healthFrame.text:SetText(string.format("|cFF00FF00%d%%|r", percent))
+end
+
 local function UpdateResource()
     if not resourceFrame or not classInfo.resource then return end
     
@@ -76,6 +92,15 @@ local function UpdatePower()
 end
 
 local function RebuildStats()
+    if healthFrame then
+        if MacUIDB and MacUIDB.displays and MacUIDB.displays.health == false then
+            healthFrame:Hide()
+        else
+            healthFrame:Show()
+            UpdateHealth()
+        end
+    end
+
     if resourceFrame then
         if MacUIDB and MacUIDB.displays and MacUIDB.displays.resource == false then
             resourceFrame:Hide()
@@ -105,12 +130,16 @@ end
 
 -- Event handling
 local eventFrame = CreateFrame("Frame")
+eventFrame:RegisterEvent("UNIT_HEALTH")
+eventFrame:RegisterEvent("UNIT_MAXHEALTH")
 eventFrame:RegisterEvent("UNIT_POWER_UPDATE")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 eventFrame:SetScript("OnEvent", function(self, event, unit, powerType)
     if event == "PLAYER_ENTERING_WORLD" then
         RebuildStats()
+    elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") and unit == "player" then
+        UpdateHealth()
     elseif event == "UNIT_POWER_UPDATE" and unit == "player" then
         -- Ideally we'd map string powerType back, but simple enough to just update both if active
         UpdateResource()
@@ -123,7 +152,7 @@ table.insert(addonTable.OnSpecChanged, function()
 end)
 
 table.insert(addonTable.OnDisplayChanged, function(displayId, isEnabled)
-    if displayId == "resource" or displayId == "power" then
+    if displayId == "health" or displayId == "resource" or displayId == "power" then
         RebuildStats()
     end
 end)

@@ -696,34 +696,86 @@ end
 
 -- Store checkbox references so we can update them on show
 local abilityCheckboxes = {}
+local sectionHeaders = {}
 
 -- Forward declare input frame
 
 
--- Build checkboxes (Custom Abilities Only)
+-- Build checkboxes (Active Mitigation & Defensive Cooldowns)
 local function BuildAbilityCheckboxes()
     -- Clear existing checkboxes
     for _, row in ipairs(abilityCheckboxes) do
         row:Hide()
     end
     abilityCheckboxes = {}
+    
+    -- Clear existing headers
+    for _, header in ipairs(sectionHeaders) do
+        header:Hide()
+    end
+    sectionHeaders = {}
 
     local visibleIndex = 0
+    local yOffsetBase = -130 -- Start a bit higher to make room
 
-    -- 1. Class Defaults
-    local classDefaults = addonTable.DefaultAbilities and addonTable.DefaultAbilities[addonTable.playerClass]
-    local specDefaults = classDefaults and classDefaults[addonTable.playerSpec]
+    -- Helper to create a section header
+    local function CreateHeader(text, yOffset)
+        local header = optionsPanel:CreateFontString(nil, "OVERLAY")
+        header:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
+        header:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, yOffset)
+        header:SetText(text)
+        header:SetTextColor(0.6, 0.6, 0.6) -- Brutalist Grey
+        table.insert(sectionHeaders, header)
+        return header
+    end
+
+    -- 1. Active Mitigation (from ClassMechanics)
+    local classMechanics = addonTable.ClassMechanics and addonTable.ClassMechanics[addonTable.playerClass]
+    local specMechanics = classMechanics and classMechanics[addonTable.playerSpec]
     
-    if specDefaults then
-        for _, ability in ipairs(specDefaults) do
-            visibleIndex = visibleIndex + 1
-            local yOffset = -148 - ((visibleIndex - 1) * 40) -- 40px Module Rhythm
-            local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
-            table.insert(abilityCheckboxes, row)
+    if specMechanics then
+        local hasMechanics = false
+        local processedIDs = {}
+        for _, mech in ipairs(specMechanics) do
+            -- Skip raw power types (like Holy Power) and prevent duplicate checkboxes (e.g. Shield Block has 2 entries)
+            if mech.type ~= "power" and not processedIDs[mech.id] then
+                if not hasMechanics then
+                    CreateHeader("ACTIVE MITIGATION", yOffsetBase - (visibleIndex * 40))
+                    visibleIndex = visibleIndex + 0.6 -- Header takes a bit of vertical space
+                    hasMechanics = true
+                end
+                
+                -- Normalize data structure for the checkbox builder
+                local ability = { spellID = mech.id, name = mech.label }
+                local yOffset = yOffsetBase - (visibleIndex * 40)
+                local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
+                table.insert(abilityCheckboxes, row)
+                
+                processedIDs[mech.id] = true
+                visibleIndex = visibleIndex + 1
+            end
+        end
+        
+        if hasMechanics then
+            visibleIndex = visibleIndex + 0.3 -- Add a small gap before the next section
         end
     end
 
-
+    -- 2. Defensive Cooldowns (from DefaultAbilities)
+    local classDefaults = addonTable.DefaultAbilities and addonTable.DefaultAbilities[addonTable.playerClass]
+    local specDefaults = classDefaults and classDefaults[addonTable.playerSpec]
+    
+    if specDefaults and #specDefaults > 0 then
+        CreateHeader("DEFENSIVE COOLDOWNS", yOffsetBase - (visibleIndex * 40))
+        visibleIndex = visibleIndex + 0.6
+        
+        for _, ability in ipairs(specDefaults) do
+            local yOffset = yOffsetBase - (visibleIndex * 40)
+            local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
+            table.insert(abilityCheckboxes, row)
+            visibleIndex = visibleIndex + 1
+        end
+    end
 end
 
 -- Refresh checkbox visuals based on current MacUIDB state

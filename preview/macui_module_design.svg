@@ -1,0 +1,30 @@
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="300" height="200" fill="#0F172A"/>
+
+  <!-- ENABLED MODULE -->
+  <text x="20" y="25" font-family="Arial Narrow" font-size="10" fill="#D1D5DB">ENABLED STATE</text>
+  <rect x="20" y="35" width="260" height="36" stroke="#D1D5DB" stroke-width="1.5" fill="#1E293B"/>
+  <!-- Glowing Status Dot -->
+  <rect x="26" y="47" width="8" height="8" fill="#10B981"/> 
+  <!-- Icon (Saturated) -->
+  <rect x="42" y="41" width="24" height="24" fill="#020617"/>
+  <text x="74" y="52" font-family="Arial Narrow" font-size="13" fill="#D1D5DB" font-weight="bold">Shield Block</text>
+  <text x="74" y="65" font-family="Arial Narrow" font-size="9" fill="#6B7280">SOUND: Raid Warning</text>
+  <!-- Audio Button -->
+  <rect x="230" y="45" width="40" height="16" stroke="#D1D5DB" fill="#0F172A"/>
+  <text x="250" y="57" font-family="Arial Narrow" font-size="8" fill="#D1D5DB" text-anchor="middle">AUDIO</text>
+
+  <!-- DISABLED MODULE -->
+  <text x="20" y="105" font-family="Arial Narrow" font-size="10" fill="#6B7280">DISABLED STATE</text>
+  <rect x="20" y="115" width="260" height="36" stroke="#1E293B" stroke-width="1" fill="#0F172A"/>
+  <!-- Dimmed Status Dot -->
+  <rect x="26" y="127" width="8" height="8" fill="#1E293B" stroke="#334155"/> 
+  <!-- Icon (Desaturated) -->
+  <rect x="42" y="121" width="24" height="24" fill="#020617" opacity="0.4"/>
+  <text x="74" y="132" font-family="Arial Narrow" font-size="13" fill="#475569">Shield Block</text>
+  <text x="74" y="145" font-family="Arial Narrow" font-size="9" fill="#1E293B">SOUND: None</text>
+  <!-- Audio Button (Dimmed) -->
+  <rect x="230" y="125" width="40" height="16" stroke="#1E293B" fill="#0F172A"/>
+  <text x="250" y="137" font-family="Arial Narrow" font-size="8" fill="#334155" text-anchor="middle">AUDIO</text>
+</svg>

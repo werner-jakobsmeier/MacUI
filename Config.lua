@@ -449,17 +449,13 @@ abilitiesLabel:Hide() -- Removed for testing
 ------------------------------------------------
 local SOUND_OPTIONS = {
     { name = "None", id = nil },
-    { name = "Tell (Beep)", id = 120 },
     { name = "Raid Warning", id = 8959 },
-    { name = "PVP Alert", id = 5674 },
-    { name = "Dungeon Pop", id = 44321 },
     { name = "PVP Horn", id = 11466 },
-    { name = "Level Up (Classic)", id = 5545 },
-    { name = "Level Up (Modern)", id = 12867 },
     { name = "Achievement", id = 12888 },
     { name = "Crisp Click", id = 31491 },
     { name = "Coin Clink", id = 1483 },
     { name = "Ready Check", id = 8960 },
+    { name = "1h-sword-hit-flesh-01", id = 237906 },
 }
 
 local audioDropdown = CreateFrame("Frame", "MacUIAudioDropdown", UIParent, "BackdropTemplate")
@@ -484,7 +480,7 @@ customSoundLabel:SetText("CUSTOM ID:")
 local customInput = CreateFrame("EditBox", nil, audioDropdown, "BackdropTemplate")
 customInput:SetSize(60, 16)
 customInput:SetPoint("TOPLEFT", customSoundLabel, "BOTTOMLEFT", 0, -4)
-customInput:SetFont("Fonts\\ARIALN.TTF", 10, "") -- Explicit empty flags to fix arg #3 error
+customInput:SetFont("Fonts\\ARIALN.TTF", 10, "")
 customInput:SetAutoFocus(false)
 customInput:SetTextInsets(4, 0, 0, 0)
 customInput:SetBackdrop({
@@ -575,71 +571,38 @@ optionsPanel:HookScript("OnHide", function() audioDropdown:Hide() end)
 
 -- Helper: Create a brutalist checkbox row
 local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
-    local row = CreateFrame("Button", nil, parent)
-    row:SetSize(220, 20)
-    row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset) -- Base alignment
-
-    -- Checkbox square
-    local checkbox = CreateFrame("Frame", nil, row, "BackdropTemplate")
-    checkbox:SetSize(12, 12)
-    checkbox:SetPoint("LEFT", row, "LEFT", 0, 0)
-    checkbox:SetBackdrop({
+    local row = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    row:SetSize(260, 36) -- Wide Module Design
+    row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset)
+    row:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
         edgeSize = 1,
     })
-    checkbox:SetBackdropBorderColor(0.82, 0.84, 0.86, 1) -- Silver
 
-    local checkText = checkbox:CreateFontString(nil, "OVERLAY")
-    checkText:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
-    checkText:SetPoint("CENTER", checkbox, "CENTER", 0, 0)
-    checkText:SetText("X")
-    checkText:SetTextColor(0.82, 0.84, 0.86) -- Silver
-    checkText:Hide()
-    row.checkText = checkText
+    -- Spell Icon
+    local icon = row:CreateTexture(nil, "ARTWORK")
+    icon:SetSize(24, 24)
+    icon:SetPoint("LEFT", row, "LEFT", 8, 0)
+    icon:SetTexture(GetSpellTexture(ability.spellID))
 
-    -- Small spell icon preview (16x16)
-    local iconPreview = row:CreateTexture(nil, "ARTWORK")
-    iconPreview:SetSize(16, 16)
-    iconPreview:SetPoint("LEFT", checkbox, "RIGHT", 6, 0)
-    iconPreview:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-    local iconTexture = GetSpellTexture(ability.spellID)
-    if iconTexture then
-        iconPreview:SetTexture(iconTexture)
-    end
-
-    -- Ability name (after the icon)
+    -- Ability Name (Top Line)
     local nameText = row:CreateFontString(nil, "OVERLAY")
-    nameText:SetFont("Fonts\\ARIALN.TTF", 11)
-    nameText:SetPoint("LEFT", iconPreview, "RIGHT", 6, 0)
-    nameText:SetTextColor(0.82, 0.84, 0.86) -- Silver
+    nameText:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
+    nameText:SetPoint("TOPLEFT", icon, "TOPRIGHT", 4, -1)
     nameText:SetText(ability.name)
 
-    -- Custom delete button
-    if isCustom then
-        local delBtn = CreateFrame("Button", nil, row)
-        delBtn:SetSize(12, 12)
-        delBtn:SetPoint("LEFT", nameText, "RIGHT", 4, 0)
-        local delText = delBtn:CreateFontString(nil, "OVERLAY")
-        delText:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
-        delText:SetPoint("CENTER", delBtn, "CENTER", 0, 0)
-        delText:SetText("|cFFFF5555X|r")
-        
-        delBtn:SetScript("OnClick", function()
-            if MacUIDB and MacUIDB.customAbilities then
-                MacUIDB.customAbilities[ability.spellID] = nil
-                if MacUIDB.trackedAbilities then MacUIDB.trackedAbilities[ability.spellID] = nil end
-                -- Rebuild the UI (forward declaration requirement: BuildAbilityCheckboxes)
-                -- We will call the global or addonTable hook instead of direct function call to avoid scope issues
-                if addonTable.RebuildConfigUI then addonTable.RebuildConfigUI() end
-                if addonTable.RebuildTrackerUI then addonTable.RebuildTrackerUI() end
-            end
-        end)
-    end
+    -- Sound Name (Bottom Line / Subtitle)
+    -- Anchored to the nameText to ensure a vertical stack without overlap
+    local soundSubtitle = row:CreateFontString(nil, "OVERLAY")
+    soundSubtitle:SetFont("Fonts\\ARIALN.TTF", 9)
+    soundSubtitle:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -1)
+    soundSubtitle:SetTextColor(0.42, 0.45, 0.50) -- Slate
 
-    -- Audio toggle button ('A' icon)
+    -- Right-side Audio Button
     local audioBtn = CreateFrame("Button", nil, row, "BackdropTemplate")
-    audioBtn:SetSize(16, 16)
-    audioBtn:SetPoint("RIGHT", row, "RIGHT", 0, 0)
+    audioBtn:SetSize(40, 18)
+    audioBtn:SetPoint("RIGHT", row, "RIGHT", -8, 0)
     audioBtn:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -647,22 +610,60 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     })
     
     local audioText = audioBtn:CreateFontString(nil, "OVERLAY")
-    audioText:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
-    audioText:SetPoint("CENTER", audioBtn, "CENTER", 1, 0)
-    audioText:SetText("A")
-    
+    audioText:SetFont("Fonts\\ARIALN.TTF", 8)
+    audioText:SetPoint("CENTER")
+    audioText:SetText("AUDIO")
+
     local function UpdateAudioVisual(soundID)
+        local soundName = "None"
         if soundID then
-            audioBtn:SetBackdropColor(0.2, 0.8, 0.2, 1) -- Green background when on
+            for _, opt in ipairs(SOUND_OPTIONS) do
+                if opt.id == soundID then
+                    soundName = opt.name
+                    break
+                end
+            end
+            if soundName == "None" then soundName = "ID: " .. soundID end
+            audioBtn:SetBackdropColor(0.2, 0.8, 0.2, 0.3)
             audioBtn:SetBackdropBorderColor(0, 1, 0, 1)
-            audioText:SetTextColor(0, 0, 0, 1)
+            audioText:SetTextColor(1, 1, 1)
         else
-            audioBtn:SetBackdropColor(0.15, 0.15, 0.15, 1)
-            audioBtn:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-            audioText:SetTextColor(0.5, 0.5, 0.5, 1)
+            audioBtn:SetBackdropColor(0.1, 0.1, 0.1, 1)
+            audioBtn:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+            audioText:SetTextColor(0.4, 0.4, 0.4)
+        end
+        soundSubtitle:SetText("SOUND: " .. soundName)
+    end
+
+    local function UpdateVisual(isEnabled)
+        if isEnabled then
+            row:SetBackdropColor(0.12, 0.16, 0.23, 1)
+            row:SetBackdropBorderColor(0.82, 0.84, 0.86, 1) -- Silver
+            icon:SetDesaturated(false)
+            nameText:SetTextColor(1, 1, 1)
+            soundSubtitle:SetTextColor(0.42, 0.45, 0.50) -- Slate
+            audioBtn:SetAlpha(1)
+        else
+            row:SetBackdropColor(0.06, 0.09, 0.16, 0.6)
+            row:SetBackdropBorderColor(0.15, 0.2, 0.3, 1) -- Dark Muted
+            icon:SetDesaturated(true)
+            nameText:SetTextColor(0.3, 0.35, 0.4)
+            soundSubtitle:SetTextColor(0.15, 0.2, 0.25) -- Dark Muted Slate
+            audioBtn:SetAlpha(0.3)
         end
     end
-    
+
+    row:SetScript("OnClick", function()
+        if not MacUIDB then return end
+        if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
+        local current = MacUIDB.trackedAbilities[ability.spellID]
+        if current == nil then current = true end
+        local isNowEnabled = not current
+        MacUIDB.trackedAbilities[ability.spellID] = isNowEnabled
+        UpdateVisual(isNowEnabled)
+        if addonTable.RebuildTrackerUI then addonTable.RebuildTrackerUI() end
+    end)
+
     audioBtn:SetScript("OnClick", function()
         if audioDropdown:IsShown() and audioDropdown.activeSpellID == ability.spellID then
             audioDropdown:Hide()
@@ -672,7 +673,6 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
             audioDropdown:ClearAllPoints()
             audioDropdown:SetPoint("TOPRIGHT", audioBtn, "BOTTOMRIGHT", 0, -2)
             
-            -- Highlight current selection
             local currentVal = MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[ability.spellID]
             for i, opt in ipairs(SOUND_OPTIONS) do
                 if opt.id == currentVal then
@@ -681,43 +681,8 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
                     dropdownButtons[i].text:SetTextColor(1, 1, 1, 1)
                 end
             end
-            
-            -- Set current custom value in input
             customInput:SetText(currentVal or "")
-            
             audioDropdown:Show()
-        end
-    end)
-
-    -- State management
-    local function UpdateVisual(isEnabled)
-        if isEnabled then
-            checkbox:SetBackdropBorderColor(0.82, 0.84, 0.86, 1) -- Silver
-            row.checkText:Show()
-            nameText:SetAlpha(1)
-        else
-            checkbox:SetBackdropColor(0, 0, 0, 0)
-            checkbox:SetBackdropBorderColor(0.18, 0.23, 0.32, 1) -- Muted Navy
-            row.checkText:Hide()
-            nameText:SetAlpha(0.3)
-        end
-    end
-
-    row:SetScript("OnClick", function()
-        if not MacUIDB then return end
-        if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
-
-        -- Toggle logic: For defaults, nil is "true".
-        local current = MacUIDB.trackedAbilities[ability.spellID]
-        if current == nil then current = true end
-        
-        local isNowEnabled = not current
-        MacUIDB.trackedAbilities[ability.spellID] = isNowEnabled
-        UpdateVisual(isNowEnabled)
-
-        -- Rebuild the tracker UI immediately
-        if addonTable.RebuildTrackerUI then
-            addonTable.RebuildTrackerUI()
         end
     end)
 
@@ -751,7 +716,7 @@ local function BuildAbilityCheckboxes()
     if specDefaults then
         for _, ability in ipairs(specDefaults) do
             visibleIndex = visibleIndex + 1
-            local yOffset = -148 - ((visibleIndex - 1) * 24) -- Unified 24px rhythm
+            local yOffset = -148 - ((visibleIndex - 1) * 40) -- 40px Module Rhythm
             local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
             table.insert(abilityCheckboxes, row)
         end

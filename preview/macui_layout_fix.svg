@@ -1,0 +1,21 @@
+<svg width="400" height="200" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="200" fill="#0F172A"/>
+
+  <!-- THE PROBLEM: OVERLAP -->
+  <text x="20" y="25" font-family="Arial Narrow" font-size="10" fill="#EF4444">CURRENT ISSUE: OVERLAP</text>
+  <rect x="20" y="35" width="260" height="36" stroke="#D1D5DB" fill="#1E293B"/>
+  <rect x="28" y="41" width="24" height="24" fill="#020617"/> <!-- Icon -->
+  <!-- Overlapping Text -->
+  <text x="60" y="48" font-family="Arial Narrow" font-size="12" fill="#D1D5DB" font-weight="bold">Shield Block</text>
+  <text x="60" y="52" font-family="Arial Narrow" font-size="9" fill="#6B7280" opacity="0.8">SOUND: Raid Warning</text>
+  <line x1="60" y1="50" x2="160" y2="50" stroke="#EF4444" stroke-width="1"/>
+
+  <!-- THE FIX: PROPER SPACING -->
+  <text x="20" y="110" font-family="Arial Narrow" font-size="10" fill="#10B981">THE FIX: VERTICAL RHYTHM</text>
+  <rect x="20" y="120" width="260" height="36" stroke="#D1D5DB" fill="#1E293B"/>
+  <rect x="28" y="126" width="24" height="24" fill="#020617"/> <!-- Icon -->
+  <!-- Correctly Spaced Text -->
+  <text x="60" y="138" font-family="Arial Narrow" font-size="12" fill="#D1D5DB" font-weight="bold">Shield Block</text>
+  <text x="60" y="152" font-family="Arial Narrow" font-size="9" fill="#6B7280">SOUND: Raid Warning</text>
+</svg>

@@ -42,6 +42,7 @@ frame:SetScript("OnEvent", function(self, event, arg1)
         if not MacUIDB then MacUIDB = {} end
         if not MacUIDB.audioAlerts then MacUIDB.audioAlerts = {} end
         if not MacUIDB.customAbilities then MacUIDB.customAbilities = {} end
+        if not MacUIDB.minimap then MacUIDB.minimap = { angle = 45 } end
         
         -- Unregister the event since we only need it once
         self:UnregisterEvent("ADDON_LOADED")

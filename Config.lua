@@ -7,7 +7,10 @@ local math = math
 local tonumber = tonumber
 local pairs = pairs
 local ipairs = ipairs
+local table = table
 local GetSpellInfo = C_Spell and C_Spell.GetSpellInfo or GetSpellInfo
+local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
+local PlaySound = PlaySound
 local print = print
 local string = string
 
@@ -18,6 +21,7 @@ SLASH_MACUI1 = "/macui"
 local configFrame = CreateFrame("Frame")
 
 -- Applies the saved font size to all registered font strings
+
 local function ApplyFontSize(size)
     if not size or size <= 0 then return end
     if not MacUIDB then return end
@@ -112,6 +116,9 @@ optionsPanel:SetScript("OnDragStart", optionsPanel.StartMoving)
 optionsPanel:SetScript("OnDragStop", optionsPanel.StopMovingOrSizing)
 optionsPanel:SetFrameStrata("DIALOG")
 
+-- Expose options panel to addonTable AFTER creation (Issue #1 fix)
+addonTable.optionsPanel = optionsPanel
+
 -- Solid black backdrop, no edge
 optionsPanel:SetBackdrop({
     bgFile = "Interface\\Buttons\\WHITE8x8",
@@ -173,14 +180,36 @@ local function CreatePillButton(parent, text)
     return btn
 end
 
+-- Expose Lock/Unlock to addonTable for MinimapButton (Issue #7 fix)
+addonTable.UnlockFrames = UnlockFrames
+addonTable.LockFrames = LockFrames
+addonTable.IsUnlocked = false
+
+local function ToggleLock()
+    if addonTable.IsUnlocked then
+        LockFrames()
+        addonTable.IsUnlocked = false
+    else
+        UnlockFrames()
+        addonTable.IsUnlocked = true
+    end
+end
+addonTable.ToggleLock = ToggleLock
+
 -- Buttons — side by side
 local btnUnlock = CreatePillButton(optionsPanel, "UNLOCK")
 btnUnlock:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -55)
-btnUnlock:SetScript("OnClick", function() UnlockFrames() end)
+btnUnlock:SetScript("OnClick", function()
+    UnlockFrames()
+    addonTable.IsUnlocked = true
+end)
 
 local btnLock = CreatePillButton(optionsPanel, "LOCK")
 btnLock:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -20, -55)
-btnLock:SetScript("OnClick", function() LockFrames() end)
+btnLock:SetScript("OnClick", function()
+    LockFrames()
+    addonTable.IsUnlocked = false
+end)
 
 -- Font Size section (Compact)
 local fontGroup = CreateFrame("Frame", nil, optionsPanel)
@@ -447,7 +476,7 @@ local abilityCheckboxes = {}
 -- Forward declare input frame
 local customAbilityInput
 
--- Build checkboxes for the player's class (filtered by current spec)
+-- Build checkboxes (Custom Abilities Only)
 local function BuildAbilityCheckboxes()
     -- Clear existing checkboxes
     for _, row in ipairs(abilityCheckboxes) do
@@ -455,23 +484,8 @@ local function BuildAbilityCheckboxes()
     end
     abilityCheckboxes = {}
 
-    local classAbilities = addonTable.AbilityRegistry and addonTable.AbilityRegistry[addonTable.playerClass]
-    if not classAbilities then return end
-
-    local currentSpec = addonTable.playerSpec
     local visibleIndex = 0
 
-    for _, ability in ipairs(classAbilities) do
-        -- Only show abilities relevant to the current spec (or spec-agnostic)
-        local specMatch = (ability.spec == nil) or (ability.spec == currentSpec)
-        if specMatch then
-            visibleIndex = visibleIndex + 1
-            local yOffset = -175 - ((visibleIndex - 1) * 24)
-            local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
-            table.insert(abilityCheckboxes, row)
-        end
-    end
-    
     -- Custom Abilities
     if MacUIDB and MacUIDB.customAbilities then
         for spellID, isTracked in pairs(MacUIDB.customAbilities) do
@@ -487,8 +501,26 @@ local function BuildAbilityCheckboxes()
         end
     end
     
+    -- Empty State Message
+    local emptyStateMessage = optionsPanel.emptyStateMessage
+    if not emptyStateMessage then
+        emptyStateMessage = optionsPanel:CreateFontString(nil, "OVERLAY")
+        emptyStateMessage:SetFont("Fonts\\FRIZQT__.TTF", 10)
+        emptyStateMessage:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -175)
+        emptyStateMessage:SetText("|cFF888888You are not tracking any abilities.\nShift-Click a spell from your spellbook\nbelow to get started.|r")
+        optionsPanel.emptyStateMessage = emptyStateMessage
+    end
+    
     -- Position Smart Input Box
     local inputYOffset = -175 - (visibleIndex * 24) - 5
+    
+    if visibleIndex == 0 then
+        emptyStateMessage:Show()
+        inputYOffset = -175 - 40 - 5 -- Move below the 3-line message
+    else
+        emptyStateMessage:Hide()
+    end
+    
     if not customAbilityInput then
         customAbilityInput = CreateFrame("EditBox", nil, optionsPanel, "InputBoxTemplate")
         customAbilityInput:SetSize(150, 20)

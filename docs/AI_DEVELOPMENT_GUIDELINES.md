@@ -28,25 +28,65 @@ This document contains rules and best practices that the AI assistant must verif
 
 ## 5. Code Hygiene & Review Lessons
 - **Cache immutable values at load time:** Data that never changes during a session (e.g., `UnitClass("player")`, `GetRealmName()`) must be read once at the top of the file and stored in a local variable. Never call these inside event handlers or `OnUpdate` scripts.
-- **Consistent upvaluing in every file:** Even files that only run once at load time should upvalue their globals (e.g., `local CreateFrame = CreateFrame`). This keeps the codebase consistent and makes it easier to spot actual global namespace leaks.
+- **Consistent upvaluing in every file:** Even files that only run once at load time should upvalue their globals (e.g., `local CreateFrame = CreateFrame`). This keeps the codebase consistent and makes it easier to spot actual global namespace leaks. **Common missed upvalues include: `table`, `math`, `pairs`, `ipairs`, `tonumber`, `print`, `PlaySound`, `GetSpellTexture`.**
 - **No dead code:** Variables that are set but never read, or functions that are defined but never called, must be removed. Dead code creates confusion and false assumptions about what the code does.
+- **No duplicate declarations:** Never declare the same `local` variable twice in the same file scope. The second declaration shadows the first, creating dead code and masking the original. Use `grep` to verify before adding new upvalues.
 - **Defensive guards on SavedVariables:** Always check that `MacUIDB` exists before writing to it. SavedVariables are `nil` until `ADDON_LOADED` fires, so any function that could theoretically be called early must guard against this.
 - **Comment intentional exceptions:** If you must break a guideline (e.g., creating `SLASH_` globals for the WoW slash command API), add a comment explaining why it is an intentional exception. This prevents future reviewers from "fixing" something that isn't broken.
 
 ## 6. API Version Compatibility
 - **Use safe fallbacks for deprecated APIs:** When Blizzard moves an API from the global namespace into a `C_` namespace (e.g., `GetSpellCharges` → `C_Spell.GetSpellCharges`), use a fallback pattern: `local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges`. This ensures the addon works across patch boundaries.
 - **Verify API changes before each major patch:** Before a new WoW patch drops, search Blizzard's patch notes and the community API changelog for any renamed, moved, or removed functions that the addon currently uses.
+- **Check return value types after API migrations:** When an API migrates to a `C_` namespace, the return value often changes from positional returns to a table. For example, `C_Spell.GetSpellCharges()` returns a `chargesInfo` table with `.currentCharges`, `.maxCharges`, etc., NOT the raw numbers that the old `GetSpellCharges()` returned. Always verify the new return signature in the API docs.
 
 ## 7. Frame Pooling & Dynamic UI
 - **Always pool dynamically created frames:** When UI elements are created and destroyed repeatedly (e.g., toggling tracked abilities), maintain a frame pool (`table.insert` on hide, `table.remove` on reuse). Never rely on creating new frames endlessly — the WoW client does not garbage-collect frames, so orphaned frames leak memory permanently.
 - **Minimize work in factory functions:** If a factory function sets properties (like anchor points) that are immediately overridden by the caller, remove the redundant work from the factory. The caller should be responsible for positioning.
 
 ## 8. Event Handler Consolidation
-- **Prefer a single `ADDON_LOADED` handler:** Ideally only `MacUI.lua` should register for `ADDON_LOADED`. After initializing `MacUIDB`, it should call init functions exposed by other modules via `addonTable`. This prevents N frames all listening for the same one-shot event. If multiple handlers are necessary, document why.
+- **Prefer a single `ADDON_LOADED` handler:** Ideally only `MacUI.lua` should register for `ADDON_LOADED`. After initializing `MacUIDB`, it should call init functions exposed by other modules via `addonTable`. This prevents N frames all listening for the same one-shot event. If multiple handlers are necessary, **document why** with a comment like: `-- NOTE (Guideline #8 exception): ...`
 - **Avoid duplicate event listeners for the same data:** If two modules both need to react to `UNIT_AURA` for the same spell, consider having one module update a shared state in `addonTable` that the other reads, rather than both independently querying the API.
 
 ## 9. Class & Spec Awareness
-- **Gate class-specific modules at load time:** Use `UnitClass("player")` at the top of a file and `return` early if the class doesn't match. This prevents the entire file from executing and registering unnecessary events.
+- **Gate class-specific modules at load time:** Use `UnitClass("player")` at the top of a file and `return` early if the class doesn't match. This prevents the entire file from executing and registering unnecessary events. **This applies to ALL class-specific files, including utility frames like `Square.lua`, not just dedicated tracker modules.**
 - **Check spec at runtime, not load time:** Unlike class, the player's spec can change mid-session. Use `GetSpecialization()` after `PLAYER_ENTERING_WORLD` and listen for `PLAYER_SPECIALIZATION_CHANGED` to stay current. Never hardcode spec checks at file load time.
-- **Tag abilities with spec in the registry:** When defining trackable abilities in `AbilityRegistry.lua`, include an optional `spec` field. This allows the UI to automatically filter abilities that don't apply to the player's current spec (e.g., hiding Shield Block for Arms Warriors).
-- **Rebuild UI on spec change:** Any UI that filters by spec (ability checkboxes, tracker indicators) must register a callback on `addonTable.OnSpecChanged` and rebuild itself when the player respeccs.
+- **Always add a spec-aware `RebuildTracker()` function:** Every class module must implement a function that shows/hides the tracker based on `addonTable.playerSpec` and hook it into `addonTable.OnSpecChanged`. Do NOT process events for the wrong spec — guard every event handler with a spec check.
+- **Custom abilities are user-managed:** Users add their own tracked abilities via the Smart Input Box in the Config Panel. The data is stored in `MacUIDB.customAbilities`. There is no hardcoded ability registry.
+
+## 10. Variable Scope & Lua Pitfalls
+- **Always declare loop/timer variables with `local` or as `self` properties:** A common and dangerous Lua bug is forgetting `local` on a variable inside an `OnUpdate` closure. Without `local`, the variable writes to the WoW **global** namespace on every single frame render. Use `self.timerVar` (attached to the frame) to safely store per-frame state inside closures.
+  ```lua
+  -- ❌ WRONG: global namespace pollution
+  tracker:SetScript("OnUpdate", function(self, elapsed)
+      updateTimer = updateTimer + elapsed  -- writes to _G.updateTimer!
+  end)
+
+  -- ✅ CORRECT: scoped to the frame
+  tracker:SetScript("OnUpdate", function(self, elapsed)
+      if not self.updateTimer then self.updateTimer = 0 end
+      self.updateTimer = self.updateTimer + elapsed
+  end)
+  ```
+- **Never reference a `local` variable before its declaration:** Lua locals are scoped from their declaration line downward. If you assign `addonTable.foo = someLocal` *before* `local someLocal = CreateFrame(...)`, `addonTable.foo` will be `nil`. Always ensure the variable exists before exporting it.
+  ```lua
+  -- ❌ WRONG: optionsPanel is nil at this point
+  addonTable.optionsPanel = optionsPanel
+  local optionsPanel = CreateFrame("Frame", ...)
+
+  -- ✅ CORRECT: export after creation
+  local optionsPanel = CreateFrame("Frame", ...)
+  addonTable.optionsPanel = optionsPanel
+  ```
+- **Expose shared functions to `addonTable` explicitly:** If Module A defines a function that Module B needs (e.g., `ToggleLock` for the MinimapButton), you **must** assign it to `addonTable` after the function is defined. Simply defining it as `local` makes it invisible to other files. Always verify the export actually happened by checking the consuming module's usage.
+
+## 11. Pre-Commit Review Checklist
+Before finalizing any code change, verify the following:
+- [ ] Every global API function used in the file is upvalued at the top.
+- [ ] No `local` variable is declared twice in the same scope.
+- [ ] All `OnUpdate` timer variables use `self.varName`, never bare names.
+- [ ] All `addonTable` exports reference variables that are already initialized (not nil).
+- [ ] Class-specific files early-return if `playerClass` doesn't match.
+- [ ] Spec-sensitive logic checks `addonTable.playerSpec` and hooks `OnSpecChanged`.
+- [ ] Any `C_` API migration uses the correct return type (table vs positional).
+- [ ] Any intentional guideline exception has a `-- NOTE (Guideline #N exception):` comment.
+- [ ] Documentation in this file reflects the current architecture (no deleted file references).

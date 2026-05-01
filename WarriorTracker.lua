@@ -17,6 +17,7 @@ local GetTime = GetTime
 local string = string
 local tostring = tostring
 local UIParent = UIParent
+local table = table
 
 -- Spell IDs for accurate tracking regardless of client language
 local SPELL_IGNORE_PAIN = 190456
@@ -75,7 +76,8 @@ local function UpdateIgnorePain()
 end
 
 local function UpdateShieldBlockCharges()
-    local charges = GetSpellCharges(SPELL_SHIELD_BLOCK) or 0
+    local chargesInfo = GetSpellCharges(SPELL_SHIELD_BLOCK)
+    local charges = chargesInfo and chargesInfo.currentCharges or 0
     -- Silver/Blue
     sbChargesText:SetText(string.format("|cFF88AAFFSB Charges: %d|r", charges))
 end
@@ -98,10 +100,11 @@ local function UpdateShieldBlockBuff()
     if auraData then
         if not tracker.onUpdateActive then
             tracker:SetScript("OnUpdate", function(self, elapsed)
-                updateTimer = updateTimer + elapsed
-                if updateTimer > 0.1 then
+                if not self.updateTimer then self.updateTimer = 0 end
+                self.updateTimer = self.updateTimer + elapsed
+                if self.updateTimer > 0.1 then
                     UpdateShieldBlockBuff()
-                    updateTimer = 0
+                    self.updateTimer = 0
                 end
             end)
             tracker.onUpdateActive = true
@@ -114,6 +117,26 @@ local function UpdateShieldBlockBuff()
     end
 end
 
+-- Spec-aware rebuild: show only for Protection (spec 3)
+local function RebuildTracker()
+    if addonTable.playerSpec == 3 then
+        tracker:Show()
+        UpdateRage()
+        UpdateIgnorePain()
+        UpdateShieldBlockCharges()
+        UpdateShieldBlockBuff()
+    else
+        tracker:Hide()
+        tracker:SetScript("OnUpdate", nil)
+        tracker.onUpdateActive = false
+    end
+end
+
+-- Hook into the spec change callback system
+table.insert(addonTable.OnSpecChanged, function()
+    RebuildTracker()
+end)
+
 -- Event Registration
 tracker:RegisterEvent("UNIT_POWER_UPDATE")
 tracker:RegisterEvent("UNIT_AURA")
@@ -123,17 +146,15 @@ tracker:RegisterEvent("PLAYER_ENTERING_WORLD")
 -- Event Handler
 tracker:SetScript("OnEvent", function(self, event, unit, powerType)
     if event == "PLAYER_ENTERING_WORLD" then
-        UpdateRage()
-        UpdateIgnorePain()
-        UpdateShieldBlockCharges()
-        UpdateShieldBlockBuff()
+        RebuildTracker()
     elseif event == "UNIT_POWER_UPDATE" and unit == "player" and powerType == "RAGE" then
-        UpdateRage()
+        if addonTable.playerSpec == 3 then UpdateRage() end
     elseif event == "UNIT_AURA" and unit == "player" then
-        UpdateIgnorePain()
-        -- Shield Block buff is also updated here when initially applied or removed
-        UpdateShieldBlockBuff()
+        if addonTable.playerSpec == 3 then
+            UpdateIgnorePain()
+            UpdateShieldBlockBuff()
+        end
     elseif event == "SPELL_UPDATE_CHARGES" then
-        UpdateShieldBlockCharges()
+        if addonTable.playerSpec == 3 then UpdateShieldBlockCharges() end
     end
 end)

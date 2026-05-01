@@ -5,9 +5,13 @@ local UIParent = UIParent
 local UnitAffectingCombat = UnitAffectingCombat
 local C_UnitAuras = C_UnitAuras
 local UnitClass = UnitClass
+local table = table
 
 -- Cache the player's class once at load time (it never changes)
 local _, playerClass = UnitClass("player")
+
+-- Only load for Warriors (Issue #8 fix: early-return like other class modules)
+if playerClass ~= "WARRIOR" then return end
 
 local SPELL_SHIELD_BLOCK = 2565
 
@@ -31,7 +35,6 @@ squareFrame:SetBackdropBorderColor(1, 1, 1, 1) -- White border (R, G, B, Alpha)
 -- Logic to change color based on Combat and Shield Block status
 local function UpdateSquareColor()
     -- Only run for Protection Warriors (spec 3)
-    if playerClass ~= "WARRIOR" then return end
     if addonTable.playerSpec ~= 3 then
         -- Not Protection spec — stay black
         squareFrame:SetScript("OnUpdate", nil)

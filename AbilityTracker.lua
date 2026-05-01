@@ -24,8 +24,7 @@ table.insert(addonTable.MovableFrames, trackerGroup)
 local indicatorFrames = {}
 local framePool = {}
 
--- Safe fallback for GetSpellTexture (12.0.5 API compatibility)
-local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
+-- NOTE: GetSpellTexture is already upvalued on line 11. Do not redeclare.
 
 local ICON_SIZE = 28
 local PADDING = 4
@@ -162,37 +161,7 @@ local function RebuildTrackerUI()
 
     if not MacUIDB or not MacUIDB.trackedAbilities then return end
 
-    -- Get the abilities for the player's class
-    local classAbilities = addonTable.AbilityRegistry and addonTable.AbilityRegistry[playerClass]
-    if not classAbilities then return end
-
-    local currentSpec = addonTable.playerSpec
-
     local index = 0
-    for _, ability in ipairs(classAbilities) do
-        -- Only show abilities that match the player's current spec (or have no spec requirement)
-        local specMatch = (ability.spec == nil) or (ability.spec == currentSpec)
-
-        if MacUIDB.trackedAbilities[ability.spellID] and specMatch then
-            index = index + 1
-
-            -- Reuse a pooled frame or create a new one
-            local row = table.remove(framePool) or CreateIndicatorRow(trackerGroup)
-            row:ClearAllPoints()
-            row:SetPoint("TOPLEFT", trackerGroup, "TOPLEFT", 0, -((index - 1) * (ICON_SIZE + PADDING)))
-            row.spellID = ability.spellID
-            row.abilityType = ability.type
-
-            -- Set the spell icon texture
-            local iconTexture = GetSpellTexture(ability.spellID)
-            if iconTexture then
-                row.icon:SetTexture(iconTexture)
-            end
-
-            row:Show()
-            table.insert(indicatorFrames, row)
-        end
-    end
     
     -- Process Custom Abilities
     if MacUIDB and MacUIDB.customAbilities then
@@ -251,6 +220,11 @@ trackerGroup:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 trackerGroup:RegisterEvent("PLAYER_REGEN_DISABLED")
 trackerGroup:RegisterEvent("PLAYER_REGEN_ENABLED")
 trackerGroup:RegisterEvent("PLAYER_ENTERING_WORLD")
+-- NOTE (Guideline #8 exception): This module uses its own ADDON_LOADED handler
+-- because it needs MacUIDB.trackedAbilities to exist before calling RebuildTrackerUI().
+-- MacUI.lua initializes the core DB, but this module must independently verify its own
+-- subset of keys before building UI elements. Consolidating would require a callback
+-- system that adds complexity without meaningful performance gain for a one-shot event.
 trackerGroup:RegisterEvent("ADDON_LOADED")
 
 -- Event Handler

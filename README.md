@@ -1,110 +1,72 @@
 # MacUI
 
-A sleek, lightweight, and highly optimized custom user interface for World of Warcraft (Midnight 12.0.5+ API compliant). Designed for power users who want a brutalist, distraction-free combat tracking system with zero external dependencies.
+A high-performance, ultra-compact user interface for World of Warcraft (Midnight 12.0.5+ API compliant). Designed with a **Brutalist** aesthetic, MacUI provides a distraction-free, typography-driven combat dashboard with zero external dependencies.
 
-## Features
+## Design Philosophy
 
-### 🎯 Fully Independent Element Positioning
-Every single UI element — text readouts, spell icons, and the status square — is its own independent, draggable frame. Place each one anywhere on your screen and lock it. Positions are saved per-frame across sessions.
+MacUI is built on the principles of **Minimalism** and **Vertical Rhythm**:
+- **Pure White Contrast**: High-contrast pure white typography on a solid black background.
+- **Rhythmic Spacing**: Every element is aligned to a strict vertical rhythm (24px section gaps, 12px content gaps).
+- **Brutalist Hierarchy**: Information is presented with raw honesty—bold labels, sharp borders, and zero decorative fluff.
 
-### 📊 Dynamic Ability Tracker
-A modular, user-driven tracking system. Add *any* spell in the game via the Smart Input Box. Each tracked ability becomes its own icon on screen with a built-in state machine:
-- 🟢 **Green Border:** Ability/Buff is currently active on you.
-- 🔴 **Red Border (Desaturated Icon):** Mitigation missing while in combat!
-- ⚪ **Gray Border:** Out of combat / Neutral state.
+## Key Features
 
-### 🎨 Brutalist Configuration Menu
-Type `/macui` or click the minimap button to open a minimalist, brutalist UI panel:
-- **Lock / Unlock Frames:** Unlock to drag any element independently. Lock to save all positions.
-- **Font Size Slider:** Scale all text readouts globally.
-- **Smart Input Box:** Shift-Click a spell from your spellbook, or type an exact Spell ID.
-- **Audio Alarm Dropdown:** Click `[A]` next to any ability to assign a warning sound. If you're in combat and missing that buff, the alarm pulses every 3 seconds.
-- **Empty State:** New users see a friendly onboarding message guiding them to add their first ability.
+### 📐 Ultra-Compact Configuration
+Access your settings via `/macui` or the custom minimap button. The config panel has been refined for maximum efficiency:
+- **Pro Header**: `LOCKED`, `RELOAD`, and `CLOSE` actions are integrated into a single top-right micro-bar.
+- **Binary Status**: A single, state-aware button toggles between `[ UNLOCKED ]` (Inverted for editing) and `LOCKED` (Standard for combat).
+- **Checklist Tracking**: Use the intuitive `[X]` checklist to toggle custom spell tracking.
 
-### ⚔️ Class Modules (Independent Text Frames)
-Each data element is its own freely positionable frame:
+### 📊 Spec-Aware Player Stats
+Real-time tracking of your most critical metrics, optimized for the 12.0.5 API:
+- **Shorthand Formatting**: Large values (like Health or Ignore Pain) are automatically formatted to `k` and `m` shorthand (e.g., `1.2m`, `450k`) for instant readability.
+- **Dynamic Hierarchy**: Stat cards display the category (Health, Resource, Power) at the top and the specific spec name (Health, Rage, Ignore Pain) at the bottom.
+- **Color-Coded Values**: Stat values use spec-appropriate colors (Green, Red, Orange, Blue) for clear visual distinction without cluttering the UI.
 
-**Warrior (Protection):**
-| Frame | Content |
-|-------|---------|
-| `MacUIWarriorRage` | Current Rage |
-| `MacUIWarriorIgnorePain` | Ignore Pain absorb value |
-| `MacUIWarriorSBCharges` | Shield Block charges |
-| `MacUIWarriorSBBuff` | Shield Block buff timer |
+### ⚔️ Specialized Protection Modules
+Deeply integrated support for Protection Warriors and Paladins:
+- **Ignore Pain Tracking**: Secure, aura-based absorb tracking that avoids "Secret Number" taint errors.
+- **Shield Block Integration**: Independent tracking of Shield Block charges and active buff durations.
+- **Holy Power & SotR**: Minimalist tracking for Protection Paladin resources.
 
-**Paladin (Protection):**
-| Frame | Content |
-|-------|---------|
-| `MacUIPaladinHolyPower` | Holy Power count |
-| `MacUIPaladinSotR` | Shield of the Righteous timer |
-| `MacUIPaladinConsecration` | Consecration active/inactive |
-
-**All Classes:**
-| Frame | Content |
-|-------|---------|
-| `MacUIPlayerHealth` | Health percentage |
-
-### 🗺️ Minimap Integration
-- **AddonCompartment (Modern):** Native 10.0+ dropdown entry — no button needed.
-- **Classic Draggable Button:** A legacy minimap icon for users who prefer a visible button. Drag it around the minimap ring.
-- **Left-Click:** Toggle config panel. **Right-Click:** Lock/Unlock frames.
-
-### 🔊 Audio Warning System
-Event-driven, non-polling audio alerts. Assign sounds per-ability from the config panel. The system only activates its timer loop when at least one tracked ability is red — zero CPU cost otherwise.
-
----
-
-## Previews
-
-### Empty State (First Launch)
-![Empty State](preview/config_empty_state.svg)
-*When no abilities are tracked, a friendly message guides new users to Shift-Click a spell from their spellbook.*
-
-### Active Config (Abilities Added)
-![Active State](preview/config_active_state.svg)
-*Three abilities tracked: Shield Block (with audio alert enabled), Ignore Pain, and Last Stand. Check/uncheck to toggle tracking. Click `X` to remove.*
-
-### Full Independent Layout
-![Full Layout](preview/macui_independent_layout.svg)
-*Every element is independently draggable. Text readouts, ability icons, and the status square can be placed anywhere on screen. Positions persist across sessions via `MacUIDB.positions`.*
-
-### Live Combat Simulation
-![Combat Demo](preview/macui_animated_demo.svg)
-*The state machine reacting to combat: green when buffed, red+desaturated when missing, gray when out of combat.*
-
----
-
-## Installation
-1. Download or clone this repository.
-2. Place the `MacUI` folder inside your `World of Warcraft/_retail_/Interface/AddOns/` directory.
-3. Log into the game and ensure the addon is enabled in your character select screen.
-4. Type `/macui` in chat or click the minimap button to begin customizing your UI!
+### 🗺️ Minimap & Branding
+- **Brutalist "M" Icon**: A custom, flipped-W logo for the minimap.
+- **Independent Layout**: Every stat readout and ability icon is an independent frame. Unlock to drag them anywhere; Lock to save them forever.
 
 ## Architecture
 
 ```
 MacUI/
-├── MacUI.lua              # Core event handler, DB init, spec change system
-├── Config.lua             # Options panel, Lock/Unlock, font slider, Smart Input
-├── AbilityTracker.lua     # Custom spell tracking with independent draggable icons
-├── Animations.lua         # Reusable animation functions (PulseRed)
-├── Square.lua             # Warrior Shield Block status indicator
-├── PlayerHealth.lua       # Player health percentage (independent frame)
-├── WarriorTracker.lua     # 4 independent frames: Rage, IP, SB Charges, SB Buff
-├── PaladinTracker.lua     # 3 independent frames: Holy Power, SotR, Consecration
-├── MinimapButton.lua      # AddonCompartment + legacy draggable minimap button
-├── .github/
-│   ├── AI_DEVELOPMENT_GUIDELINES.md  # Coding standards & API reference
-│   └── copilot-instructions.md       # GitHub Copilot instructions
-├── .cursorrules           # Cursor AI instructions
-└── AGENTS.md              # Gemini/Antigravity instructions
+├── MacUI.lua              # Core registry, FormatNumber helper, Spec change logic
+├── Config.lua             # Ultra-compact options panel & UI layout
+├── PlayerStats.lua        # Health, Resource, and Power (Ignore Pain) tracking
+├── ClassMechanics.lua     # Class-specific aura tracking (Shield Block, etc.)
+├── AbilityTracker.lua     # Draggable custom spell icons with state machine
+├── Animations.lua         # PulseRed and Fade effects
+├── Square.lua             # Minimalist Shield Block status indicator
+└── MinimapButton.lua      # Custom "M" icon & AddonCompartment integration
 ```
 
-## Key Technical Details
-- **Zero Dependencies:** No Ace3, no LibDataBroker, no external libraries.
-- **12.0.5 API Compliant:** All `C_Spell`, `C_UnitAuras` APIs use modern table returns.
-- **Performance:** All globals upvalued, `OnUpdate` throttled and disabled when inactive, frames pooled.
-- **SavedVariables:** `MacUIDB` stores positions, font size, tracked abilities, audio settings, and minimap angle.
+## Technical Details
+- **Zero Dependencies**: No Ace3, no LibDataBroker.
+- **12.0.5 Compliant**: Uses modern `C_Spell` and `C_UnitAuras` table returns.
+- **Taint-Aware**: Uses safe number formatting to avoid protected value restrictions in combat.
+- **Performance**: Throttled `OnUpdate` handlers and upvalued globals for maximum FPS.
+
+## Previews
+
+### Final Compact UI
+![Compact UI](preview/config_ui_final_compact.svg)
+*The final ultra-compact layout featuring the header-integrated lock toggle and slim stat cards.*
+
+### Spacing & Rhythm Analysis
+![Spacing Analysis](preview/config_ui_v6_analysis.svg)
+*MacUI follows a strict 24px/12px vertical rhythm for a professional, "locked-in" feel.*
+
+## Installation
+1. Place the `MacUI` folder in `_retail_/Interface/AddOns/`.
+2. Type `/macui` or click the minimap icon to open the panel.
+3. **Shift-Click** any spell from your spellbook into the input box to track it.
 
 ## License
 See [LICENSE](LICENSE) for details.

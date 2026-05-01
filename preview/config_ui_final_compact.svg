@@ -1,0 +1,46 @@
+<svg width="300" height="320" viewBox="0 0 300 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="320" fill="#050505"/>
+  <rect x="0.5" y="0.5" width="299" height="319" stroke="#222222"/>
+  
+  <text x="16" y="28" fill="white" font-family="Arial Narrow" font-size="16" font-weight="bold">MACUI</text>
+  
+  <!-- Header Bar Buttons -->
+  <rect x="116" y="14" width="54" height="18" fill="white"/>
+  <text x="143" y="27" fill="black" font-family="Arial Narrow" font-size="8" text-anchor="middle">UNLOCKED</text>
+  
+  <rect x="174" y="14" width="54" height="18" stroke="white"/>
+  <text x="201" y="27" fill="white" font-family="Arial Narrow" font-size="8" text-anchor="middle">RELOAD</text>
+  
+  <rect x="232" y="14" width="52" height="18" stroke="white"/>
+  <text x="258" y="27" fill="white" font-family="Arial Narrow" font-size="8" text-anchor="middle">CLOSE</text>
+
+  <!-- Player Stats Section -->
+  <text x="20" y="50" fill="white" font-family="Arial Narrow" font-size="10">PLAYER STATS</text>
+  
+  <!-- Health Card -->
+  <rect x="20" y="68" width="80" height="40" stroke="white"/>
+  <text x="60" y="78" fill="white" font-family="Arial Narrow" font-size="8" text-anchor="middle">Health</text>
+  <text x="60" y="100" fill="#00FF00" font-family="Arial Narrow" font-size="9" text-anchor="middle">Health</text>
+  
+  <!-- Resource Card -->
+  <rect x="110" y="68" width="80" height="40" stroke="white"/>
+  <text x="150" y="78" fill="white" font-family="Arial Narrow" font-size="8" text-anchor="middle">Resource</text>
+  <text x="150" y="100" fill="#FF0000" font-family="Arial Narrow" font-size="9" text-anchor="middle">Rage</text>
+  
+  <!-- Power Card -->
+  <rect x="200" y="68" width="80" height="40" stroke="white"/>
+  <text x="240" y="78" fill="white" font-family="Arial Narrow" font-size="8" text-anchor="middle">Power</text>
+  <text x="240" y="100" fill="#FF8000" font-family="Arial Narrow" font-size="9" text-anchor="middle">Ignore Pain</text>
+
+  <!-- Ability Tracking Section -->
+  <text x="20" y="132" fill="white" font-family="Arial Narrow" font-size="10">ABILITY TRACKING</text>
+  
+  <!-- Ability Items -->
+  <rect x="20" y="150" width="12" height="12" stroke="white"/>
+  <text x="26" y="160" fill="white" font-family="Arial Narrow" font-size="10" text-anchor="middle">X</text>
+  <text x="40" y="160" fill="white" font-family="Arial Narrow" font-size="10">Shield Block</text>
+  
+  <rect x="20" y="174" width="12" height="12" stroke="white"/>
+  <text x="26" y="184" fill="white" font-family="Arial Narrow" font-size="10" text-anchor="middle">X</text>
+  <text x="40" y="184" fill="white" font-family="Arial Narrow" font-size="10">Spell Block</text>
+</svg>

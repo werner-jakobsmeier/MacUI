@@ -299,10 +299,11 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
     tile.color = defaultColor
     
     local function UpdateVisual(isEnabled)
+        local c = tile.color or defaultColor
         if isEnabled then
             tile:SetBackdropColor(0.06, 0.06, 0.06, 1)
-            tile:SetBackdropBorderColor(defaultColor[1], defaultColor[2], defaultColor[3], 1)
-            nameText:SetTextColor(defaultColor[1], defaultColor[2], defaultColor[3])
+            tile:SetBackdropBorderColor(c[1], c[2], c[3], 1)
+            nameText:SetTextColor(c[1], c[2], c[3])
             typeText:SetTextColor(0.4, 0.4, 0.4)
         else
             tile:SetBackdropColor(0.04, 0.04, 0.04, 1)

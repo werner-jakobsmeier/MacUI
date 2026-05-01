@@ -89,7 +89,6 @@ local function UpdateAuras()
         local mech = frame.mech
         local c = mech.color
         local hexColor = string.format("%02x%02x%02x", c[1]*255, c[2]*255, c[3]*255)
-        local prefix = string.format("|cFF%s%s:|r ", hexColor, mech.label)
         
         if mech.type == "absorb" or mech.type == "buff" or mech.type == "active" then
             local auraData = C_UnitAuras.GetPlayerAuraBySpellID(mech.id)
@@ -97,26 +96,26 @@ local function UpdateAuras()
             if mech.type == "absorb" then
                 local absorb = (auraData and auraData.points and auraData.points[1]) or 0
                 if absorb > 0 then
-                    frame.text:SetText(prefix .. string.format("|cFF%s%s|r", hexColor, FormatNumber(absorb)))
+                    frame.text:SetText(string.format("|cFF%s%s|r", hexColor, FormatNumber(absorb)))
                 else
-                    frame.text:SetText(prefix .. string.format("|cFF%s0|r", hexColor))
+                    frame.text:SetText(string.format("|cFF%s0|r", hexColor))
                 end
             elseif mech.type == "active" then
                 if auraData then
-                    frame.text:SetText(prefix .. string.format("|cFF%sActive|r", hexColor))
+                    frame.text:SetText(string.format("|cFF%sActive|r", hexColor))
                 else
-                    frame.text:SetText(string.format("|cFF888888%s: Inactive|r", mech.label))
+                    frame.text:SetText("|cFF8888880|r")
                 end
             elseif mech.type == "buff" then
-                local durationStr = "0.0s"
+                local durationStr = "0.0"
                 if auraData and auraData.expirationTime then
                     local remaining = auraData.expirationTime - GetTime()
                     if remaining > 0 then
-                        durationStr = string.format("%.1fs", remaining)
+                        durationStr = string.format("%.1f", remaining)
                         needsOnUpdate = true
                     end
                 end
-                frame.text:SetText(prefix .. string.format("|cFF%s%s|r", hexColor, durationStr))
+                frame.text:SetText(string.format("|cFF%s%s|r", hexColor, durationStr))
             end
         end
     end
@@ -151,7 +150,7 @@ local function UpdateCharges()
             local chargesInfo = GetSpellCharges(mech.id)
             local charges = chargesInfo and chargesInfo.currentCharges or 0
             
-            frame.text:SetText(string.format("|cFF%s%s: %d|r", hexColor, mech.label, charges))
+            frame.text:SetText(string.format("|cFF%s%d|r", hexColor, charges))
         end
     end
 end

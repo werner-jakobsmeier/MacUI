@@ -18,6 +18,7 @@ if not classInfo then return end -- Should never happen, but safety first
 local function CreateStatFrame(id, defaultX, defaultY)
     local frame = CreateFrame("Frame", "MacUIPlayerStat_" .. id, UIParent)
     frame:SetSize(150, 25)
+    frame:SetFrameStrata("HIGH") -- Ensure it renders above the Blizzard Personal Resource Display
     frame.defaultPoint = {"CENTER", UIParent, "CENTER", defaultX, defaultY}
     table.insert(addonTable.MovableFrames, frame)
 
@@ -60,35 +61,38 @@ end
 local function UpdateHealth()
     if not healthFrame then return end
     
-    local health = UnitHealth("player") or 0
-    local maxHealth = UnitHealthMax("player") or 1
-    if maxHealth <= 0 then maxHealth = 1 end
-    
-    local percent = math.floor((health / maxHealth) * 100)
-    healthFrame.text:SetText(string.format("|cFF00FF00%d%%|r", percent))
+    -- In 12.0.5, both UnitHealth and UnitHealthPercent return "secret number values"
+    -- We cannot perform arithmetic (* 100) on the percentage float.
+    -- We must use the absolute health value directly to avoid Lua taint.
+    local health = UnitHealth("player")
+    if health then
+        healthFrame.text:SetTextColor(0, 1, 0)
+        healthFrame.text:SetText(health)
+    end
 end
 
 local function UpdateResource()
     if not resourceFrame or not classInfo.resource then return end
     
     local pType = GetPowerTypeByName(classInfo.resource.name)
-    local val = pType and UnitPower("player", pType) or 0
-    local c = classInfo.resource.color
-    
-    -- Format number
-    local hexColor = string.format("%02x%02x%02x", c[1]*255, c[2]*255, c[3]*255)
-    resourceFrame.text:SetText(string.format("|cFF%s%d|r", hexColor, val))
+    local val = pType and UnitPower("player", pType)
+    if val then
+        local c = classInfo.resource.color
+        resourceFrame.text:SetTextColor(c[1], c[2], c[3])
+        resourceFrame.text:SetText(val)
+    end
 end
 
 local function UpdatePower()
     if not powerFrame or not classInfo.power then return end
     
     local pType = GetPowerTypeByName(classInfo.power.name)
-    local val = pType and UnitPower("player", pType) or 0
-    local c = classInfo.power.color
-    
-    local hexColor = string.format("%02x%02x%02x", c[1]*255, c[2]*255, c[3]*255)
-    powerFrame.text:SetText(string.format("|cFF%s%d|r", hexColor, val))
+    local val = pType and UnitPower("player", pType)
+    if val then
+        local c = classInfo.power.color
+        powerFrame.text:SetTextColor(c[1], c[2], c[3])
+        powerFrame.text:SetText(val)
+    end
 end
 
 local function RebuildStats()

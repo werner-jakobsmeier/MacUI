@@ -157,11 +157,14 @@ optionsPanel:SetFrameStrata("DIALOG")
 -- Expose options panel to addonTable AFTER creation (Issue #1 fix)
 addonTable.optionsPanel = optionsPanel
 
--- Solid black backdrop, no edge
+-- Solid black backdrop with a stark 2px white border
 optionsPanel:SetBackdrop({
     bgFile = "Interface\\Buttons\\WHITE8x8",
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 2,
 })
 optionsPanel:SetBackdropColor(0, 0, 0, 0.95)
+optionsPanel:SetBackdropBorderColor(1, 1, 1, 1)
 
 -- Split-weight title: bold "MAC" + thin "UI"
 local titleBold = optionsPanel:CreateFontString(nil, "OVERLAY")

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <rect width="800" height="600" fill="#1a1a1a"/>
+  
+  <!-- Minimap -->
+  <circle cx="720" cy="80" r="60" fill="#222" stroke="#444" stroke-width="2"/>
+  
+  <!-- MacUI Minimap Button -->
+  <rect x="650" y="110" width="24" height="24" fill="#000" stroke="#fff" stroke-width="1"/>
+  <text x="662" y="127" font-family="monospace" font-size="14" fill="#fff" text-anchor="middle" font-weight="bold">M</text>
+  
+  <!-- Default Player Stats (Warrior Example) -->
+  <g transform="translate(400, 300)">
+    <!-- Health (-60) -->
+    <text x="0" y="-60" font-family="Arial, sans-serif" font-size="20" fill="#00FF00" text-anchor="middle" font-weight="bold">100%</text>
+    
+    <!-- Rage (-100) -->
+    <text x="0" y="-100" font-family="Arial, sans-serif" font-size="20" fill="#FF0000" text-anchor="middle" font-weight="bold">0</text>
+    
+    <!-- Ignore Pain (-125) -->
+    <text x="0" y="-125" font-family="Arial, sans-serif" font-size="20" fill="#FF8000" text-anchor="middle" font-weight="bold">Ignore Pain: 0</text>
+    
+    <!-- SB Charges (-150) -->
+    <text x="0" y="-150" font-family="Arial, sans-serif" font-size="20" fill="#88AAFF" text-anchor="middle" font-weight="bold">SB Charges: 2</text>
+    
+    <!-- SB Buff (-175) -->
+    <text x="0" y="-175" font-family="Arial, sans-serif" font-size="20" fill="#88AAFF" text-anchor="middle" font-weight="bold">SB Buff: 0.0s</text>
+  </g>
+  
+  <!-- Player Avatar/World placeholder -->
+  <path d="M 370 450 L 430 450 L 400 350 Z" fill="#333" opacity="0.5"/>
+</svg>

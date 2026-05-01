@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <rect width="800" height="600" fill="#1a1a1a"/>
+  
+  <text x="400" y="50" font-family="monospace" font-size="14" fill="#33FF99" text-anchor="middle">MacUI: Frames UNLOCKED.</text>
+  
+  <g transform="translate(400, 300)">
+    
+    <!-- Health -->
+    <g transform="translate(0, -60)">
+      <rect x="-75" y="-15" width="150" height="30" fill="#00FF00" opacity="0.4"/>
+      <text x="0" y="7" font-family="Arial, sans-serif" font-size="20" fill="#00FF00" text-anchor="middle" font-weight="bold">100%</text>
+      <!-- Resize Nodes -->
+      <g transform="translate(55, 5)">
+        <rect x="0" y="0" width="40" height="20" fill="#222" stroke="#666" stroke-width="1"/>
+        <line x1="20" y1="0" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+        <text x="10" y="14" font-family="monospace" font-size="12" fill="#fff" text-anchor="middle">-</text>
+        <text x="30" y="14" font-family="monospace" font-size="12" fill="#fff" text-anchor="middle">+</text>
+      </g>
+    </g>
+
+    <!-- Rage -->
+    <g transform="translate(0, -100)">
+      <rect x="-75" y="-15" width="150" height="30" fill="#00FF00" opacity="0.4"/>
+      <text x="0" y="7" font-family="Arial, sans-serif" font-size="20" fill="#FF0000" text-anchor="middle" font-weight="bold">0</text>
+      <g transform="translate(55, 5)">
+        <rect x="0" y="0" width="40" height="20" fill="#222" stroke="#666" stroke-width="1"/>
+        <line x1="20" y1="0" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+        <text x="10" y="14" font-family="monospace" font-size="12" fill="#fff" text-anchor="middle">-</text>
+        <text x="30" y="14" font-family="monospace" font-size="12" fill="#fff" text-anchor="middle">+</text>
+      </g>
+    </g>
+    
+    <!-- Ignore Pain (Scaled up to show independence) -->
+    <g transform="translate(0, -145) scale(1.2)">
+      <rect x="-75" y="-15" width="150" height="30" fill="#00FF00" opacity="0.4"/>
+      <text x="0" y="7" font-family="Arial, sans-serif" font-size="20" fill="#FF8000" text-anchor="middle" font-weight="bold">Ignore Pain: 0</text>
+      <g transform="translate(55, 5)">
+        <rect x="0" y="0" width="40" height="20" fill="#222" stroke="#666" stroke-width="1"/>
+        <line x1="20" y1="0" x2="20" y2="20" stroke="#666" stroke-width="1"/>
+        <text x="10" y="14" font-family="monospace" font-size="12" fill="#fff" text-anchor="middle">-</text>
+        <text x="30" y="14" font-family="monospace" font-size="12" fill="#fff" text-anchor="middle">+</text>
+      </g>
+    </g>
+
+  </g>
+</svg>

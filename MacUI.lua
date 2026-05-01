@@ -91,6 +91,18 @@ addonTable.ClassMechanics = {
     }
 }
 
+-- Default abilities for the AbilityTracker (toggleable in Config)
+addonTable.DefaultAbilities = {
+    WARRIOR = {
+        [3] = { -- Protection
+            { spellID = 2565, type = "buff", name = "Shield Block" },
+            { spellID = 329121, type = "buff", name = "Spell Block" },
+            { spellID = 12975, type = "buff", name = "Last Stand" },
+            { spellID = 871, type = "buff", name = "Shield Wall" },
+        }
+    }
+}
+
 local function UpdatePlayerSpec()
     local specIndex = GetSpecialization()
     addonTable.playerSpec = specIndex

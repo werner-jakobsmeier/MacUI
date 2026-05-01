@@ -167,7 +167,6 @@ local function RebuildTrackerUI()
     -- Return existing frames to the pool instead of leaking them
     for spellID, indicator in pairs(indicatorFrames) do
         indicator:Hide()
-        -- Unregister from MovableFrames to prevent stale references
         for i, mf in ipairs(addonTable.MovableFrames) do
             if mf == indicator then
                 table.remove(addonTable.MovableFrames, i)
@@ -180,75 +179,67 @@ local function RebuildTrackerUI()
 
     if not MacUIDB or not MacUIDB.trackedAbilities then return end
 
-    local index = 0
-
-    -- Process Custom Abilities
-    if MacUIDB.customAbilities then
-        for spellID, isCustomTracked in pairs(MacUIDB.customAbilities) do
-            -- Only render if the user has checked the box in the config UI
-            if MacUIDB.trackedAbilities[spellID] then
-                index = index + 1
-
-                -- Reuse a pooled frame or create a new one
-                local row = table.remove(framePool) or CreateIndicatorRow()
-
-                -- Give it a unique, persistent name based on spell ID
-                -- so MacUIDB.positions["MacUIIndicator_2565"] persists across sessions
-                local frameName = "MacUIIndicator_" .. spellID
-                -- SetName is not available on generic frames, so we create with name if needed
-                if row:GetName() ~= frameName then
-                    -- We can't rename frames in WoW. If the pooled frame has a different name,
-                    -- create a fresh one with the correct name instead.
-                    row:Hide()
-                    row = CreateFrame("Frame", frameName, UIParent)
-                    row:SetSize(ICON_SIZE, ICON_SIZE)
-
-                    local border = CreateFrame("Frame", nil, row, "BackdropTemplate")
-                    border:SetSize(ICON_SIZE + 4, ICON_SIZE + 4)
-                    border:SetPoint("CENTER", row, "CENTER", 0, 0)
-                    border:SetBackdrop({
-                        edgeFile = "Interface\\Buttons\\WHITE8x8",
-                        edgeSize = 2,
-                    })
-                    border:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-
-                    local icon = row:CreateTexture(nil, "ARTWORK")
-                    icon:SetSize(ICON_SIZE, ICON_SIZE)
-                    icon:SetPoint("CENTER", row, "CENTER", 0, 0)
-                    icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-
-                    row.border = border
-                    row.icon = icon
-                    row.isRed = false
-                    row.audioTimer = 0
-                end
-
-                row.spellID = spellID
-                row.abilityType = "buff"
-
-                local iconTexture = GetSpellTexture(spellID)
-                if not iconTexture then
-                    local spellInfo = GetSpellInfo(spellID)
-                    iconTexture = spellInfo and spellInfo.iconID
-                end
-
-                if iconTexture then
-                    row.icon:SetTexture(iconTexture)
-                end
-
-                -- Apply saved position or default stagger
-                ApplyIndicatorPosition(row, index)
-
-                -- Register for the Lock/Unlock system
-                table.insert(addonTable.MovableFrames, row)
-
-                row:Show()
-                indicatorFrames[spellID] = row
+    local abilitiesToTrack = {}
+    
+    -- 1. Gather Class Defaults
+    local classDefaults = addonTable.DefaultAbilities and addonTable.DefaultAbilities[addonTable.playerClass]
+    local specDefaults = classDefaults and classDefaults[addonTable.playerSpec]
+    if specDefaults then
+        for _, ability in ipairs(specDefaults) do
+            -- Defaults are tracked unless explicitly disabled
+            if MacUIDB.trackedAbilities[ability.spellID] ~= false then
+                table.insert(abilitiesToTrack, { spellID = ability.spellID, type = ability.type })
             end
         end
     end
+    
 
-    -- Force an initial update
+
+    local index = 0
+    for _, ability in ipairs(abilitiesToTrack) do
+        local spellID = ability.spellID
+        index = index + 1
+
+        -- Reuse a pooled frame or create a new one
+        local row = table.remove(framePool) or CreateIndicatorRow()
+        local frameName = "MacUIIndicator_" .. spellID
+        
+        -- Since SetName is not possible, we recreate if name mismatch
+        if row:GetName() ~= frameName then
+            row:Hide()
+            row = CreateFrame("Frame", frameName, UIParent)
+            row:SetSize(ICON_SIZE, ICON_SIZE)
+            local border = CreateFrame("Frame", nil, row, "BackdropTemplate")
+            border:SetSize(ICON_SIZE + 4, ICON_SIZE + 4)
+            border:SetPoint("CENTER", row, "CENTER", 0, 0)
+            border:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2 })
+            border:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+            local icon = row:CreateTexture(nil, "ARTWORK")
+            icon:SetSize(ICON_SIZE, ICON_SIZE)
+            icon:SetPoint("CENTER", row, "CENTER", 0, 0)
+            icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+            row.border = border
+            row.icon = icon
+            row.isRed = false
+            row.audioTimer = 0
+        end
+
+        row.spellID = spellID
+        row.abilityType = ability.type
+
+        local iconTexture = GetSpellTexture(spellID)
+        if not iconTexture then
+            local spellInfo = GetSpellInfo(spellID)
+            iconTexture = spellInfo and spellInfo.iconID
+        end
+        if iconTexture then row.icon:SetTexture(iconTexture) end
+
+        ApplyIndicatorPosition(row, index)
+        table.insert(addonTable.MovableFrames, row)
+        row:Show()
+        indicatorFrames[spellID] = row
+    end
+
     UpdateAllIndicators()
 end
 

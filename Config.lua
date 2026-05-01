@@ -555,9 +555,12 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
         if not MacUIDB then return end
         if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
 
-        -- Toggle
-        local isNowEnabled = not MacUIDB.trackedAbilities[ability.spellID]
-        MacUIDB.trackedAbilities[ability.spellID] = isNowEnabled or nil
+        -- Toggle logic: For defaults, nil is "true".
+        local current = MacUIDB.trackedAbilities[ability.spellID]
+        if current == nil then current = true end
+        
+        local isNowEnabled = not current
+        MacUIDB.trackedAbilities[ability.spellID] = isNowEnabled
         UpdateVisual(isNowEnabled)
 
         -- Rebuild the tracker UI immediately
@@ -569,6 +572,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     row.UpdateVisual = UpdateVisual
     row.UpdateAudioVisual = UpdateAudioVisual
     row.spellID = ability.spellID
+    row.isCustom = isCustom
     return row
 end
 
@@ -576,7 +580,7 @@ end
 local abilityCheckboxes = {}
 
 -- Forward declare input frame
-local customAbilityInput
+
 
 -- Build checkboxes (Custom Abilities Only)
 local function BuildAbilityCheckboxes()
@@ -588,114 +592,20 @@ local function BuildAbilityCheckboxes()
 
     local visibleIndex = 0
 
-    -- Custom Abilities
-    if MacUIDB and MacUIDB.customAbilities then
-        for spellID, isTracked in pairs(MacUIDB.customAbilities) do
-            -- C_Spell.GetSpellInfo returns a table in 12.0.5 (.name, .iconID, .spellID)
-            local spellInfo = GetSpellInfo(spellID)
-            if spellInfo and spellInfo.name then
-                local name = spellInfo.name
-                visibleIndex = visibleIndex + 1
-                local yOffset = -210 - ((visibleIndex - 1) * 24)
-                -- custom abilities default to "buff" type for tracking
-                local ability = { spellID = spellID, name = name, type = "buff" } 
-                local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, true)
-                table.insert(abilityCheckboxes, row)
-            end
+    -- 1. Class Defaults
+    local classDefaults = addonTable.DefaultAbilities and addonTable.DefaultAbilities[addonTable.playerClass]
+    local specDefaults = classDefaults and classDefaults[addonTable.playerSpec]
+    
+    if specDefaults then
+        for _, ability in ipairs(specDefaults) do
+            visibleIndex = visibleIndex + 1
+            local yOffset = -210 - ((visibleIndex - 1) * 24)
+            local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
+            table.insert(abilityCheckboxes, row)
         end
     end
-    
-    -- Empty State Message
-    local emptyStateMessage = optionsPanel.emptyStateMessage
-    if not emptyStateMessage then
-        emptyStateMessage = optionsPanel:CreateFontString(nil, "OVERLAY")
-        emptyStateMessage:SetFont("Fonts\\ARIALN.TTF", 10)
-        emptyStateMessage:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -210)
-        emptyStateMessage:SetText("|cFF888888You are not tracking any abilities.\nShift-Click a spell from your spellbook\nbelow to get started.|r")
-        optionsPanel.emptyStateMessage = emptyStateMessage
-    end
-    
-    -- Position Smart Input Box
-    local inputYOffset = -210 - (visibleIndex * 24) - 5
-    
-    if visibleIndex == 0 then
-        emptyStateMessage:Show()
-        inputYOffset = -210 - 40 - 5 -- Move below the 3-line message
-    else
-        emptyStateMessage:Hide()
-    end
-    
-    if not customAbilityInput then
-        customAbilityInput = CreateFrame("EditBox", nil, optionsPanel, "InputBoxTemplate")
-        customAbilityInput:SetSize(150, 20)
-        customAbilityInput:SetAutoFocus(false)
-        customAbilityInput:SetFontObject("ChatFontNormal")
-        customAbilityInput:SetText("Shift-Click spell...")
-        
-        customAbilityInput:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
-        customAbilityInput:SetScript("OnEditFocusGained", function(self) 
-            if self:GetText() == "Shift-Click spell..." then self:SetText("") end 
-        end)
-        customAbilityInput:SetScript("OnEditFocusLost", function(self) 
-            if self:GetText() == "" then self:SetText("Shift-Click spell...") end 
-        end)
-        
-        local addBtn = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
-        addBtn:SetSize(20, 20)
-        addBtn:SetBackdrop({
-            bgFile = "Interface\\Buttons\\WHITE8x8",
-            edgeFile = "Interface\\Buttons\\WHITE8x8",
-            edgeSize = 1,
-        })
-        addBtn:SetBackdropColor(0.2, 0.2, 0.2, 1)
-        addBtn:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-        
-        local addText = addBtn:CreateFontString(nil, "OVERLAY")
-        addText:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
-        addText:SetPoint("CENTER", addBtn, "CENTER", 1, 0)
-        addText:SetText("+")
-        
-        addBtn:SetScript("OnClick", function()
-            local text = customAbilityInput:GetText()
-            local spellID = nil
-            
-            -- Try to parse as exact ID
-            if tonumber(text) then
-                spellID = tonumber(text)
-            else
-                -- Try to parse as link (e.g. |cff71d5ff|Hspell:190456:0|h[Ignore Pain]|h|r)
-                local linkID = text:match("|Hspell:(%d+)")
-                if linkID then
-                    spellID = tonumber(linkID)
-                else
-                    -- Try to search by name — C_Spell.GetSpellInfo(name) returns a table
-                    local spellInfo = GetSpellInfo(text)
-                    if spellInfo and spellInfo.spellID then
-                        spellID = spellInfo.spellID
-                    end
-                end
-            end
-            
-            -- Validate the spell ID actually resolves
-            local validInfo = spellID and GetSpellInfo(spellID)
-            if validInfo and validInfo.name then
-                if not MacUIDB.customAbilities then MacUIDB.customAbilities = {} end
-                MacUIDB.customAbilities[spellID] = true
-                if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
-                MacUIDB.trackedAbilities[spellID] = true -- Auto-track when added
-                customAbilityInput:SetText("")
-                customAbilityInput:ClearFocus()
-                if addonTable.RebuildConfigUI then addonTable.RebuildConfigUI() end
-                if addonTable.RebuildTrackerUI then addonTable.RebuildTrackerUI() end
-            else
-                print("|cFFFF0000MacUI:|r Could not find spell ID for '" .. text .. "'. Make sure to Shift-Click it from the spellbook.")
-            end
-        end)
-        customAbilityInput.addBtn = addBtn
-    end
-    
-    customAbilityInput:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 26, inputYOffset)
-    customAbilityInput.addBtn:SetPoint("LEFT", customAbilityInput, "RIGHT", 5, 0)
+
+
 end
 
 -- Refresh checkbox visuals based on current MacUIDB state
@@ -703,7 +613,14 @@ local function RefreshAbilityCheckboxes()
     if not MacUIDB or not MacUIDB.trackedAbilities then return end
     if not MacUIDB.audioAlerts then MacUIDB.audioAlerts = {} end
     for _, row in ipairs(abilityCheckboxes) do
-        row.UpdateVisual(MacUIDB.trackedAbilities[row.spellID] == true)
+        -- For defaults, if not in DB, it's true (tracked). For custom, it must be true.
+        local isEnabled
+        if row.isCustom then
+            isEnabled = MacUIDB.trackedAbilities[row.spellID] == true
+        else
+            isEnabled = MacUIDB.trackedAbilities[row.spellID] ~= false
+        end
+        row.UpdateVisual(isEnabled)
         row.UpdateAudioVisual(MacUIDB.audioAlerts[row.spellID])
     end
 end
@@ -738,6 +655,8 @@ SlashCmdList["MACUI"] = function()
         if powerTile then powerTile.UpdateVisual(MacUIDB.displays.power) end
     end
 end
+
+
 
 -- Listen for our addon to finish loading so we can read the DB
 configFrame:RegisterEvent("ADDON_LOADED")

@@ -115,35 +115,25 @@ end
 
 -- Update ALL indicators
 local function UpdateAllIndicators()
-    local needsAudioUpdate = false
-
     for _, indicator in pairs(indicatorFrames) do
         UpdateIndicator(indicator)
-        if indicator.isRed and MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[indicator.spellID] then
-            needsAudioUpdate = true
-        end
-    end
-
-    -- Dynamically enable/disable OnUpdate throttle for audio to save CPU
-    if needsAudioUpdate then
-        if not eventFrame.onUpdateActive then
-            eventFrame:SetScript("OnUpdate", function(self, elapsed)
-                for _, ind in pairs(indicatorFrames) do
-                    if ind.isRed and MacUIDB.audioAlerts and MacUIDB.audioAlerts[ind.spellID] then
-                        ind.audioTimer = (ind.audioTimer or 0) + elapsed
-                        if ind.audioTimer >= 3.0 then
-                            PlaySound(MacUIDB.audioAlerts[ind.spellID])
-                            ind.audioTimer = 0
-                        end
-                    end
+        
+        -- EDGE CASE: "Recursive Audio Triggering" (Nuclear Fix)
+        -- If a SoundID is a 'Loop' (like 10952), triggering it repeatedly creates 
+        -- multiple stacked audio instances that cannot be stopped individually.
+        -- We use 'indicator.audioPlayed' as a Hard State Lock to ensure a sound
+        -- ONLY fires once when an alert state is entered, and cannot re-fire 
+        -- until the alert is cleared and reset.
+        if indicator.isRed then
+            if not indicator.audioPlayed then
+                if MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[indicator.spellID] then
+                    addonTable.PlaySoundSafe(MacUIDB.audioAlerts[indicator.spellID])
+                    indicator.audioPlayed = true
                 end
-            end)
-            eventFrame.onUpdateActive = true
-        end
-    else
-        if eventFrame.onUpdateActive then
-            eventFrame:SetScript("OnUpdate", nil)
-            eventFrame.onUpdateActive = false
+            end
+        else
+            -- Reset the lock only when the alert is cleared (buff gained / combat end)
+            indicator.audioPlayed = false
         end
     end
 end

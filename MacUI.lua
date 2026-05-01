@@ -10,6 +10,25 @@ local ipairs = ipairs
 local string = string
 local tostring = tostring
 local math = math
+-- Modern API aliases
+local C_Timer = C_Timer
+local PlaySound = PlaySound
+local StopSound = StopSound
+
+-- Global Sound Safety: PlaySoundSafe
+-- Ensures that no sound triggered by MacUI can play longer than 10 seconds.
+-- This effectively kills accidental infinite loops (like SoundID 10952)
+-- without requiring a manual UI reset.
+function addonTable.PlaySoundSafe(soundID)
+    if not soundID then return end
+    local _, handle = PlaySound(soundID)
+    if handle then
+        C_Timer.After(10, function()
+            StopSound(handle)
+        end)
+    end
+    return handle
+end
 
 -- Cache player class at load time (never changes)
 local _, playerClass = UnitClass("player")

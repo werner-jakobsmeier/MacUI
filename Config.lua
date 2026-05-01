@@ -449,10 +449,17 @@ abilitiesLabel:Hide() -- Removed for testing
 ------------------------------------------------
 local SOUND_OPTIONS = {
     { name = "None", id = nil },
-    { name = "Warning", id = 8959 }, -- Raid Warning
+    { name = "Tell (Beep)", id = 120 },
+    { name = "Raid Warning", id = 8959 },
+    { name = "PVP Alert", id = 5674 },
+    { name = "Dungeon Pop", id = 44321 },
+    { name = "PVP Horn", id = 11466 },
+    { name = "Level Up (Classic)", id = 5545 },
+    { name = "Level Up (Modern)", id = 12867 },
+    { name = "Achievement", id = 12888 },
+    { name = "Crisp Click", id = 31491 },
+    { name = "Coin Clink", id = 1483 },
     { name = "Ready Check", id = 8960 },
-    { name = "Ping", id = 5674 },
-    { name = "Coin", id = 1483 },
 }
 
 local audioDropdown = CreateFrame("Frame", "MacUIAudioDropdown", UIParent, "BackdropTemplate")
@@ -464,8 +471,74 @@ audioDropdown:SetBackdrop({
     edgeFile = "Interface\\Buttons\\WHITE8x8",
     edgeSize = 1,
 })
-audioDropdown:SetBackdropColor(0, 0, 0, 0.95)
-audioDropdown:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+audioDropdown:SetBackdropColor(0.06, 0.09, 0.16, 0.95)
+audioDropdown:SetBackdropBorderColor(0.82, 0.84, 0.86, 1)
+
+-- Custom ID Input Field at bottom of dropdown
+local customSoundLabel = audioDropdown:CreateFontString(nil, "OVERLAY")
+customSoundLabel:SetFont("Fonts\\ARIALN.TTF", 8)
+customSoundLabel:SetPoint("TOPLEFT", audioDropdown, "TOPLEFT", 6, -(#SOUND_OPTIONS * 20 + 8))
+customSoundLabel:SetTextColor(0.42, 0.45, 0.50)
+customSoundLabel:SetText("CUSTOM ID:")
+
+local customInput = CreateFrame("EditBox", nil, audioDropdown, "BackdropTemplate")
+customInput:SetSize(60, 16)
+customInput:SetPoint("TOPLEFT", customSoundLabel, "BOTTOMLEFT", 0, -4)
+customInput:SetFont("Fonts\\ARIALN.TTF", 10, "") -- Explicit empty flags to fix arg #3 error
+customInput:SetAutoFocus(false)
+customInput:SetTextInsets(4, 0, 0, 0)
+customInput:SetBackdrop({
+    bgFile = "Interface\\Buttons\\WHITE8x8",
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 1,
+})
+customInput:SetBackdropColor(0, 0, 0, 1)
+customInput:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+
+local playBtn = CreateFrame("Button", nil, audioDropdown, "BackdropTemplate")
+playBtn:SetSize(30, 16)
+playBtn:SetPoint("LEFT", customInput, "RIGHT", 4, 0)
+playBtn:SetBackdrop({
+    bgFile = "Interface\\Buttons\\WHITE8x8",
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 1,
+})
+playBtn:SetBackdropColor(0.2, 0.2, 0.2, 1)
+playBtn:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+
+local playText = playBtn:CreateFontString(nil, "OVERLAY")
+playText:SetFont("Fonts\\ARIALN.TTF", 8)
+playText:SetPoint("CENTER")
+playText:SetText("PLAY")
+
+audioDropdown:SetSize(110, #SOUND_OPTIONS * 20 + 44)
+
+local lastSoundHandle
+
+local function SaveCustomSound()
+    local val = tonumber(customInput:GetText())
+    if audioDropdown.activeSpellID then
+        MacUIDB.audioAlerts[audioDropdown.activeSpellID] = val
+        if audioDropdown.activeRow then
+            audioDropdown.activeRow.UpdateAudioVisual(val)
+        end
+    end
+end
+
+customInput:SetScript("OnEnterPressed", function(self)
+    SaveCustomSound()
+    self:ClearFocus()
+end)
+
+playBtn:SetScript("OnClick", function()
+    local val = tonumber(customInput:GetText())
+    if val then 
+        if lastSoundHandle then StopSound(lastSoundHandle) end
+        lastSoundHandle = addonTable.PlaySoundSafe(val)
+    end
+end)
+
+audioDropdown:SetSize(110, #SOUND_OPTIONS * 20 + 44)
 
 local dropdownButtons = {}
 for i, option in ipairs(SOUND_OPTIONS) do
@@ -608,6 +681,9 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
                     dropdownButtons[i].text:SetTextColor(1, 1, 1, 1)
                 end
             end
+            
+            -- Set current custom value in input
+            customInput:SetText(currentVal or "")
             
             audioDropdown:Show()
         end

@@ -1,6 +1,6 @@
 local addonName, addonTable = ...
 
--- Only load if playing a Warrior
+-- Only load if playing a Protection Warrior (spec 3)
 local _, playerClass = UnitClass("player")
 if playerClass ~= "WARRIOR" then return end
 
@@ -91,18 +91,26 @@ local function UpdateShieldBlockBuff()
     
     -- Silver/Blue
     sbBuffText:SetText(string.format("|cFF88AAFFSB Buff: %s|r", durationStr))
-end
 
--- OnUpdate script for smooth duration countdowns
--- We throttle this so it doesn't run every single frame
-local updateTimer = 0
-tracker:SetScript("OnUpdate", function(self, elapsed)
-    updateTimer = updateTimer + elapsed
-    if updateTimer > 0.1 then -- Throttle to 10 times a second
-        UpdateShieldBlockBuff()
-        updateTimer = 0
+    -- Performance: only run OnUpdate when the buff is actually active
+    if auraData then
+        if not tracker.onUpdateActive then
+            tracker:SetScript("OnUpdate", function(self, elapsed)
+                updateTimer = updateTimer + elapsed
+                if updateTimer > 0.1 then
+                    UpdateShieldBlockBuff()
+                    updateTimer = 0
+                end
+            end)
+            tracker.onUpdateActive = true
+        end
+    else
+        if tracker.onUpdateActive then
+            tracker:SetScript("OnUpdate", nil)
+            tracker.onUpdateActive = false
+        end
     end
-end)
+end
 
 -- Event Registration
 tracker:RegisterEvent("UNIT_POWER_UPDATE")

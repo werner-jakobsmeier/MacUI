@@ -8,6 +8,8 @@
 MacUI.lua
 Config.lua
 Animations.lua
+AbilityRegistry.lua
+AbilityTracker.lua
 Square.lua
 PlayerHealth.lua
 WarriorTracker.lua

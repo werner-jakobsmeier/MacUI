@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="360" viewBox="0 0 260 360">
+  <!-- Background -->
+  <rect width="260" height="360" fill="#0a0a0a" rx="0"/>
+
+  <!-- Title: MAC (bold) + UI (thin) -->
+  <text x="16" y="32" font-family="Arial Black, Helvetica, sans-serif" font-size="22" font-weight="900" fill="#FFFFFF">MAC</text>
+  <text x="82" y="32" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="300" fill="#AAAAAA">UI</text>
+
+  <!-- Close button × -->
+  <text x="237" y="28" font-family="Arial, sans-serif" font-size="18" fill="#FFFFFF" text-anchor="middle">×</text>
+
+  <!-- UNLOCK button (white fill, black text) -->
+  <rect x="20" y="55" width="105" height="32" fill="#FFFFFF" rx="0"/>
+  <text x="72" y="76" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">UNLOCK</text>
+
+  <!-- LOCK button (white fill, black text) -->
+  <rect x="135" y="55" width="105" height="32" fill="#FFFFFF" rx="0"/>
+  <text x="187" y="76" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">LOCK</text>
+
+  <!-- FONT SIZE label -->
+  <text x="20" y="118" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#888888" letter-spacing="1">FONT SIZE</text>
+
+  <!-- Large font size value -->
+  <text x="130" y="160" font-family="Arial Black, Helvetica, sans-serif" font-size="36" font-weight="900" fill="#FFFFFF" text-anchor="middle">14</text>
+
+  <!-- Slider track -->
+  <rect x="20" y="180" width="220" height="2" fill="#666666" rx="1"/>
+
+  <!-- Slider thumb -->
+  <rect x="82" y="174" width="12" height="12" fill="#FFFFFF" rx="0"/>
+
+  <!-- Slider min/max labels -->
+  <text x="20" y="202" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#666666">8</text>
+  <text x="235" y="202" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#666666" text-anchor="end">32</text>
+
+  <!-- ABILITIES label -->
+  <text x="20" y="232" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#888888" letter-spacing="1">ABILITIES</text>
+
+  <!-- Separator line -->
+  <rect x="20" y="240" width="220" height="1" fill="#333333"/>
+
+  <!-- Checkbox Row 1: Shield Block (checked) -->
+  <rect x="20" y="253" width="14" height="14" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1" rx="0"/>
+  <text x="27" y="264" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">✓</text>
+  <text x="42" y="264" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#FFFFFF">Shield Block</text>
+
+  <!-- Checkbox Row 2: Spell Reflect (unchecked) -->
+  <rect x="20" y="277" width="14" height="14" fill="#262626" stroke="#808080" stroke-width="1" rx="0"/>
+  <text x="42" y="288" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#FFFFFF">Spell Reflect</text>
+
+  <!-- Checkbox Row 3: Ignore Pain (checked) -->
+  <rect x="20" y="301" width="14" height="14" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1" rx="0"/>
+  <text x="27" y="312" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">✓</text>
+  <text x="42" y="312" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#FFFFFF">Ignore Pain</text>
+</svg>

@@ -30,8 +30,14 @@ squareFrame:SetBackdropBorderColor(1, 1, 1, 1) -- White border (R, G, B, Alpha)
 
 -- Logic to change color based on Combat and Shield Block status
 local function UpdateSquareColor()
-    -- Only run warrior-specific logic
+    -- Only run for Protection Warriors (spec 3)
     if playerClass ~= "WARRIOR" then return end
+    if addonTable.playerSpec ~= 3 then
+        -- Not Protection spec — stay black
+        squareFrame:SetScript("OnUpdate", nil)
+        squareFrame:SetBackdropColor(0, 0, 0, 1)
+        return
+    end
 
     local inCombat = UnitAffectingCombat("player")
     local hasShieldBlock = C_UnitAuras.GetPlayerAuraBySpellID(SPELL_SHIELD_BLOCK) ~= nil

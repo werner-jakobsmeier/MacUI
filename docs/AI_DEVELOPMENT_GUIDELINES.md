@@ -16,6 +16,7 @@ This document contains rules and best practices that the AI assistant must verif
 - **Localizing Globals (Upvaluing):** For code that runs frequently (like inside `OnUpdate` or combat events), localize Blizzard API functions at the top of the file (e.g., `local UnitHealth = UnitHealth`). Lua accesses local variables significantly faster than global table lookups.
 - **Event Handling:** Unregister events as soon as they are no longer needed (e.g., `ADDON_LOADED`). Consolidate event handlers to a single parent frame when possible rather than creating dozens of frames listening to the same event.
 - **Throttling Updates:** Never do heavy calculations inside an `OnUpdate` script without a throttle. If an `OnUpdate` is necessary, use a timer variable to execute logic every `0.1` or `0.2` seconds instead of every single rendered frame.
+- **Disable OnUpdate when inactive:** If an `OnUpdate` script is only needed during specific states (e.g., while a buff is active or during combat), dynamically attach and remove it (`frame:SetScript("OnUpdate", nil)`) to save CPU cycles when it's not needed.
 - **Frame Pooling:** Do not constantly use `CreateFrame` dynamically if you need a lot of UI elements that appear and disappear (like custom buff icons or damage numbers). Instead, create a "Frame Pool" to reuse existing hidden frames, which prevents memory bloat and garbage collection stutters.
 - **Global Namespace Protection:** Do NOT pollute the WoW global namespace. Use the private `addonTable` provided at the top of every file (`local addonName, addonTable = ...`) to share variables and functions between your own files.
 - **Avoiding UI Taint:** Be extremely careful when hooking or modifying default Blizzard frames. Always prefer `hooksecurefunc()` over directly overriding default functions. Modifying default UI execution paths incorrectly can lead to the dreaded "Action Blocked by MacUI" taint errors during combat.
@@ -35,3 +36,17 @@ This document contains rules and best practices that the AI assistant must verif
 ## 6. API Version Compatibility
 - **Use safe fallbacks for deprecated APIs:** When Blizzard moves an API from the global namespace into a `C_` namespace (e.g., `GetSpellCharges` → `C_Spell.GetSpellCharges`), use a fallback pattern: `local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges`. This ensures the addon works across patch boundaries.
 - **Verify API changes before each major patch:** Before a new WoW patch drops, search Blizzard's patch notes and the community API changelog for any renamed, moved, or removed functions that the addon currently uses.
+
+## 7. Frame Pooling & Dynamic UI
+- **Always pool dynamically created frames:** When UI elements are created and destroyed repeatedly (e.g., toggling tracked abilities), maintain a frame pool (`table.insert` on hide, `table.remove` on reuse). Never rely on creating new frames endlessly — the WoW client does not garbage-collect frames, so orphaned frames leak memory permanently.
+- **Minimize work in factory functions:** If a factory function sets properties (like anchor points) that are immediately overridden by the caller, remove the redundant work from the factory. The caller should be responsible for positioning.
+
+## 8. Event Handler Consolidation
+- **Prefer a single `ADDON_LOADED` handler:** Ideally only `MacUI.lua` should register for `ADDON_LOADED`. After initializing `MacUIDB`, it should call init functions exposed by other modules via `addonTable`. This prevents N frames all listening for the same one-shot event. If multiple handlers are necessary, document why.
+- **Avoid duplicate event listeners for the same data:** If two modules both need to react to `UNIT_AURA` for the same spell, consider having one module update a shared state in `addonTable` that the other reads, rather than both independently querying the API.
+
+## 9. Class & Spec Awareness
+- **Gate class-specific modules at load time:** Use `UnitClass("player")` at the top of a file and `return` early if the class doesn't match. This prevents the entire file from executing and registering unnecessary events.
+- **Check spec at runtime, not load time:** Unlike class, the player's spec can change mid-session. Use `GetSpecialization()` after `PLAYER_ENTERING_WORLD` and listen for `PLAYER_SPECIALIZATION_CHANGED` to stay current. Never hardcode spec checks at file load time.
+- **Tag abilities with spec in the registry:** When defining trackable abilities in `AbilityRegistry.lua`, include an optional `spec` field. This allows the UI to automatically filter abilities that don't apply to the player's current spec (e.g., hiding Shield Block for Arms Warriors).
+- **Rebuild UI on spec change:** Any UI that filters by spec (ability checkboxes, tracker indicators) must register a callback on `addonTable.OnSpecChanged` and rebuild itself when the player respeccs.

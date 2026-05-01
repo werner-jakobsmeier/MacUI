@@ -57,7 +57,9 @@ This document contains rules and best practices that the AI assistant must verif
 - **Events Reference:** https://warcraft.wiki.gg/wiki/Events
 
 ## 7. Frame Pooling & Dynamic UI
-- **Always pool dynamically created frames:** When UI elements are created and destroyed repeatedly (e.g., toggling tracked abilities), maintain a frame pool (`table.insert` on hide, `table.remove` on reuse). Never rely on creating new frames endlessly — the WoW client does not garbage-collect frames, so orphaned frames leak memory permanently.
+- **Always pool dynamically created frames:** When UI elements are created and destroyed repeatedly (e.g., toggling tracked abilities or changing specialization), maintain a frame pool (`table.insert` on hide, `table.remove` on reuse). Never rely on creating new frames endlessly — the WoW client does not garbage-collect frames, so orphaned frames leak memory permanently.
+- **Mandatory pooling for UI Rebuilds:** Any function that "rebuilds" a UI component (like `RebuildMechanics`) MUST use a frame pool for any elements that are hidden and replaced.
+- **Prevent Registry Bloat:** When adding frames to a persistent registry (like `addonTable.MovableFrames`), always check if the frame is already in the list before `table.insert`. This prevents infinite list growth during repeated UI rebuilds.
 - **Minimize work in factory functions:** If a factory function sets properties (like anchor points) that are immediately overridden by the caller, remove the redundant work from the factory. The caller should be responsible for positioning.
 
 ## 8. Event Handler Consolidation
@@ -66,6 +68,7 @@ This document contains rules and best practices that the AI assistant must verif
 
 ## 9. Class & Spec Awareness
 - **Gate class-specific modules at load time:** Use `UnitClass("player")` at the top of a file and `return` early if the class doesn't match. This prevents the entire file from executing and registering unnecessary events. **This applies to ALL class-specific files, including utility frames like `Square.lua`, not just dedicated tracker modules.**
+- **Enforce top-of-file load gating:** The class check MUST happen immediately after upvalues and before any frame creation or event registration.
 - **Check spec at runtime, not load time:** Unlike class, the player's spec can change mid-session. Use `GetSpecialization()` after `PLAYER_ENTERING_WORLD` and listen for `PLAYER_SPECIALIZATION_CHANGED` to stay current. Never hardcode spec checks at file load time.
 - **Always add a spec-aware `RebuildTracker()` function:** Every class module must implement a function that shows/hides the tracker based on `addonTable.playerSpec` and hook it into `addonTable.OnSpecChanged`. Do NOT process events for the wrong spec — guard every event handler with a spec check.
 - **Custom abilities are user-managed:** Users add their own tracked abilities via the Smart Input Box in the Config Panel. The data is stored in `MacUIDB.customAbilities`. There is no hardcoded ability registry.
@@ -110,3 +113,5 @@ Before finalizing any code change, verify the following:
 - [ ] Documentation in this file reflects the current architecture (no deleted file references).
 - [ ] **A Redundancy Audit has been performed and all unused variables/upvalues have been removed.**
 - [ ] **Every upvalued variable at the top of the file is actively used in the logic (verified via grep).**
+- [ ] **All frames added to global registries (MovableFrames) are checked for existing entries to prevent bloat.**
+- [ ] **All UI rebuild components utilize frame pooling to prevent memory leaks.**

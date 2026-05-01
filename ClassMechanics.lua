@@ -1,33 +1,41 @@
 local addonName, addonTable = ...
 
+-- Guideline #9: Gate class-specific modules at load time
+local playerClass = addonTable.playerClass
+if not (playerClass == "WARRIOR" or playerClass == "PALADIN") then
+    return
+end
+
+-- Upvalues
 local CreateFrame = CreateFrame
 local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges
 local GetTime = GetTime
+local GetTotemInfo = GetTotemInfo
+local UnitPower = UnitPower
 local string = string
 local UIParent = UIParent
 local table = table
 local ipairs = ipairs
 local unpack = unpack
 
--- Helper for large numbers
-
-
+-- Zero-Waste Engineering: Frame Pool
 local activeFrames = {}
+local framePool = {}
 local eventFrame = CreateFrame("Frame", "MacUIClassMechanicsEvents", UIParent)
+
+-- Forward Declarations
+local RebuildMechanics, UpdateAuras, UpdateCharges, UpdatePower, CreateMechanicFrame
 
 local function ClearFrames()
     for _, f in ipairs(activeFrames) do
         f:Hide()
-        f:SetParent(nil)
+        table.insert(framePool, f)
     end
     activeFrames = {}
     eventFrame:SetScript("OnUpdate", nil)
     eventFrame.onUpdateActive = false
 end
-
-
-local RebuildMechanics, UpdateAuras, UpdateCharges, UpdatePower
 
 UpdateAuras = function()
     local needsOnUpdate = false
@@ -125,6 +133,33 @@ UpdatePower = function()
     end
 end
 
+CreateMechanicFrame = function()
+    local frame = CreateFrame("Frame", nil, UIParent)
+    frame:SetSize(150, 25)
+    
+    -- Movement Handling
+    frame:SetMovable(true)
+    frame:EnableMouse(false)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetScript("OnDragStart", function(self) if addonTable.IsUnlocked then self:StartMoving() end end)
+    frame:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+        local p, _, rp, x, y = self:GetPoint()
+        if self.saveKey then
+            if not MacUIDB.positions then MacUIDB.positions = {} end
+            MacUIDB.positions[self.saveKey] = { point = p, relativePoint = rp, x = x, y = y }
+        end
+    end)
+
+    local text = frame:CreateFontString(nil, "OVERLAY")
+    text:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
+    text:SetPoint("CENTER", frame, "CENTER", 0, 0)
+    frame.fontStrings = { text }
+    frame.text = text
+    
+    return frame
+end
+
 eventFrame:RegisterEvent("UNIT_AURA")
 eventFrame:RegisterEvent("UNIT_POWER_UPDATE")
 eventFrame:RegisterEvent("SPELL_UPDATE_CHARGES")
@@ -149,66 +184,61 @@ end)
 RebuildMechanics = function()
     ClearFrames()
     
-    local classData = addonTable.ClassMechanics and addonTable.ClassMechanics[addonTable.playerClass]
+    local classData = addonTable.ClassMechanics and addonTable.ClassMechanics[playerClass]
     if not classData then return end
     
     local mechanics = classData[addonTable.playerSpec]
     if not mechanics then return end
     
     for i, mech in ipairs(mechanics) do
-        -- Check Config: Only show if NOT disabled in the rack
         local isEnabled = true
         if MacUIDB and MacUIDB.trackedAbilities then
             isEnabled = MacUIDB.trackedAbilities[mech.id] ~= false
         end
         
         if isEnabled then
-            local frame = CreateFrame("Frame", "MacUIClassMechanic_" .. mech.id .. "_" .. i, UIParent)
-            frame:SetSize(150, 25)
+            local frame = table.remove(framePool) or CreateMechanicFrame()
+            local saveKey = "MacUIClassMechanic_" .. mech.id .. "_" .. i
+            frame.saveKey = saveKey
+            frame.mech = mech
+            
             local defaultPoint = mech.point or {0, -100 - (i*25)}
             frame.defaultPoint = {"CENTER", UIParent, "CENTER", unpack(defaultPoint)}
             
-            -- Movement Handling
-            local frameName = frame:GetName()
-            frame:SetMovable(true)
-            frame:EnableMouse(false) -- Default to locked
-            frame:RegisterForDrag("LeftButton")
-            frame:SetScript("OnDragStart", function(self) if addonTable.IsUnlocked then self:StartMoving() end end)
-            frame:SetScript("OnDragStop", function(self)
-                self:StopMovingOrSizing()
-                local p, _, rp, x, y = self:GetPoint()
-                if not MacUIDB.positions then MacUIDB.positions = {} end
-                MacUIDB.positions[frameName] = { point = p, relativePoint = rp, x = x, y = y }
-            end)
-
-            -- Try to restore saved point/scale
-            if MacUIDB and MacUIDB.positions and MacUIDB.positions[frameName] then
-                local pos = MacUIDB.positions[frameName]
+            -- Restore saved point/scale
+            if MacUIDB and MacUIDB.positions and MacUIDB.positions[saveKey] then
+                local pos = MacUIDB.positions[saveKey]
+                frame:ClearAllPoints()
                 frame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
             else
+                frame:ClearAllPoints()
                 frame:SetPoint(unpack(frame.defaultPoint))
             end
-            if MacUIDB and MacUIDB.scales and MacUIDB.scales[frameName] then
-                frame:SetScale(MacUIDB.scales[frameName])
+            
+            if MacUIDB and MacUIDB.scales and MacUIDB.scales[saveKey] then
+                frame:SetScale(MacUIDB.scales[saveKey])
+            else
+                frame:SetScale(1)
             end
             
-            table.insert(addonTable.MovableFrames, frame)
-            table.insert(activeFrames, frame)
+            -- Registry (Check for duplicates)
+            local found = false
+            for _, f in ipairs(addonTable.MovableFrames) do
+                if f == frame then found = true break end
+            end
+            if not found then
+                table.insert(addonTable.MovableFrames, frame)
+            end
             
-            local text = frame:CreateFontString(nil, "OVERLAY")
-            text:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
-            text:SetPoint("CENTER", frame, "CENTER", 0, 0)
-            frame.fontStrings = { text }
-            frame.text = text
-            frame.mech = mech
+            table.insert(activeFrames, frame)
             frame:Show()
         end
     end
     
-    -- Force an initial update
     UpdateAuras()
     UpdateCharges()
     UpdatePower()
 end
 
 addonTable.RebuildMechanics = RebuildMechanics
+

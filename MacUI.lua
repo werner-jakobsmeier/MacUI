@@ -5,11 +5,7 @@ local print = print
 local UIParent = UIParent
 local UnitClass = UnitClass
 local GetSpecialization = GetSpecialization
-local table = table
 local ipairs = ipairs
-local string = string
-local tostring = tostring
-local math = math
 -- Modern API aliases
 local C_Timer = C_Timer
 local PlaySound = PlaySound

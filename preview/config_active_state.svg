@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="280" height="380" viewBox="0 0 280 380">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;display=swap');
+      text { font-family: 'Inter', 'Segoe UI', sans-serif; }
+    </style>
+  </defs>
+
+  <!-- Panel Background -->
+  <rect width="280" height="380" rx="0" fill="#0a0a0a" opacity="0.97"/>
+
+  <!-- Title: MAC (bold) + UI (thin) -->
+  <text x="18" y="34" font-size="22" font-weight="700" fill="#ffffff">MAC</text>
+  <text x="72" y="34" font-size="22" font-weight="400" fill="#aaaaaa">UI</text>
+
+  <!-- Close Button -->
+  <text x="254" y="30" font-size="18" fill="#ffffff" text-anchor="middle">×</text>
+
+  <!-- UNLOCK / LOCK Buttons -->
+  <rect x="18" y="52" width="115" height="32" rx="2" fill="#ffffff"/>
+  <text x="75" y="73" font-size="12" font-weight="600" fill="#000000" text-anchor="middle">UNLOCK</text>
+  <rect x="147" y="52" width="115" height="32" rx="2" fill="#ffffff"/>
+  <text x="204" y="73" font-size="12" font-weight="600" fill="#000000" text-anchor="middle">LOCK</text>
+
+  <!-- Font Size Section -->
+  <text x="18" y="108" font-size="10" fill="#888888">FONT SIZE:</text>
+  <text x="88" y="108" font-size="10" font-weight="600" fill="#ffffff">16</text>
+  <!-- Slider Track -->
+  <rect x="18" y="116" width="240" height="2" rx="1" fill="#444444"/>
+  <!-- Slider Thumb (moved right for size 16) -->
+  <circle cx="138" cy="117" r="5" fill="#ffffff"/>
+
+  <!-- Abilities Section -->
+  <text x="18" y="148" font-size="10" fill="#888888">ABILITIES</text>
+  <rect x="18" y="155" width="240" height="1" fill="#333333"/>
+
+  <!-- Ability Row 1: Shield Block (checked) -->
+  <rect x="18" y="166" width="14" height="14" rx="1" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+  <text x="25" y="177" font-size="11" font-weight="700" fill="#000000">✓</text>
+  <!-- Spell Icon (blue square placeholder) -->
+  <rect x="38" y="166" width="16" height="16" rx="2" fill="#4488cc"/>
+  <text x="60" y="178" font-size="11" fill="#ffffff">Shield Block</text>
+  <!-- Delete X -->
+  <text x="155" y="178" font-size="10" font-weight="600" fill="#ff5555">X</text>
+  <!-- Audio Button (active/green) -->
+  <rect x="240" y="166" width="16" height="16" rx="1" fill="#229922" stroke="#00ff00" stroke-width="1"/>
+  <text x="248" y="178" font-size="10" font-weight="600" fill="#000000" text-anchor="middle">A</text>
+
+  <!-- Ability Row 2: Ignore Pain (checked) -->
+  <rect x="18" y="192" width="14" height="14" rx="1" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
+  <text x="25" y="203" font-size="11" font-weight="700" fill="#000000">✓</text>
+  <rect x="38" y="192" width="16" height="16" rx="2" fill="#cc8844"/>
+  <text x="60" y="204" font-size="11" fill="#ffffff">Ignore Pain</text>
+  <text x="145" y="204" font-size="10" font-weight="600" fill="#ff5555">X</text>
+  <!-- Audio Button (inactive/gray) -->
+  <rect x="240" y="192" width="16" height="16" rx="1" fill="#222222" stroke="#555555" stroke-width="1"/>
+  <text x="248" y="204" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">A</text>
+
+  <!-- Ability Row 3: Last Stand (unchecked) -->
+  <rect x="18" y="218" width="14" height="14" rx="1" fill="#222222" stroke="#555555" stroke-width="1"/>
+  <rect x="38" y="218" width="16" height="16" rx="2" fill="#cc4444"/>
+  <text x="60" y="230" font-size="11" fill="#ffffff">Last Stand</text>
+  <text x="135" y="230" font-size="10" font-weight="600" fill="#ff5555">X</text>
+  <rect x="240" y="218" width="16" height="16" rx="1" fill="#222222" stroke="#555555" stroke-width="1"/>
+  <text x="248" y="230" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">A</text>
+
+  <!-- Smart Input Box -->
+  <rect x="24" y="252" width="170" height="22" rx="1" fill="none" stroke="#555555" stroke-width="1"/>
+  <text x="32" y="267" font-size="11" fill="#777777" font-style="italic">Shift-Click spell...</text>
+  <!-- Add Button -->
+  <rect x="200" y="252" width="22" height="22" rx="1" fill="#222222" stroke="#555555" stroke-width="1"/>
+  <text x="211" y="268" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">+</text>
+
+  <!-- Footer Label -->
+  <text x="140" y="360" font-size="8" fill="#333333" text-anchor="middle">MacUI v1.0 — /macui</text>
+</svg>

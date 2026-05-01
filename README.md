@@ -4,40 +4,73 @@ A sleek, lightweight, and highly optimized custom user interface for World of Wa
 
 ## Features
 
-### Dynamic Ability Tracker
-A modular, class and spec-aware tracking system. Tracks abilities using real spell icons with a built-in state machine:
+### 🎯 Fully Independent Element Positioning
+Every single UI element — text readouts, spell icons, and the status square — is its own independent, draggable frame. Place each one anywhere on your screen and lock it. Positions are saved per-frame across sessions.
+
+### 📊 Dynamic Ability Tracker
+A modular, user-driven tracking system. Add *any* spell in the game via the Smart Input Box. Each tracked ability becomes its own icon on screen with a built-in state machine:
 - 🟢 **Green Border:** Ability/Buff is currently active on you.
 - 🔴 **Red Border (Desaturated Icon):** Mitigation missing while in combat!
 - ⚪ **Gray Border:** Out of combat / Neutral state.
 
-### Brutalist Configuration Menu
-Type `/macui` to open a minimalist, brutalist UI panel where you can lock/unlock frames, scale text sizes, and dynamically select which abilities to track.
-- **Smart Input Box:** Track *any* ability in the game. Simply click the input box and **Shift-Click** a spell from your spellbook, or type an exact Spell ID. MacUI handles the rest dynamically.
-- **Audio Alarm Dropdown:** Click the `[A]` button next to any tracked ability to open a custom dropdown. Assign sounds like "Raid Warning", "Ready Check Ping", or "Coin Drop". If you are in combat and missing that buff, the addon will pulse the alarm exactly once every 3 seconds to save your life.
+### 🎨 Brutalist Configuration Menu
+Type `/macui` or click the minimap button to open a minimalist, brutalist UI panel:
+- **Lock / Unlock Frames:** Unlock to drag any element independently. Lock to save all positions.
+- **Font Size Slider:** Scale all text readouts globally.
+- **Smart Input Box:** Shift-Click a spell from your spellbook, or type an exact Spell ID.
+- **Audio Alarm Dropdown:** Click `[A]` next to any ability to assign a warning sound. If you're in combat and missing that buff, the alarm pulses every 3 seconds.
+- **Empty State:** New users see a friendly onboarding message guiding them to add their first ability.
 
-### Class Modules
-- **Warrior Module**: Tracks Rage, Ignore Pain absorbs, and Shield Block charges/duration.
-- **Paladin Module**: Tracks Holy Power, Shield of the Righteous duration, and active Consecration.
-- **Extreme Efficiency**: All trackers utilize `OnUpdate` throttling, caching, and dynamic script detachment to ensure 0 CPU waste.
+### ⚔️ Class Modules (Independent Text Frames)
+Each data element is its own freely positionable frame:
 
-### Persistent Layouts
-Move any UI element on your screen and lock it. Your exact layout coordinates, tracked abilities, and audio alarm settings are automatically saved to your `SavedVariables` across game sessions.
+**Warrior (Protection):**
+| Frame | Content |
+|-------|---------|
+| `MacUIWarriorRage` | Current Rage |
+| `MacUIWarriorIgnorePain` | Ignore Pain absorb value |
+| `MacUIWarriorSBCharges` | Shield Block charges |
+| `MacUIWarriorSBBuff` | Shield Block buff timer |
+
+**Paladin (Protection):**
+| Frame | Content |
+|-------|---------|
+| `MacUIPaladinHolyPower` | Holy Power count |
+| `MacUIPaladinSotR` | Shield of the Righteous timer |
+| `MacUIPaladinConsecration` | Consecration active/inactive |
+
+**All Classes:**
+| Frame | Content |
+|-------|---------|
+| `MacUIPlayerHealth` | Health percentage |
+
+### 🗺️ Minimap Integration
+- **AddonCompartment (Modern):** Native 10.0+ dropdown entry — no button needed.
+- **Classic Draggable Button:** A legacy minimap icon for users who prefer a visible button. Drag it around the minimap ring.
+- **Left-Click:** Toggle config panel. **Right-Click:** Lock/Unlock frames.
+
+### 🔊 Audio Warning System
+Event-driven, non-polling audio alerts. Assign sounds per-ability from the config panel. The system only activates its timer loop when at least one tracked ability is red — zero CPU cost otherwise.
 
 ---
 
 ## Previews
 
+### Empty State (First Launch)
+![Empty State](preview/config_empty_state.svg)
+*When no abilities are tracked, a friendly message guides new users to Shift-Click a spell from their spellbook.*
+
+### Active Config (Abilities Added)
+![Active State](preview/config_active_state.svg)
+*Three abilities tracked: Shield Block (with audio alert enabled), Ignore Pain, and Last Stand. Check/uncheck to toggle tracking. Click `X` to remove.*
+
+### Full Independent Layout
+![Full Layout](preview/macui_independent_layout.svg)
+*Every element is independently draggable. Text readouts, ability icons, and the status square can be placed anywhere on screen. Positions persist across sessions via `MacUIDB.positions`.*
+
 ### Live Combat Simulation
-![MacUI Animated Demo](preview/macui_animated_demo.svg)
-*A live simulation of the MacUI state machine reacting to entering combat, taking damage, applying a buff, and triggering an audio alarm.*
-
-### Brutalist Config & Smart Input
-![MacUI Config Panel](preview/config_ui_v4_rebalanced.svg)
-*The updated `/macui` config panel featuring a compressed font scale slider, dynamic ability selection, the custom Audio Dropdown menu, and the Smart Input Box at the bottom.*
-
-### Full Layout Overview
-![MacUI Full Layout](preview/macui_full_layout.svg)
-*The complete layout, featuring the configuration panel (left), center resource trackers, and the icon-based ability indicators on the right.*
+![Combat Demo](preview/macui_animated_demo.svg)
+*The state machine reacting to combat: green when buffed, red+desaturated when missing, gray when out of combat.*
 
 ---
 
@@ -45,4 +78,33 @@ Move any UI element on your screen and lock it. Your exact layout coordinates, t
 1. Download or clone this repository.
 2. Place the `MacUI` folder inside your `World of Warcraft/_retail_/Interface/AddOns/` directory.
 3. Log into the game and ensure the addon is enabled in your character select screen.
-4. Type `/macui` in chat to begin customizing your UI!
+4. Type `/macui` in chat or click the minimap button to begin customizing your UI!
+
+## Architecture
+
+```
+MacUI/
+├── MacUI.lua              # Core event handler, DB init, spec change system
+├── Config.lua             # Options panel, Lock/Unlock, font slider, Smart Input
+├── AbilityTracker.lua     # Custom spell tracking with independent draggable icons
+├── Animations.lua         # Reusable animation functions (PulseRed)
+├── Square.lua             # Warrior Shield Block status indicator
+├── PlayerHealth.lua       # Player health percentage (independent frame)
+├── WarriorTracker.lua     # 4 independent frames: Rage, IP, SB Charges, SB Buff
+├── PaladinTracker.lua     # 3 independent frames: Holy Power, SotR, Consecration
+├── MinimapButton.lua      # AddonCompartment + legacy draggable minimap button
+├── .github/
+│   ├── AI_DEVELOPMENT_GUIDELINES.md  # Coding standards & API reference
+│   └── copilot-instructions.md       # GitHub Copilot instructions
+├── .cursorrules           # Cursor AI instructions
+└── AGENTS.md              # Gemini/Antigravity instructions
+```
+
+## Key Technical Details
+- **Zero Dependencies:** No Ace3, no LibDataBroker, no external libraries.
+- **12.0.5 API Compliant:** All `C_Spell`, `C_UnitAuras` APIs use modern table returns.
+- **Performance:** All globals upvalued, `OnUpdate` throttled and disabled when inactive, frames pooled.
+- **SavedVariables:** `MacUIDB` stores positions, font size, tracked abilities, audio settings, and minimap angle.
+
+## License
+See [LICENSE](LICENSE) for details.

@@ -21,11 +21,11 @@ local configFrame = CreateFrame("Frame")
 
 -- Applies the saved position and scale to a specific frame
 local function ApplyFrameSettings(frame)
-    if not frame then return end
-    local frameName = frame:GetName()
-    
-    if MacUIDB.positions and MacUIDB.positions[frameName] then
-        local pos = MacUIDB.positions[frameName]
+    local saveKey = frame.saveKey or (frame.spellID and ("Ability_" .. frame.spellID)) or frame:GetName()
+    if not saveKey then return end
+
+    if MacUIDB and MacUIDB.positions and MacUIDB.positions[saveKey] then
+        local pos = MacUIDB.positions[saveKey]
         frame:ClearAllPoints()
         frame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
     else
@@ -35,8 +35,8 @@ local function ApplyFrameSettings(frame)
         end
     end
     
-    if MacUIDB.scales and MacUIDB.scales[frameName] then
-        frame:SetScale(MacUIDB.scales[frameName])
+    if MacUIDB and MacUIDB.scales and MacUIDB.scales[saveKey] then
+        frame:SetScale(MacUIDB.scales[saveKey])
     end
 end
 
@@ -120,17 +120,20 @@ local function LockFrames()
             frame.resizeControls:Hide()
         end
         
-        MacUIDB.scales = MacUIDB.scales or {}
-        MacUIDB.scales[frame:GetName()] = frame:GetScale()
-        
-        local point, _, relativePoint, x, y = frame:GetPoint()
-        if point then
-            MacUIDB.positions[frame:GetName()] = {
-                point = point,
-                relativePoint = relativePoint,
-                x = x,
-                y = y
-            }
+        local saveKey = frame.saveKey or (frame.spellID and ("Ability_" .. frame.spellID)) or frame:GetName()
+        if saveKey then
+            MacUIDB.scales = MacUIDB.scales or {}
+            MacUIDB.scales[saveKey] = frame:GetScale()
+            
+            local point, _, relativePoint, x, y = frame:GetPoint()
+            if point then
+                MacUIDB.positions[saveKey] = {
+                    point = point,
+                    relativePoint = relativePoint,
+                    x = x,
+                    y = y
+                }
+            end
         end
     end
 end

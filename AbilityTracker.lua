@@ -14,24 +14,21 @@ local GetSpellInfo = C_Spell and C_Spell.GetSpellInfo or GetSpellInfo
 -- Cache player class at load time
 local playerClass = addonTable.playerClass
 
--- Container frame for all ability indicators
-local trackerGroup = CreateFrame("Frame", "MacUIAbilityTracker", UIParent)
-trackerGroup:SetSize(160, 10) -- Height will be dynamically adjusted
-trackerGroup.defaultPoint = {"CENTER", UIParent, "CENTER", 200, 0}
-table.insert(addonTable.MovableFrames, trackerGroup)
+-- Invisible event-only frame (no visual footprint, just handles events and audio)
+local eventFrame = CreateFrame("Frame", "MacUIAbilityTrackerEvents", UIParent)
 
--- Store references to active and pooled indicator frames
+-- Store references to active indicator frames (keyed by spellID for fast lookup)
 local indicatorFrames = {}
+-- Pool of hidden, reusable frames
 local framePool = {}
 
--- NOTE: GetSpellTexture is already upvalued on line 11. Do not redeclare.
-
 local ICON_SIZE = 28
-local PADDING = 4
+local DEFAULT_STAGGER = 36 -- px between staggered default positions
 
 -- Helper: Create a single ability indicator with spell icon
-local function CreateIndicatorRow(parent)
-    local row = CreateFrame("Frame", nil, parent)
+-- Parent is UIParent so each icon is independently positionable
+local function CreateIndicatorRow()
+    local row = CreateFrame("Frame", nil, UIParent)
     row:SetSize(ICON_SIZE, ICON_SIZE)
 
     -- Colored border frame (shows green/red/gray status)
@@ -114,11 +111,21 @@ local function UpdateIndicator(indicator)
     end
 end
 
+-- Collect all active indicators into an ordered list for iteration
+local function GetActiveIndicators()
+    local list = {}
+    for _, indicator in pairs(indicatorFrames) do
+        table.insert(list, indicator)
+    end
+    return list
+end
+
 -- Update ALL indicators
 local function UpdateAllIndicators()
     local needsAudioUpdate = false
+    local activeList = GetActiveIndicators()
 
-    for _, indicator in ipairs(indicatorFrames) do
+    for _, indicator in ipairs(activeList) do
         UpdateIndicator(indicator)
         if indicator.isRed and MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[indicator.spellID] then
             needsAudioUpdate = true
@@ -127,34 +134,56 @@ local function UpdateAllIndicators()
 
     -- Dynamically enable/disable OnUpdate throttle for audio to save CPU
     if needsAudioUpdate then
-        if not trackerGroup.onUpdateActive then
-            trackerGroup:SetScript("OnUpdate", function(self, elapsed)
-                for _, ind in ipairs(indicatorFrames) do
-                    if ind.isRed and MacUIDB.audioAlerts[ind.spellID] then
+        if not eventFrame.onUpdateActive then
+            eventFrame:SetScript("OnUpdate", function(self, elapsed)
+                for _, ind in pairs(indicatorFrames) do
+                    if ind.isRed and MacUIDB.audioAlerts and MacUIDB.audioAlerts[ind.spellID] then
                         ind.audioTimer = (ind.audioTimer or 0) + elapsed
                         if ind.audioTimer >= 3.0 then
-                            -- audioAlerts[spellID] stores the specific sound ID (e.g. 8959, 8960, etc.)
                             PlaySound(MacUIDB.audioAlerts[ind.spellID])
                             ind.audioTimer = 0
                         end
                     end
                 end
             end)
-            trackerGroup.onUpdateActive = true
+            eventFrame.onUpdateActive = true
         end
     else
-        if trackerGroup.onUpdateActive then
-            trackerGroup:SetScript("OnUpdate", nil)
-            trackerGroup.onUpdateActive = false
+        if eventFrame.onUpdateActive then
+            eventFrame:SetScript("OnUpdate", nil)
+            eventFrame.onUpdateActive = false
         end
+    end
+end
+
+-- Apply a saved or default position to an indicator
+local function ApplyIndicatorPosition(indicator, index)
+    local frameName = indicator:GetName()
+    if not frameName then return end
+
+    if MacUIDB and MacUIDB.positions and MacUIDB.positions[frameName] then
+        local pos = MacUIDB.positions[frameName]
+        indicator:ClearAllPoints()
+        indicator:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
+    else
+        -- Default: stagger icons starting from center-right of screen
+        indicator:ClearAllPoints()
+        indicator:SetPoint("CENTER", UIParent, "CENTER", 200, 50 - ((index - 1) * DEFAULT_STAGGER))
     end
 end
 
 -- Rebuild the tracker UI based on MacUIDB.trackedAbilities
 local function RebuildTrackerUI()
     -- Return existing frames to the pool instead of leaking them
-    for _, indicator in ipairs(indicatorFrames) do
+    for spellID, indicator in pairs(indicatorFrames) do
         indicator:Hide()
+        -- Unregister from MovableFrames to prevent stale references
+        for i, mf in ipairs(addonTable.MovableFrames) do
+            if mf == indicator then
+                table.remove(addonTable.MovableFrames, i)
+                break
+            end
+        end
         table.insert(framePool, indicator)
     end
     indicatorFrames = {}
@@ -162,45 +191,71 @@ local function RebuildTrackerUI()
     if not MacUIDB or not MacUIDB.trackedAbilities then return end
 
     local index = 0
-    
+
     -- Process Custom Abilities
-    if MacUIDB and MacUIDB.customAbilities then
+    if MacUIDB.customAbilities then
         for spellID, isCustomTracked in pairs(MacUIDB.customAbilities) do
-            -- Only render if the user has checked the box in the config UI to track it
-            if MacUIDB.trackedAbilities and MacUIDB.trackedAbilities[spellID] then
+            -- Only render if the user has checked the box in the config UI
+            if MacUIDB.trackedAbilities[spellID] then
                 index = index + 1
-                
-                local row = table.remove(framePool) or CreateIndicatorRow(trackerGroup)
-                row:ClearAllPoints()
-                row:SetPoint("TOPLEFT", trackerGroup, "TOPLEFT", 0, -((index - 1) * (ICON_SIZE + PADDING)))
+
+                -- Reuse a pooled frame or create a new one
+                local row = table.remove(framePool) or CreateIndicatorRow()
+
+                -- Give it a unique, persistent name based on spell ID
+                -- so MacUIDB.positions["MacUIIndicator_2565"] persists across sessions
+                local frameName = "MacUIIndicator_" .. spellID
+                -- SetName is not available on generic frames, so we create with name if needed
+                if row:GetName() ~= frameName then
+                    -- We can't rename frames in WoW. If the pooled frame has a different name,
+                    -- create a fresh one with the correct name instead.
+                    row:Hide()
+                    row = CreateFrame("Frame", frameName, UIParent)
+                    row:SetSize(ICON_SIZE, ICON_SIZE)
+
+                    local border = CreateFrame("Frame", nil, row, "BackdropTemplate")
+                    border:SetSize(ICON_SIZE + 4, ICON_SIZE + 4)
+                    border:SetPoint("CENTER", row, "CENTER", 0, 0)
+                    border:SetBackdrop({
+                        edgeFile = "Interface\\Buttons\\WHITE8x8",
+                        edgeSize = 2,
+                    })
+                    border:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+
+                    local icon = row:CreateTexture(nil, "ARTWORK")
+                    icon:SetSize(ICON_SIZE, ICON_SIZE)
+                    icon:SetPoint("CENTER", row, "CENTER", 0, 0)
+                    icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+
+                    row.border = border
+                    row.icon = icon
+                    row.isRed = false
+                    row.audioTimer = 0
+                end
+
                 row.spellID = spellID
-                row.abilityType = "buff" -- Default custom tracking to 'buff' type
-                
+                row.abilityType = "buff"
+
                 local iconTexture = GetSpellTexture(spellID)
                 if not iconTexture then
-                    -- C_Spell.GetSpellInfo returns a table in 12.0.5
                     local spellInfo = GetSpellInfo(spellID)
                     iconTexture = spellInfo and spellInfo.iconID
                 end
-                
+
                 if iconTexture then
                     row.icon:SetTexture(iconTexture)
                 end
-                
+
+                -- Apply saved position or default stagger
+                ApplyIndicatorPosition(row, index)
+
+                -- Register for the Lock/Unlock system
+                table.insert(addonTable.MovableFrames, row)
+
                 row:Show()
-                table.insert(indicatorFrames, row)
+                indicatorFrames[spellID] = row
             end
         end
-    end
-
-    -- Adjust the container to fit all icon rows
-    trackerGroup:SetSize(ICON_SIZE, index * (ICON_SIZE + PADDING))
-
-    -- If no abilities are tracked, hide the entire group
-    if index == 0 then
-        trackerGroup:Hide()
-    else
-        trackerGroup:Show()
     end
 
     -- Force an initial update
@@ -216,22 +271,20 @@ table.insert(addonTable.OnSpecChanged, function()
 end)
 
 -- Event Registration
-trackerGroup:RegisterEvent("UNIT_AURA")
-trackerGroup:RegisterEvent("SPELL_UPDATE_COOLDOWN")
-trackerGroup:RegisterEvent("PLAYER_REGEN_DISABLED")
-trackerGroup:RegisterEvent("PLAYER_REGEN_ENABLED")
-trackerGroup:RegisterEvent("PLAYER_ENTERING_WORLD")
+eventFrame:RegisterEvent("UNIT_AURA")
+eventFrame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
+eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
+eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 -- NOTE (Guideline #8 exception): This module uses its own ADDON_LOADED handler
 -- because it needs MacUIDB.trackedAbilities to exist before calling RebuildTrackerUI().
 -- MacUI.lua initializes the core DB, but this module must independently verify its own
--- subset of keys before building UI elements. Consolidating would require a callback
--- system that adds complexity without meaningful performance gain for a one-shot event.
-trackerGroup:RegisterEvent("ADDON_LOADED")
+-- subset of keys before building UI elements.
+eventFrame:RegisterEvent("ADDON_LOADED")
 
 -- Event Handler
-trackerGroup:SetScript("OnEvent", function(self, event, arg1)
+eventFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
-        -- Initialize tracked abilities if needed
         if not MacUIDB then MacUIDB = {} end
         if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
 

@@ -72,6 +72,24 @@ addonTable.ClassDisplayInfo = {
     },
 }
 
+-- Text Aura/Charges metadata per class+spec
+-- This drives the ClassMechanics.lua engine for spec-specific tracking
+addonTable.ClassMechanics = {
+    WARRIOR = {
+        [3] = { -- Protection
+            { id = 190456, type = "absorb", label = "Ignore Pain", color = {1, 0.5, 0}, point = {0, -125} },
+            { id = 2565, type = "charges", label = "SB Charges", color = {0.5, 0.5, 1}, point = {0, -150} },
+            { id = 2565, type = "buff", label = "SB Buff", color = {0.5, 0.5, 1}, point = {0, -175} },
+        }
+    },
+    PALADIN = {
+        [2] = { -- Protection
+            { id = 132403, type = "buff", label = "SotR Buff", color = {1, 1, 0}, point = {0, -125} },
+            { id = 188370, type = "active", label = "Consecration", color = {1, 1, 0}, point = {0, -150} },
+        }
+    }
+}
+
 local function UpdatePlayerSpec()
     local specIndex = GetSpecialization()
     addonTable.playerSpec = specIndex

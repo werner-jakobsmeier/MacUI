@@ -39,7 +39,7 @@ local function UpdateHealth()
     local percent = math.floor((health / maxHealth) * 100)
     
     -- Green font
-    healthText:SetText(string.format("|cFF00FF00Health: %d%%|r", percent))
+    healthText:SetText(string.format("|cFF00FF00%d%%|r", percent))
 end
 
 -- Hook into display changes

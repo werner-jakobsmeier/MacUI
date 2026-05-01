@@ -15,6 +15,6 @@ Animations.lua
 AbilityTracker.lua
 Square.lua
 PlayerHealth.lua
-WarriorTracker.lua
-PaladinTracker.lua
+PlayerStats.lua
+ClassMechanics.lua
 MinimapButton.lua

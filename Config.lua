@@ -22,23 +22,8 @@ local configFrame = CreateFrame("Frame")
 
 -- Applies the saved font size to all registered font strings
 
-local function ApplyFontSize(size)
-    if not size or size <= 0 then return end
-    if not MacUIDB then return end
-    MacUIDB.fontSize = size
-    
-    for _, frame in ipairs(addonTable.MovableFrames or {}) do
-        if frame.fontStrings then
-            for _, fs in ipairs(frame.fontStrings) do
-                local fontPath, _, fontFlags = fs:GetFont()
-                fs:SetFont(fontPath or "Fonts\\FRIZQT__.TTF", size, fontFlags)
-            end
-        end
-    end
-end
-
--- Applies the saved position to a specific frame
-local function ApplyFramePosition(frame)
+-- Applies the saved position and scale to a specific frame
+local function ApplyFrameSettings(frame)
     if not frame then return end
     local frameName = frame:GetName()
     
@@ -51,6 +36,10 @@ local function ApplyFramePosition(frame)
             frame:ClearAllPoints()
             frame:SetPoint(unpack(frame.defaultPoint))
         end
+    end
+    
+    if MacUIDB.scales and MacUIDB.scales[frameName] then
+        frame:SetScale(MacUIDB.scales[frameName])
     end
 end
 
@@ -70,6 +59,49 @@ local function UnlockFrames()
             frame.dragTexture:SetColorTexture(0, 1, 0, 0.4)
         end
         frame.dragTexture:Show()
+        
+        if not frame.resizeControls then
+            local rc = CreateFrame("Frame", nil, frame, "BackdropTemplate")
+            rc:SetSize(40, 20)
+            rc:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 20, -10)
+            rc:SetFrameStrata("TOOLTIP")
+            
+            local btnMinus = CreateFrame("Button", nil, rc, "BackdropTemplate")
+            btnMinus:SetSize(20, 20)
+            btnMinus:SetPoint("LEFT", rc, "LEFT")
+            btnMinus:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8", edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 1 })
+            btnMinus:SetBackdropColor(0.15, 0.15, 0.15, 1)
+            btnMinus:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+            local minusText = btnMinus:CreateFontString(nil, "OVERLAY")
+            minusText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+            minusText:SetPoint("CENTER", 0, 1)
+            minusText:SetText("-")
+            
+            local btnPlus = CreateFrame("Button", nil, rc, "BackdropTemplate")
+            btnPlus:SetSize(20, 20)
+            btnPlus:SetPoint("RIGHT", rc, "RIGHT")
+            btnPlus:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8x8", edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 1 })
+            btnPlus:SetBackdropColor(0.15, 0.15, 0.15, 1)
+            btnPlus:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+            local plusText = btnPlus:CreateFontString(nil, "OVERLAY")
+            plusText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+            plusText:SetPoint("CENTER", 0, 1)
+            plusText:SetText("+")
+            
+            local function ChangeScale(delta)
+                local currentScale = frame:GetScale() or 1.0
+                local newScale = currentScale + delta
+                if newScale < 0.5 then newScale = 0.5 end
+                if newScale > 3.0 then newScale = 3.0 end
+                frame:SetScale(newScale)
+            end
+            
+            btnMinus:SetScript("OnClick", function() ChangeScale(-0.1) end)
+            btnPlus:SetScript("OnClick", function() ChangeScale(0.1) end)
+            
+            frame.resizeControls = rc
+        end
+        frame.resizeControls:Show()
     end
 end
 
@@ -87,6 +119,12 @@ local function LockFrames()
         if frame.dragTexture then
             frame.dragTexture:Hide()
         end
+        if frame.resizeControls then
+            frame.resizeControls:Hide()
+        end
+        
+        MacUIDB.scales = MacUIDB.scales or {}
+        MacUIDB.scales[frame:GetName()] = frame:GetScale()
         
         local point, _, relativePoint, x, y = frame:GetPoint()
         if point then
@@ -211,66 +249,24 @@ btnLock:SetScript("OnClick", function()
     addonTable.IsUnlocked = false
 end)
 
--- Font Size section (Compact)
-local fontGroup = CreateFrame("Frame", nil, optionsPanel)
-fontGroup:SetSize(220, 30)
-fontGroup:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -100)
-
-local fontSizeLabel = fontGroup:CreateFontString(nil, "OVERLAY")
-fontSizeLabel:SetFont("Fonts\\FRIZQT__.TTF", 10)
-fontSizeLabel:SetPoint("TOPLEFT", fontGroup, "TOPLEFT", 0, 0)
-fontSizeLabel:SetText("|cFF888888FONT SIZE:|r")
-
-local fontSizeValue = fontGroup:CreateFontString(nil, "OVERLAY")
-fontSizeValue:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
-fontSizeValue:SetPoint("LEFT", fontSizeLabel, "RIGHT", 5, 0)
-fontSizeValue:SetText("|cFFFFFFFF14|r")
-
--- Custom slider (thin white line with white handle)
-local slider = CreateFrame("Slider", "MacUIFontSlider", fontGroup)
-slider:SetSize(220, 10)
-slider:SetPoint("BOTTOMLEFT", fontGroup, "BOTTOMLEFT", 0, 0)
-slider:SetMinMaxValues(8, 32)
-slider:SetValueStep(1)
-slider:SetObeyStepOnDrag(true)
-
--- Slider track (thin white line)
-local sliderTrack = slider:CreateTexture(nil, "BACKGROUND")
-sliderTrack:SetColorTexture(0.4, 0.4, 0.4, 1)
-sliderTrack:SetHeight(2)
-sliderTrack:SetPoint("LEFT", slider, "LEFT", 0, 0)
-sliderTrack:SetPoint("RIGHT", slider, "RIGHT", 0, 0)
-
--- Slider thumb (white circle)
-local thumbTex = slider:CreateTexture(nil, "OVERLAY")
-thumbTex:SetColorTexture(1, 1, 1, 1)
-thumbTex:SetSize(10, 10)
-slider:SetThumbTexture(thumbTex)
-
-slider:SetScript("OnValueChanged", function(self, value)
-    value = math.floor(value + 0.5) -- Round to nearest integer
-    fontSizeValue:SetText("|cFFFFFFFF" .. value .. "|r")
-    ApplyFontSize(value)
-end)
-
 ------------------------------------------------
 -- Player Stats (Grid Tiles)
 ------------------------------------------------
 
 local statsLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 statsLabel:SetFont("Fonts\\FRIZQT__.TTF", 10)
-statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -150)
+statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -100)
 statsLabel:SetText("|cFF888888PLAYER STATS|r")
 
 local statsSeparator = optionsPanel:CreateTexture(nil, "OVERLAY")
 statsSeparator:SetColorTexture(0.3, 0.3, 0.3, 1)
 statsSeparator:SetSize(240, 1)
-statsSeparator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -163)
+statsSeparator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -113)
 
 local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColor)
     local tile = CreateFrame("Button", nil, parent, "BackdropTemplate")
     tile:SetSize(74, 50)
-    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -170)
+    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -120)
     tile:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -334,7 +330,7 @@ else
     -- Dimmed N/A tile
     local naTile = CreateFrame("Frame", nil, optionsPanel, "BackdropTemplate")
     naTile:SetSize(76, 50)
-    naTile:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 184, -170)
+    naTile:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 184, -120)
     naTile:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -363,14 +359,14 @@ end
 -- Section label
 local abilitiesLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 abilitiesLabel:SetFont("Fonts\\FRIZQT__.TTF", 10)
-abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -235)
+abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -185)
 abilitiesLabel:SetText("|cFF888888ABILITY TRACKING|r")
 
 -- Separator line
 local separator = optionsPanel:CreateTexture(nil, "OVERLAY")
 separator:SetColorTexture(0.3, 0.3, 0.3, 1)
 separator:SetSize(240, 1)
-separator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -248)
+separator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -198)
 
 ------------------------------------------------
 -- Audio Dropdown Menu
@@ -597,7 +593,7 @@ local function BuildAbilityCheckboxes()
             if spellInfo and spellInfo.name then
                 local name = spellInfo.name
                 visibleIndex = visibleIndex + 1
-                local yOffset = -260 - ((visibleIndex - 1) * 24)
+                local yOffset = -210 - ((visibleIndex - 1) * 24)
                 -- custom abilities default to "buff" type for tracking
                 local ability = { spellID = spellID, name = name, type = "buff" } 
                 local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, true)
@@ -611,17 +607,17 @@ local function BuildAbilityCheckboxes()
     if not emptyStateMessage then
         emptyStateMessage = optionsPanel:CreateFontString(nil, "OVERLAY")
         emptyStateMessage:SetFont("Fonts\\FRIZQT__.TTF", 10)
-        emptyStateMessage:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -260)
+        emptyStateMessage:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -210)
         emptyStateMessage:SetText("|cFF888888You are not tracking any abilities.\nShift-Click a spell from your spellbook\nbelow to get started.|r")
         optionsPanel.emptyStateMessage = emptyStateMessage
     end
     
     -- Position Smart Input Box
-    local inputYOffset = -260 - (visibleIndex * 24) - 5
+    local inputYOffset = -210 - (visibleIndex * 24) - 5
     
     if visibleIndex == 0 then
         emptyStateMessage:Show()
-        inputYOffset = -175 - 40 - 5 -- Move below the 3-line message
+        inputYOffset = -210 - 40 - 5 -- Move below the 3-line message
     else
         emptyStateMessage:Hide()
     end
@@ -729,8 +725,6 @@ SlashCmdList["MACUI"] = function()
         optionsPanel:Hide()
     else
         optionsPanel:Show()
-        -- Ensure slider visually matches the current saved value
-        slider:SetValue(MacUIDB and MacUIDB.fontSize or 14)
         -- Refresh checkboxes to reflect current DB state
         RefreshAbilityCheckboxes()
         
@@ -748,15 +742,12 @@ configFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
         if not MacUIDB then MacUIDB = {} end
         if not MacUIDB.positions then MacUIDB.positions = {} end
-        if not MacUIDB.fontSize then MacUIDB.fontSize = 14 end
+        if not MacUIDB.scales then MacUIDB.scales = {} end
         if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
         
         for _, frame in ipairs(addonTable.MovableFrames or {}) do
-            ApplyFramePosition(frame)
+            ApplyFrameSettings(frame)
         end
-        
-        ApplyFontSize(MacUIDB.fontSize)
-        slider:SetValue(MacUIDB.fontSize)
         
         -- Build ability checkboxes now that the DB is ready
         BuildAbilityCheckboxes()

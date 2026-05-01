@@ -64,7 +64,8 @@ local function RebuildMechanics()
         table.insert(addonTable.MovableFrames, frame)
         table.insert(activeFrames, frame)
         
-        local text = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        local text = frame:CreateFontString(nil, "OVERLAY")
+        text:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
         text:SetPoint("CENTER", frame, "CENTER", 0, 0)
         frame.fontStrings = { text }
         frame.text = text

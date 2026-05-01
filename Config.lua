@@ -73,7 +73,7 @@ local function UnlockFrames()
             btnMinus:SetBackdropColor(0.15, 0.15, 0.15, 1)
             btnMinus:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
             local minusText = btnMinus:CreateFontString(nil, "OVERLAY")
-            minusText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+            minusText:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
             minusText:SetPoint("CENTER", 0, 1)
             minusText:SetText("-")
             
@@ -84,7 +84,7 @@ local function UnlockFrames()
             btnPlus:SetBackdropColor(0.15, 0.15, 0.15, 1)
             btnPlus:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
             local plusText = btnPlus:CreateFontString(nil, "OVERLAY")
-            plusText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+            plusText:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
             plusText:SetPoint("CENTER", 0, 1)
             plusText:SetText("+")
             
@@ -144,7 +144,7 @@ end
 
 -- Custom black panel with NO border (floating brutalist style)
 local optionsPanel = CreateFrame("Frame", "MacUIOptionsPanel", UIParent, "BackdropTemplate")
-optionsPanel:SetSize(260, 360)
+optionsPanel:SetSize(300, 360)
 optionsPanel:SetPoint("CENTER")
 optionsPanel:Hide()
 optionsPanel:SetMovable(true)
@@ -168,12 +168,12 @@ optionsPanel:SetBackdropBorderColor(1, 1, 1, 1)
 
 -- Split-weight title: bold "MAC" + thin "UI"
 local titleBold = optionsPanel:CreateFontString(nil, "OVERLAY")
-titleBold:SetFont("Fonts\\FRIZQT__.TTF", 22, "OUTLINE")
+titleBold:SetFont("Fonts\\ARIALN.TTF", 22, "OUTLINE")
 titleBold:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 16, -14)
 titleBold:SetText("|cFFFFFFFFMAC|r")
 
 local titleThin = optionsPanel:CreateFontString(nil, "OVERLAY")
-titleThin:SetFont("Fonts\\FRIZQT__.TTF", 22)
+titleThin:SetFont("Fonts\\ARIALN.TTF", 22)
 titleThin:SetPoint("LEFT", titleBold, "RIGHT", 0, 0)
 titleThin:SetText("|cFFAAAAAAUI|r")
 
@@ -182,7 +182,7 @@ local closeBtn = CreateFrame("Button", nil, optionsPanel)
 closeBtn:SetSize(20, 20)
 closeBtn:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -10, -10)
 local closeBtnText = closeBtn:CreateFontString(nil, "OVERLAY")
-closeBtnText:SetFont("Fonts\\FRIZQT__.TTF", 18)
+closeBtnText:SetFont("Fonts\\ARIALN.TTF", 18)
 closeBtnText:SetPoint("CENTER")
 closeBtnText:SetText("|cFFFFFFFF×|r")
 closeBtn:SetScript("OnClick", function() optionsPanel:Hide() end)
@@ -203,7 +203,7 @@ local function CreatePillButton(parent, text)
     btn:SetBackdropBorderColor(1, 1, 1, 1)
 
     local btnText = btn:CreateFontString(nil, "OVERLAY")
-    btnText:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+    btnText:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
     btnText:SetPoint("CENTER")
     btnText:SetTextColor(0, 0, 0, 1) -- Black text
     btnText:SetText(text)
@@ -257,13 +257,13 @@ end)
 ------------------------------------------------
 
 local statsLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
-statsLabel:SetFont("Fonts\\FRIZQT__.TTF", 10)
+statsLabel:SetFont("Fonts\\ARIALN.TTF", 10)
 statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -100)
 statsLabel:SetText("|cFF888888PLAYER STATS|r")
 
 local statsSeparator = optionsPanel:CreateTexture(nil, "OVERLAY")
 statsSeparator:SetColorTexture(0.3, 0.3, 0.3, 1)
-statsSeparator:SetSize(240, 1)
+statsSeparator:SetSize(280, 1)
 statsSeparator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -113)
 
 local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColor)
@@ -277,12 +277,12 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
     })
     
     local nameText = tile:CreateFontString(nil, "OVERLAY")
-    nameText:SetFont("Fonts\\FRIZQT__.TTF", 9)
+    nameText:SetFont("Fonts\\ARIALN.TTF", 9)
     nameText:SetPoint("TOP", tile, "TOP", 0, -12)
     nameText:SetText(label)
     
     local typeText = tile:CreateFontString(nil, "OVERLAY")
-    typeText:SetFont("Fonts\\FRIZQT__.TTF", 8)
+    typeText:SetFont("Fonts\\ARIALN.TTF", 8)
     typeText:SetPoint("BOTTOM", tile, "BOTTOM", 0, 12)
     typeText:SetText(typeLabel)
     
@@ -319,7 +319,7 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
 end
 
 -- Create the 3 tiles
-local healthTile = CreateStatTile(optionsPanel, "health", 0, "HEALTH", "HP %", {0, 1, 0})
+local healthTile = CreateStatTile(optionsPanel, "health", 0, "HEALTH", "HP Value", {0, 1, 0})
 local resourceTile, powerTile
 
 local classInfo = addonTable.ClassDisplayInfo and addonTable.ClassDisplayInfo[addonTable.playerClass]
@@ -343,13 +343,13 @@ else
     naTile:SetBackdropBorderColor(0.13, 0.13, 0.13, 1)
     
     local nameText = naTile:CreateFontString(nil, "OVERLAY")
-    nameText:SetFont("Fonts\\FRIZQT__.TTF", 9)
+    nameText:SetFont("Fonts\\ARIALN.TTF", 9)
     nameText:SetPoint("TOP", naTile, "TOP", 0, -12)
     nameText:SetText("POWER")
     nameText:SetTextColor(0.2, 0.2, 0.2)
     
     local typeText = naTile:CreateFontString(nil, "OVERLAY")
-    typeText:SetFont("Fonts\\FRIZQT__.TTF", 8)
+    typeText:SetFont("Fonts\\ARIALN.TTF", 8)
     typeText:SetPoint("BOTTOM", naTile, "BOTTOM", 0, 12)
     typeText:SetText("N/A")
     typeText:SetTextColor(0.13, 0.13, 0.13)
@@ -361,7 +361,7 @@ end
 
 -- Section label
 local abilitiesLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
-abilitiesLabel:SetFont("Fonts\\FRIZQT__.TTF", 10)
+abilitiesLabel:SetFont("Fonts\\ARIALN.TTF", 10)
 abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -185)
 abilitiesLabel:SetText("|cFF888888ABILITY TRACKING|r")
 
@@ -401,7 +401,7 @@ for i, option in ipairs(SOUND_OPTIONS) do
     btn:SetPoint("TOP", audioDropdown, "TOP", 0, -2 - ((i - 1) * 20))
     
     local text = btn:CreateFontString(nil, "OVERLAY")
-    text:SetFont("Fonts\\FRIZQT__.TTF", 10)
+    text:SetFont("Fonts\\ARIALN.TTF", 10)
     text:SetPoint("LEFT", btn, "LEFT", 5, 0)
     text:SetText(option.name)
     btn.text = text
@@ -445,7 +445,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
 
     -- Checkmark text (hidden by default)
     local checkmark = checkbox:CreateFontString(nil, "OVERLAY")
-    checkmark:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+    checkmark:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
     checkmark:SetPoint("CENTER", checkbox, "CENTER", 0, 0)
     checkmark:SetText("|cFF000000✓|r")
     checkmark:Hide()
@@ -462,7 +462,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
 
     -- Ability name (after the icon)
     local nameText = row:CreateFontString(nil, "OVERLAY")
-    nameText:SetFont("Fonts\\FRIZQT__.TTF", 11)
+    nameText:SetFont("Fonts\\ARIALN.TTF", 11)
     nameText:SetPoint("LEFT", iconPreview, "RIGHT", 6, 0)
     nameText:SetText("|cFFFFFFFF" .. ability.name .. "|r")
 
@@ -472,7 +472,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
         delBtn:SetSize(12, 12)
         delBtn:SetPoint("LEFT", nameText, "RIGHT", 4, 0)
         local delText = delBtn:CreateFontString(nil, "OVERLAY")
-        delText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+        delText:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
         delText:SetPoint("CENTER", delBtn, "CENTER", 0, 0)
         delText:SetText("|cFFFF5555X|r")
         
@@ -499,7 +499,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     })
     
     local audioText = audioBtn:CreateFontString(nil, "OVERLAY")
-    audioText:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+    audioText:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
     audioText:SetPoint("CENTER", audioBtn, "CENTER", 1, 0)
     audioText:SetText("A")
     
@@ -609,7 +609,7 @@ local function BuildAbilityCheckboxes()
     local emptyStateMessage = optionsPanel.emptyStateMessage
     if not emptyStateMessage then
         emptyStateMessage = optionsPanel:CreateFontString(nil, "OVERLAY")
-        emptyStateMessage:SetFont("Fonts\\FRIZQT__.TTF", 10)
+        emptyStateMessage:SetFont("Fonts\\ARIALN.TTF", 10)
         emptyStateMessage:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -210)
         emptyStateMessage:SetText("|cFF888888You are not tracking any abilities.\nShift-Click a spell from your spellbook\nbelow to get started.|r")
         optionsPanel.emptyStateMessage = emptyStateMessage
@@ -651,7 +651,7 @@ local function BuildAbilityCheckboxes()
         addBtn:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
         
         local addText = addBtn:CreateFontString(nil, "OVERLAY")
-        addText:SetFont("Fonts\\FRIZQT__.TTF", 14, "OUTLINE")
+        addText:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
         addText:SetPoint("CENTER", addBtn, "CENTER", 1, 0)
         addText:SetText("+")
         

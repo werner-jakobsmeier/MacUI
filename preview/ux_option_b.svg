@@ -1,90 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="280" height="520" viewBox="0 0 280 520">
-  <defs>
-    <style>
-      text { font-family: 'Segoe UI', 'Inter', sans-serif; }
-    </style>
-  </defs>
+<svg width="300" height="360" viewBox="0 0 300 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="360" fill="#050505"/>
+  <rect x="0.5" y="0.5" width="299" height="359" stroke="#222222"/>
+  
+  <text x="16" y="28" fill="white" font-family="Arial Narrow" font-size="16" font-weight="bold">MACUI</text>
+  
+  <!-- Top Right Text Buttons (No box) -->
+  <text x="210" y="27" fill="white" font-family="Arial Narrow" font-size="9" text-anchor="middle">RELOAD</text>
+  <line x1="195" y1="30" x2="225" y2="30" stroke="white" stroke-width="0.5"/>
+  
+  <text x="260" y="27" fill="white" font-family="Arial Narrow" font-size="9" text-anchor="middle">CLOSE</text>
+  <line x1="248" y1="30" x2="272" y2="30" stroke="white" stroke-width="0.5"/>
 
-  <!-- Panel Background -->
-  <rect width="280" height="520" fill="#0a0a0a" opacity="0.97"/>
-
-  <!-- Title -->
-  <text x="18" y="34" font-size="22" font-weight="700" fill="#ffffff">MAC</text>
-  <text x="72" y="34" font-size="22" font-weight="400" fill="#aaaaaa">UI</text>
-  <text x="254" y="30" font-size="18" fill="#ffffff" text-anchor="middle">×</text>
-
-  <!-- Buttons -->
-  <rect x="18" y="52" width="115" height="32" rx="2" fill="#ffffff"/>
-  <text x="75" y="73" font-size="12" font-weight="600" fill="#000000" text-anchor="middle">UNLOCK</text>
-  <rect x="147" y="52" width="115" height="32" rx="2" fill="#ffffff"/>
-  <text x="204" y="73" font-size="12" font-weight="600" fill="#000000" text-anchor="middle">LOCK</text>
-
-  <!-- Font Size -->
-  <text x="18" y="108" font-size="10" fill="#888888">FONT SIZE:</text>
-  <text x="88" y="108" font-size="10" font-weight="600" fill="#ffffff">14</text>
-  <rect x="18" y="116" width="240" height="2" rx="1" fill="#444444"/>
-  <circle cx="110" cy="117" r="5" fill="#ffffff"/>
-
-  <!-- ════════════════════════════════════ -->
-  <!-- SECTION 1: PLAYER STATS — Card Style -->
-  <!-- ════════════════════════════════════ -->
-  <text x="18" y="148" font-size="10" font-weight="600" fill="#888888">PLAYER STATS</text>
-  <rect x="18" y="155" width="240" height="1" fill="#333333"/>
-
-  <!-- Health Card (enabled) -->
-  <rect x="18" y="164" width="240" height="36" rx="2" fill="#111111" stroke="#333333" stroke-width="1"/>
-  <text x="30" y="186" font-size="12" font-weight="600" fill="#00ff00">HEALTH</text>
-  <text x="115" y="186" font-size="9" fill="#555555">Player HP %</text>
-  <!-- Checkbox on right -->
-  <rect x="232" y="174" width="16" height="16" rx="1" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-  <text x="240" y="187" font-size="11" font-weight="700" fill="#000000" text-anchor="middle">✓</text>
-
-  <!-- Resource Card (enabled) -->
-  <rect x="18" y="206" width="240" height="36" rx="2" fill="#111111" stroke="#333333" stroke-width="1"/>
-  <text x="30" y="228" font-size="12" font-weight="600" fill="#ff0000">RAGE</text>
-  <text x="80" y="228" font-size="9" fill="#555555">Primary Resource</text>
-  <rect x="232" y="216" width="16" height="16" rx="1" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-  <text x="240" y="229" font-size="11" font-weight="700" fill="#000000" text-anchor="middle">✓</text>
-
-  <!-- Power Card (disabled / N/A for Prot Warrior) -->
-  <rect x="18" y="248" width="240" height="36" rx="2" fill="#0a0a0a" stroke="#222222" stroke-width="1"/>
-  <text x="30" y="270" font-size="12" font-weight="600" fill="#333333">POWER</text>
-  <text x="85" y="270" font-size="9" fill="#333333">Not available for this spec</text>
-
-  <!-- ════════════════════════════════════ -->
-  <!-- SECTION 2: ABILITY TRACKING -->
-  <!-- ════════════════════════════════════ -->
-  <text x="18" y="306" font-size="10" font-weight="600" fill="#888888">ABILITY TRACKING</text>
-  <rect x="18" y="313" width="240" height="1" fill="#333333"/>
-
-  <!-- Ability Row 1 -->
-  <rect x="18" y="324" width="14" height="14" rx="1" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-  <text x="25" y="335" font-size="10" font-weight="700" fill="#000000">✓</text>
-  <rect x="38" y="324" width="16" height="16" rx="2" fill="#4488cc"/>
-  <text x="60" y="336" font-size="11" fill="#ffffff">Shield Block</text>
-  <text x="155" y="336" font-size="10" fill="#ff5555">X</text>
-  <rect x="240" y="324" width="16" height="16" rx="1" fill="#229922" stroke="#00ff00" stroke-width="1"/>
-  <text x="248" y="336" font-size="10" font-weight="600" fill="#000000" text-anchor="middle">A</text>
-
-  <!-- Ability Row 2 -->
-  <rect x="18" y="348" width="14" height="14" rx="1" fill="#ffffff" stroke="#ffffff" stroke-width="1"/>
-  <text x="25" y="359" font-size="10" font-weight="700" fill="#000000">✓</text>
-  <rect x="38" y="348" width="16" height="16" rx="2" fill="#cc8844"/>
-  <text x="60" y="360" font-size="11" fill="#ffffff">Ignore Pain</text>
-  <text x="145" y="360" font-size="10" fill="#ff5555">X</text>
-  <rect x="240" y="348" width="16" height="16" rx="1" fill="#222222" stroke="#555555" stroke-width="1"/>
-  <text x="248" y="360" font-size="10" font-weight="600" fill="#555555" text-anchor="middle">A</text>
-
-  <!-- Input -->
-  <rect x="24" y="380" width="170" height="22" rx="1" fill="none" stroke="#555555" stroke-width="1"/>
-  <text x="32" y="395" font-size="11" fill="#777777" font-style="italic">Shift-Click spell...</text>
-  <rect x="200" y="380" width="22" height="22" rx="1" fill="#222222" stroke="#555555" stroke-width="1"/>
-  <text x="211" y="396" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">+</text>
-
-  <!-- Option Label -->
-  <rect x="18" y="430" width="240" height="1" fill="#222222"/>
-  <text x="140" y="450" font-size="10" font-weight="700" fill="#00cc44" text-anchor="middle">OPTION B — Stat Cards</text>
-  <text x="140" y="465" font-size="9" fill="#555555" text-anchor="middle">Each stat is a bordered card with color-coded label.</text>
-  <text x="140" y="480" font-size="9" fill="#555555" text-anchor="middle">Health = green, Rage = red (matches in-game color).</text>
-  <text x="140" y="495" font-size="9" fill="#555555" text-anchor="middle">Unavailable power is dimmed — not hidden.</text>
+  <!-- Lock Section -->
+  <text x="20" y="65" fill="#666666" font-family="Arial Narrow" font-size="10">STATUS</text>
+  <text x="20" y="85" fill="white" font-family="Arial Narrow" font-size="10">[X] UNLOCKED</text>
+  <text x="110" y="85" fill="#444444" font-family="Arial Narrow" font-size="10">[ ] LOCKED</text>
+  
+  <!-- Stats -->
+  <text x="20" y="125" fill="#666666" font-family="Arial Narrow" font-size="10">PLAYER STATS</text>
+  <rect x="20" y="135" width="260" height="40" stroke="#333333"/>
+  <text x="60" y="160" fill="#00FF00" font-family="Arial Narrow" font-size="9" text-anchor="middle">HEALTH</text>
+  <text x="150" y="160" fill="#FF0000" font-family="Arial Narrow" font-size="9" text-anchor="middle">RESOURCE</text>
+  <text x="240" y="160" fill="#FF8000" font-family="Arial Narrow" font-size="9" text-anchor="middle">POWER</text>
 </svg>

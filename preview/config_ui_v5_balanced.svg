@@ -1,0 +1,32 @@
+<svg width="300" height="360" viewBox="0 0 300 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="300" height="360" fill="#080808"/>
+  <rect x="0.5" y="0.5" width="299" height="359" stroke="#333333"/>
+  
+  <!-- Header -->
+  <text x="20" y="30" fill="white" font-family="Arial Narrow" font-size="14" font-weight="bold">MacUI CONFIG (BALANCED)</text>
+  <line x1="20" y1="40" x2="280" y2="40" stroke="#333333"/>
+  
+  <!-- Top Buttons (Balanced: 125 width, 10 gap) -->
+  <rect x="20" y="55" width="125" height="24" fill="#1A1A1A" stroke="#444444"/>
+  <text x="82.5" y="72" fill="white" font-family="Arial Narrow" font-size="11" text-anchor="middle">UNLOCK</text>
+  
+  <rect x="155" y="55" width="125" height="24" fill="#1A1A1A" stroke="#444444"/>
+  <text x="217.5" y="72" fill="white" font-family="Arial Narrow" font-size="11" text-anchor="middle">LOCK</text>
+  
+  <!-- Stat Tiles (Balanced: 80 width, 10 gap) -->
+  <text x="20" y="105" fill="#666666" font-family="Arial Narrow" font-size="10">PLAYER STATS</text>
+  <line x1="20" y1="113" x2="280" y2="113" stroke="#444444"/>
+  
+  <rect x="20" y="120" width="80" height="50" fill="#0F0F0F" stroke="#00FF00"/>
+  <rect x="110" y="120" width="80" height="50" fill="#0F0F0F" stroke="#FF0000"/>
+  <rect x="200" y="120" width="80" height="50" fill="#0F0F0F" stroke="#FF8000"/>
+  
+  <!-- Ability Section -->
+  <text x="20" y="195" fill="#666666" font-family="Arial Narrow" font-size="10">ABILITY TRACKING</text>
+  <line x1="20" y1="203" x2="280" y2="203" stroke="#444444"/>
+  
+  <!-- Reload Button (260 width) -->
+  <rect x="20" y="320" width="260" height="24" fill="#1A1A1A" stroke="#444444"/>
+  <text x="150" y="336" fill="white" font-family="Arial Narrow" font-size="11" text-anchor="middle">RELOAD</text>
+</svg>

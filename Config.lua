@@ -175,48 +175,109 @@ titleBold:SetText("|cFFFFFFFFMAC|r")
 local titleThin = optionsPanel:CreateFontString(nil, "OVERLAY")
 titleThin:SetFont("Fonts\\ARIALN.TTF", 22)
 titleThin:SetPoint("LEFT", titleBold, "RIGHT", 0, 0)
-titleThin:SetText("|cFFAAAAAAUI|r")
+titleThin:SetText("|cFFFFFFFFUI|r")
 
--- Minimal × close button (top right)
-local closeBtn = CreateFrame("Button", nil, optionsPanel)
-closeBtn:SetSize(20, 20)
-closeBtn:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -10, -10)
-local closeBtnText = closeBtn:CreateFontString(nil, "OVERLAY")
-closeBtnText:SetFont("Fonts\\ARIALN.TTF", 18)
-closeBtnText:SetPoint("CENTER")
-closeBtnText:SetText("|cFFFFFFFF×|r")
-closeBtn:SetScript("OnClick", function() optionsPanel:Hide() end)
-closeBtn:SetScript("OnEnter", function() closeBtnText:SetText("|cFFFF4444×|r") end)
-closeBtn:SetScript("OnLeave", function() closeBtnText:SetText("|cFFFFFFFF×|r") end)
+-- Top Right System Buttons (LOCK / RELOAD / CLOSE)
+local btnToggleLock = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
+btnToggleLock:SetSize(58, 18)
+btnToggleLock:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -126, -14)
+btnToggleLock:SetBackdrop({
+    bgFile = "Interface\\Buttons\\WHITE8x8",
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 1,
+})
 
--- Helper: Create a pill-shaped button (white fill, black text)
--- NOTE: Caller is responsible for positioning via SetPoint after creation.
-local function CreatePillButton(parent, text)
+local lockText = btnToggleLock:CreateFontString(nil, "OVERLAY")
+lockText:SetFont("Fonts\\ARIALN.TTF", 8) -- Smaller font
+lockText:SetPoint("CENTER")
+btnToggleLock.text = lockText
+
+function btnToggleLock:SetText(newText) self.text:SetText(newText) end
+function btnToggleLock:SetState(isActive)
+    if isActive then
+        self:SetBackdropColor(1, 1, 1, 1)
+        self:SetBackdropBorderColor(1, 1, 1, 1)
+        self.text:SetTextColor(0, 0, 0, 1)
+    else
+        self:SetBackdropColor(0, 0, 0, 0)
+        self:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+        self.text:SetTextColor(1, 1, 1, 1)
+    end
+end
+
+local function UpdateLockUI()
+    if addonTable.IsUnlocked then
+        btnToggleLock:SetText("UNLOCKED")
+        btnToggleLock:SetState(true)
+    else
+        btnToggleLock:SetText("LOCKED")
+        btnToggleLock:SetState(false)
+    end
+end
+addonTable.UpdateLockUI = UpdateLockUI
+btnToggleLock:SetScript("OnClick", function() addonTable.ToggleLock() end)
+UpdateLockUI()
+
+local btnReload = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
+btnReload:SetSize(48, 18)
+btnReload:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -72, -14)
+btnReload:SetBackdrop({
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 1,
+})
+btnReload:SetBackdropBorderColor(1, 1, 1, 1)
+
+local reloadText = btnReload:CreateFontString(nil, "OVERLAY")
+reloadText:SetFont("Fonts\\ARIALN.TTF", 8)
+reloadText:SetPoint("CENTER")
+reloadText:SetText("RELOAD")
+btnReload:SetScript("OnClick", function() ReloadUI() end)
+
+local btnClose = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
+btnClose:SetSize(48, 18)
+btnClose:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -16, -14)
+btnClose:SetBackdrop({
+    edgeFile = "Interface\\Buttons\\WHITE8x8",
+    edgeSize = 1,
+})
+btnClose:SetBackdropBorderColor(1, 1, 1, 1)
+
+local closeText = btnClose:CreateFontString(nil, "OVERLAY")
+closeText:SetFont("Fonts\\ARIALN.TTF", 8)
+closeText:SetPoint("CENTER")
+closeText:SetText("CLOSE")
+btnClose:SetScript("OnClick", function() optionsPanel:Hide() end)
+
+local function CreateToggleItem(parent, text)
     local btn = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    btn:SetSize(105, 32)
+    btn:SetSize(80, 20)
     btn:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
         edgeSize = 1,
     })
-    btn:SetBackdropColor(1, 1, 1, 1) -- White fill
-    btn:SetBackdropBorderColor(1, 1, 1, 1)
-
+    
     local btnText = btn:CreateFontString(nil, "OVERLAY")
-    btnText:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
+    btnText:SetFont("Fonts\\ARIALN.TTF", 10)
     btnText:SetPoint("CENTER")
-    btnText:SetTextColor(0, 0, 0, 1) -- Black text
     btnText:SetText(text)
+    btn.text = btnText
 
-    -- Hover: invert colors (black fill, white text)
-    btn:SetScript("OnEnter", function()
-        btn:SetBackdropColor(0.15, 0.15, 0.15, 1)
-        btnText:SetTextColor(1, 1, 1, 1)
-    end)
-    btn:SetScript("OnLeave", function()
-        btn:SetBackdropColor(1, 1, 1, 1)
-        btnText:SetTextColor(0, 0, 0, 1)
-    end)
+    function btn:SetText(newText)
+        self.text:SetText(newText)
+    end
+
+    function btn:SetState(isActive)
+        if isActive then
+            self:SetBackdropColor(1, 1, 1, 1) -- White BG
+            self:SetBackdropBorderColor(1, 1, 1, 1)
+            self.text:SetTextColor(0, 0, 0, 1) -- Black Text
+        else
+            self:SetBackdropColor(0, 0, 0, 0) -- Transparent
+            self:SetBackdropBorderColor(0.3, 0.3, 0.3, 1)
+            self.text:SetTextColor(0.4, 0.4, 0.4, 1)
+        end
+    end
 
     return btn
 end
@@ -234,30 +295,11 @@ local function ToggleLock()
         UnlockFrames()
         addonTable.IsUnlocked = true
     end
+    if addonTable.UpdateLockUI then addonTable.UpdateLockUI() end
 end
 addonTable.ToggleLock = ToggleLock
 
--- Buttons — side by side
-local btnUnlock = CreatePillButton(optionsPanel, "UNLOCK")
-btnUnlock:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -55)
-btnUnlock:SetScript("OnClick", function()
-    UnlockFrames()
-    addonTable.IsUnlocked = true
-end)
-
-local btnLock = CreatePillButton(optionsPanel, "LOCK")
-btnLock:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -20, -55)
-btnLock:SetScript("OnClick", function()
-    LockFrames()
-    addonTable.IsUnlocked = false
-end)
-
-local btnReload = CreatePillButton(optionsPanel, "RELOAD")
-btnReload:SetSize(260, 24)
-btnReload:SetPoint("BOTTOM", optionsPanel, "BOTTOM", 0, 16)
-btnReload:SetScript("OnClick", function()
-    ReloadUI()
-end)
+-- (Lock UI section removed from body)
 
 ------------------------------------------------
 -- Player Stats (Grid Tiles)
@@ -265,51 +307,46 @@ end)
 
 local statsLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 statsLabel:SetFont("Fonts\\ARIALN.TTF", 10)
-statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -100)
-statsLabel:SetText("|cFF888888PLAYER STATS|r")
-
-local statsSeparator = optionsPanel:CreateTexture(nil, "OVERLAY")
-statsSeparator:SetColorTexture(0.3, 0.3, 0.3, 1)
-statsSeparator:SetSize(280, 1)
-statsSeparator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -113)
+statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -50)
+statsLabel:SetText("PLAYER STATS")
 
 local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColor)
     local tile = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    tile:SetSize(74, 50)
-    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -120)
+    tile:SetSize(80, 40) -- Slimmer
+    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -68) -- 18px gap
     tile:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
         edgeSize = 1,
     })
     
-    local nameText = tile:CreateFontString(nil, "OVERLAY")
-    nameText:SetFont("Fonts\\ARIALN.TTF", 9)
-    nameText:SetPoint("TOP", tile, "TOP", 0, -12)
-    nameText:SetText(label)
-    tile.nameText = nameText
-    
     local typeText = tile:CreateFontString(nil, "OVERLAY")
     typeText:SetFont("Fonts\\ARIALN.TTF", 8)
-    typeText:SetPoint("BOTTOM", tile, "BOTTOM", 0, 12)
+    typeText:SetPoint("TOP", tile, "TOP", 0, -8) -- Tightened for 40px
     typeText:SetText(typeLabel)
     tile.typeText = typeText
+
+    local nameText = tile:CreateFontString(nil, "OVERLAY")
+    nameText:SetFont("Fonts\\ARIALN.TTF", 9)
+    nameText:SetPoint("BOTTOM", tile, "BOTTOM", 0, 8) -- Tightened for 40px
+    nameText:SetText(label)
+    tile.nameText = nameText
     
     tile.id = id
     tile.color = defaultColor
     
     local function UpdateVisual(isEnabled)
-        local c = tile.color or defaultColor
         if isEnabled then
-            tile:SetBackdropColor(0.06, 0.06, 0.06, 1)
-            tile:SetBackdropBorderColor(c[1], c[2], c[3], 1)
-            nameText:SetTextColor(c[1], c[2], c[3])
-            typeText:SetTextColor(0.4, 0.4, 0.4)
+            tile:SetBackdropColor(0, 0, 0, 1)
+            tile:SetBackdropBorderColor(1, 1, 1, 1) -- Pure White
+            local c = tile.color or {1, 1, 1}
+            nameText:SetTextColor(c[1], c[2], c[3]) -- Spec Color for the Name (Value)
+            typeText:SetTextColor(1, 1, 1) -- Pure White for Category
         else
-            tile:SetBackdropColor(0.04, 0.04, 0.04, 1)
-            tile:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
-            nameText:SetTextColor(0.4, 0.4, 0.4)
-            typeText:SetTextColor(0.3, 0.3, 0.3)
+            tile:SetBackdropColor(0, 0, 0, 0.5)
+            tile:SetBackdropBorderColor(0.2, 0.2, 0.2, 1) -- Dark Grey
+            nameText:SetTextColor(0.3, 0.3, 0.3)
+            typeText:SetTextColor(0.2, 0.2, 0.2)
         end
     end
     
@@ -329,9 +366,9 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
 end
 
 -- Create the 3 tiles (Now always created, content updated dynamically)
-local healthTile = CreateStatTile(optionsPanel, "health", 0, "HEALTH", "Health", {0, 1, 0})
-local resourceTile = CreateStatTile(optionsPanel, "resource", 82, "RESOURCE", "Resource", {1, 1, 1})
-local powerTile = CreateStatTile(optionsPanel, "power", 164, "POWER", "Power", {1, 1, 1})
+local healthTile = CreateStatTile(optionsPanel, "health", 0, "Health", "Health", {0, 1, 0})
+local resourceTile = CreateStatTile(optionsPanel, "resource", 90, "Resource", "Resource", {1, 1, 1})
+local powerTile = CreateStatTile(optionsPanel, "power", 180, "Power", "Power", {1, 1, 1})
 
 local function RefreshStatTiles()
     if not MacUIDB or not MacUIDB.displays then return end
@@ -343,7 +380,7 @@ local function RefreshStatTiles()
     -- 2. Resource
     if classInfo and classInfo.resource then
         resourceTile:Show()
-        resourceTile.nameText:SetText(string.upper(classInfo.resource.name))
+        resourceTile.nameText:SetText(classInfo.resource.name)
         resourceTile.typeText:SetText("Resource")
         resourceTile.color = classInfo.resource.color
         resourceTile.UpdateVisual(MacUIDB.displays.resource)
@@ -362,7 +399,7 @@ local function RefreshStatTiles()
     if hasPower then
         powerTile:SetAlpha(1)
         powerTile:EnableMouse(true)
-        powerTile.nameText:SetText(string.upper(classInfo.power.name))
+        powerTile.nameText:SetText(classInfo.power.name)
         powerTile.nameText:SetTextColor(1, 1, 1)
         powerTile.typeText:SetText("Power")
         powerTile.color = classInfo.power.color
@@ -387,14 +424,10 @@ end
 -- Section label
 local abilitiesLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 abilitiesLabel:SetFont("Fonts\\ARIALN.TTF", 10)
-abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -185)
-abilitiesLabel:SetText("|cFF888888ABILITY TRACKING|r")
+abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -132) -- 24px Gap from tiles
+abilitiesLabel:SetText("ABILITY TRACKING")
 
--- Separator line
-local separator = optionsPanel:CreateTexture(nil, "OVERLAY")
-separator:SetColorTexture(0.3, 0.3, 0.3, 1)
-separator:SetSize(240, 1)
-separator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -198)
+-- (Underline separator removed)
 
 ------------------------------------------------
 -- Audio Dropdown Menu
@@ -460,20 +493,20 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
 
     -- Checkbox square
     local checkbox = CreateFrame("Frame", nil, row, "BackdropTemplate")
-    checkbox:SetSize(14, 14)
+    checkbox:SetSize(12, 12)
     checkbox:SetPoint("LEFT", row, "LEFT", 0, 0)
     checkbox:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
         edgeSize = 1,
     })
+    checkbox:SetBackdropBorderColor(1, 1, 1, 1)
 
-    -- Checkmark text (hidden by default)
-    local checkmark = checkbox:CreateFontString(nil, "OVERLAY")
-    checkmark:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
-    checkmark:SetPoint("CENTER", checkbox, "CENTER", 0, 0)
-    checkmark:SetText("|cFF000000✓|r")
-    checkmark:Hide()
+    local checkText = checkbox:CreateFontString(nil, "OVERLAY")
+    checkText:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
+    checkText:SetPoint("CENTER", checkbox, "CENTER", 0, 0)
+    checkText:SetText("X")
+    checkText:Hide()
+    row.checkText = checkText
 
     -- Small spell icon preview (16x16)
     local iconPreview = row:CreateTexture(nil, "ARTWORK")
@@ -566,13 +599,12 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     -- State management
     local function UpdateVisual(isEnabled)
         if isEnabled then
-            checkbox:SetBackdropColor(1, 1, 1, 1)
             checkbox:SetBackdropBorderColor(1, 1, 1, 1)
-            checkmark:Show()
+            row.checkText:Show()
         else
-            checkbox:SetBackdropColor(0.15, 0.15, 0.15, 1)
-            checkbox:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-            checkmark:Hide()
+            checkbox:SetBackdropColor(0, 0, 0, 0)
+            checkbox:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+            row.checkText:Hide()
         end
     end
 
@@ -624,7 +656,7 @@ local function BuildAbilityCheckboxes()
     if specDefaults then
         for _, ability in ipairs(specDefaults) do
             visibleIndex = visibleIndex + 1
-            local yOffset = -210 - ((visibleIndex - 1) * 24)
+            local yOffset = -150 - ((visibleIndex - 1) * 24) -- 18px gap from label
             local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
             table.insert(abilityCheckboxes, row)
         end

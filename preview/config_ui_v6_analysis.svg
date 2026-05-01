@@ -1,0 +1,27 @@
+<svg width="300" height="400" viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="400" fill="#050505"/>
+  <text x="16" y="28" fill="white" font-family="Arial Narrow" font-size="16" font-weight="bold">MACUI ANALYSIS</text>
+
+  <!-- LOCK SECTION (Gap: 20px) -->
+  <text x="20" y="65" fill="white" font-family="Arial Narrow" font-size="10">INTERFACE LOCK</text>
+  <rect x="20" y="75" width="80" height="20" fill="white"/>
+  <rect x="105" y="75" width="80" height="20" stroke="#444444"/>
+  
+  <!-- STATS SECTION (Gap: 20px from lock, but 15px from content) -->
+  <text x="20" y="115" fill="white" font-family="Arial Narrow" font-size="10">PLAYER STATS</text>
+  <rect x="20" y="130" width="80" height="50" stroke="#00FF00"/>
+  <rect x="110" y="130" width="80" height="50" stroke="#FF0000"/>
+  <rect x="200" y="130" width="80" height="50" stroke="#FF8000"/>
+
+  <!-- ABILITY SECTION (Gap: 30px from stats, and 20px from list) -->
+  <text x="20" y="210" fill="white" font-family="Arial Narrow" font-size="10">ABILITY TRACKING</text>
+  <rect x="20" y="230" width="14" height="14" stroke="white"/> <!-- The "rectangle" issue -->
+  <text x="40" y="241" fill="white" font-family="Arial Narrow" font-size="10">Shield Block</text>
+  
+  <!-- Spacing Rulers -->
+  <line x1="285" y1="95" x2="285" y2="115" stroke="red" stroke-width="1"/>
+  <text x="280" y="108" fill="red" font-family="Arial Narrow" font-size="8" text-anchor="end">20px</text>
+  
+  <line x1="285" y1="180" x2="285" y2="210" stroke="red" stroke-width="1"/>
+  <text x="280" y="198" fill="red" font-family="Arial Narrow" font-size="8" text-anchor="end">30px</text>
+</svg>

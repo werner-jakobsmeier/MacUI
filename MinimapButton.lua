@@ -4,6 +4,45 @@ local CreateFrame = CreateFrame
 local Minimap = Minimap
 local math = math
 local GetCursorPosition = GetCursorPosition
+local GameTooltip = GameTooltip
+
+------------------------------------------------
+-- 1. AddonCompartmentFrame (Modern 10.0+ / 12.0.5 API)
+--    Registered via TOC metadata. These global functions are REQUIRED
+--    by the Blizzard API and are an intentional exception to Guideline #3.
+------------------------------------------------
+
+-- NOTE: AddonCompartmentFunc requires GLOBAL functions (not local).
+-- This is an intentional exception to the "no globals" rule (see Guideline #5).
+function MacUI_OnAddonCompartmentClick(addonName, buttonName)
+    if buttonName == "LeftButton" then
+        if addonTable.optionsPanel then
+            addonTable.optionsPanel:SetShown(not addonTable.optionsPanel:IsShown())
+        end
+    elseif buttonName == "RightButton" then
+        if addonTable.ToggleLock then
+            addonTable.ToggleLock()
+        end
+    end
+end
+
+function MacUI_OnAddonCompartmentEnter(addonName, menuButtonFrame)
+    GameTooltip:SetOwner(menuButtonFrame, "ANCHOR_RIGHT")
+    GameTooltip:SetText("|cFFFFFFFFMac|r|cFFAAAAAAUI|r")
+    GameTooltip:AddLine("Left-Click: Toggle Config Panel", 1, 1, 1)
+    GameTooltip:AddLine("Right-Click: Lock/Unlock Frames", 1, 1, 1)
+    GameTooltip:Show()
+end
+
+function MacUI_OnAddonCompartmentLeave(addonName, menuButtonFrame)
+    GameTooltip:Hide()
+end
+
+------------------------------------------------
+-- 2. Classic Minimap Button (Legacy draggable icon)
+--    For users who prefer a dedicated, visible, draggable icon
+--    on the minimap ring itself.
+------------------------------------------------
 
 local button = CreateFrame("Button", "MacUIMinimapButton", Minimap)
 button:SetSize(32, 32)
@@ -13,7 +52,7 @@ button:RegisterForDrag("LeftButton")
 button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
 local icon = button:CreateTexture(nil, "BACKGROUND")
-icon:SetTexture("Interface\\Icons\\INV_Misc_EngGizmos_17") -- Cool gear icon
+icon:SetTexture("Interface\\Icons\\INV_Misc_EngGizmos_17")
 icon:SetSize(20, 20)
 icon:SetPoint("CENTER")
 
@@ -32,6 +71,19 @@ local highlight = button:CreateTexture(nil, "HIGHLIGHT")
 highlight:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
 highlight:SetBlendMode("ADD")
 highlight:SetAllPoints(icon)
+
+-- Tooltip on hover (matches the Compartment tooltip)
+button:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+    GameTooltip:SetText("|cFFFFFFFFMac|r|cFFAAAAAAUI|r")
+    GameTooltip:AddLine("Left-Click: Toggle Config Panel", 1, 1, 1)
+    GameTooltip:AddLine("Right-Click: Lock/Unlock Frames", 1, 1, 1)
+    GameTooltip:AddLine("Drag: Move this button", 0.5, 0.5, 0.5)
+    GameTooltip:Show()
+end)
+button:SetScript("OnLeave", function()
+    GameTooltip:Hide()
+end)
 
 -- Updates the position of the button on the minimap ring
 local function UpdatePosition()
@@ -69,7 +121,7 @@ button:SetScript("OnDragStop", function(self)
     self:SetScript("OnUpdate", nil)
 end)
 
--- Click Handlers
+-- Click Handlers (same logic as Compartment)
 button:SetScript("OnClick", function(self, btn)
     if btn == "LeftButton" then
         if addonTable.optionsPanel then

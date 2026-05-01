@@ -178,8 +178,9 @@ local function RebuildTrackerUI()
                 
                 local iconTexture = GetSpellTexture(spellID)
                 if not iconTexture then
-                    local _, _, icon = GetSpellInfo(spellID)
-                    iconTexture = icon
+                    -- C_Spell.GetSpellInfo returns a table in 12.0.5
+                    local spellInfo = GetSpellInfo(spellID)
+                    iconTexture = spellInfo and spellInfo.iconID
                 end
                 
                 if iconTexture then

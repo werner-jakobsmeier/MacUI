@@ -489,8 +489,10 @@ local function BuildAbilityCheckboxes()
     -- Custom Abilities
     if MacUIDB and MacUIDB.customAbilities then
         for spellID, isTracked in pairs(MacUIDB.customAbilities) do
-            local name, _, icon = GetSpellInfo(spellID)
-            if name then
+            -- C_Spell.GetSpellInfo returns a table in 12.0.5 (.name, .iconID, .spellID)
+            local spellInfo = GetSpellInfo(spellID)
+            if spellInfo and spellInfo.name then
+                local name = spellInfo.name
                 visibleIndex = visibleIndex + 1
                 local yOffset = -175 - ((visibleIndex - 1) * 24)
                 -- custom abilities default to "buff" type for tracking
@@ -564,13 +566,17 @@ local function BuildAbilityCheckboxes()
                 if linkID then
                     spellID = tonumber(linkID)
                 else
-                    -- Try to search by name
-                    local _, _, _, _, _, _, sID = GetSpellInfo(text)
-                    if sID then spellID = sID end
+                    -- Try to search by name — C_Spell.GetSpellInfo(name) returns a table
+                    local spellInfo = GetSpellInfo(text)
+                    if spellInfo and spellInfo.spellID then
+                        spellID = spellInfo.spellID
+                    end
                 end
             end
             
-            if spellID and GetSpellInfo(spellID) then
+            -- Validate the spell ID actually resolves
+            local validInfo = spellID and GetSpellInfo(spellID)
+            if validInfo and validInfo.name then
                 if not MacUIDB.customAbilities then MacUIDB.customAbilities = {} end
                 MacUIDB.customAbilities[spellID] = true
                 if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end

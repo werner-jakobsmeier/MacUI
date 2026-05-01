@@ -4,6 +4,10 @@
 ## Author: MacPewPew
 ## Version: 1.0.0
 ## SavedVariables: MacUIDB
+## IconTexture: Interface\Icons\INV_Misc_EngGizmos_17
+## AddonCompartmentFunc: MacUI_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: MacUI_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: MacUI_OnAddonCompartmentLeave
 
 MacUI.lua
 Config.lua

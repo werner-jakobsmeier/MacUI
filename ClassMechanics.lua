@@ -1,7 +1,7 @@
 local addonName, addonTable = ...
 
 local CreateFrame = CreateFrame
-local C_UnitAuras = C_UnitAuras
+local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges
 local GetTime = GetTime
 local string = string
@@ -10,6 +10,7 @@ local UIParent = UIParent
 local table = table
 local pairs = pairs
 local ipairs = ipairs
+local unpack = unpack
 
 -- Helper for large numbers
 
@@ -85,7 +86,7 @@ local function UpdateAuras()
         local hexColor = string.format("%02x%02x%02x", c[1]*255, c[2]*255, c[3]*255)
         
         if mech.type == "absorb" or mech.type == "buff" or mech.type == "active" then
-            local auraData = C_UnitAuras.GetPlayerAuraBySpellID(mech.id)
+            local auraData = GetPlayerAuraBySpellID(mech.id)
             
             if mech.type == "absorb" then
                 local absorb = (auraData and auraData.points and auraData.points[1]) or 0

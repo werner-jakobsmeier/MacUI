@@ -4,12 +4,15 @@ local CreateFrame = CreateFrame
 local UnitPower = UnitPower
 local UnitHealth = UnitHealth
 local UnitHealthMax = UnitHealthMax
+local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 local Enum = Enum
 local string = string
+local tostring = tostring
 local math = math
 local UIParent = UIParent
 local table = table
 local ipairs = ipairs
+local unpack = unpack
 
 local classInfo = addonTable.ClassDisplayInfo and addonTable.ClassDisplayInfo[addonTable.playerClass]
 if not classInfo then return end -- Should never happen, but safety first
@@ -72,8 +75,7 @@ end
 local function UpdateResource()
     if not resourceFrame or not classInfo.resource then return end
     
-    local pType = GetPowerTypeByName(classInfo.resource.name)
-    local val = pType and UnitPower("player", pType)
+    local val = resourceFrame.pType and UnitPower("player", resourceFrame.pType)
     if val then
         local c = classInfo.resource.color
         resourceFrame.text:SetTextColor(c[1], c[2], c[3])
@@ -87,11 +89,10 @@ local function UpdatePower()
     local val
     if classInfo.power.name == "Ignore Pain" then
         -- Use aura points to avoid "Secret Number" taint (UnitGetTotalAbsorbs is protected)
-        local auraData = C_UnitAuras.GetPlayerAuraBySpellID(190456)
+        local auraData = GetPlayerAuraBySpellID(190456)
         val = (auraData and auraData.points and auraData.points[1]) or 0
     else
-        local pType = GetPowerTypeByName(classInfo.power.name)
-        val = pType and UnitPower("player", pType)
+        val = resourceFrame.pType and UnitPower("player", resourceFrame.pType)
     end
     
     if val then
@@ -136,9 +137,14 @@ local function RebuildStats()
         if (not specValid) or (MacUIDB and MacUIDB.displays and MacUIDB.displays.power == false) then
             powerFrame:Hide()
         else
+            powerFrame.pType = GetPowerTypeByName(classInfo.power.name)
             powerFrame:Show()
             UpdatePower()
         end
+    end
+    
+    if resourceFrame then
+        resourceFrame.pType = GetPowerTypeByName(classInfo.resource.name)
     end
 end
 

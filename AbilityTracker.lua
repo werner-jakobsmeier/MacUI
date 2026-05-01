@@ -2,7 +2,7 @@ local addonName, addonTable = ...
 
 local CreateFrame = CreateFrame
 local UIParent = UIParent
-local C_UnitAuras = C_UnitAuras
+local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 local UnitAffectingCombat = UnitAffectingCombat
 local ipairs = ipairs
 local pairs = pairs
@@ -10,6 +10,9 @@ local table = table
 local PlaySound = PlaySound
 local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 local GetSpellInfo = C_Spell and C_Spell.GetSpellInfo or GetSpellInfo
+local math = math
+local string = string
+local tostring = tostring
 
 -- Cache player class at load time
 local playerClass = addonTable.playerClass
@@ -89,7 +92,7 @@ local function UpdateIndicator(indicator)
     if not indicator.spellID then return end
 
     local inCombat = UnitAffectingCombat("player")
-    local auraData = C_UnitAuras.GetPlayerAuraBySpellID(indicator.spellID)
+    local auraData = GetPlayerAuraBySpellID(indicator.spellID)
 
     if indicator.abilityType == "buff" then
         if auraData then

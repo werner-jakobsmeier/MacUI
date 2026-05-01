@@ -1,73 +1,57 @@
 # MacUI
 
-A high-performance, ultra-compact user interface for World of Warcraft (Midnight 12.0.5+ API compliant). Designed with a **Brutalist** aesthetic, MacUI provides a distraction-free, typography-driven combat dashboard with zero external dependencies.
+A high-performance, **Industrial Brutalist** user interface for World of Warcraft (Midnight 12.0.5+). MacUI provides a typography-driven combat HUD with zero external dependencies, focused on raw information hierarchy and vertical rhythm.
 
 ## Design Philosophy
 
-MacUI is built on the principles of **Minimalism** and **Vertical Rhythm**:
-- **Pure White Contrast**: High-contrast pure white typography on a solid black background.
-- **Rhythmic Spacing**: Every element is aligned to a strict vertical rhythm (24px section gaps, 12px content gaps).
-- **Brutalist Hierarchy**: Information is presented with raw honesty—bold labels, sharp borders, and zero decorative fluff.
+- **Brutalist Minimalism**: High-contrast typography on solid black backgrounds. No decorative fluff.
+- **Vertical Rhythm**: Unified spacing grid (24px/12px) for a "locked-in" industrial feel.
+- **Zero-Waste Engineering**: Optimized for the 12.0.5 "Secret Number" API and high-frame-rate combat.
 
 ## Key Features
 
-### 📐 Ultra-Compact Configuration
-Access your settings via `/macui` or the custom minimap button. The config panel has been refined for maximum efficiency:
-- **Pro Header**: `LOCKED`, `RELOAD`, and `CLOSE` actions are integrated into a single top-right micro-bar.
-- **Binary Status**: A single, state-aware button toggles between `[ UNLOCKED ]` (Inverted for editing) and `LOCKED` (Standard for combat).
-- **Checklist Tracking**: Use the intuitive `[X]` checklist to toggle custom spell tracking.
+### 📐 Modular "Rack" Configuration
+- **System Micro-bar**: Integrated `LOCK`, `RELOAD`, and `CLOSE` cluster.
+- **State-Aware Toggles**: Intuitive checklists and binary status buttons.
+- **Unified Logic**: One-click configuration that persists across sessions.
 
-### 📊 Spec-Aware Player Stats
-Real-time tracking of your most critical metrics, optimized for the 12.0.5 API:
-- **Secure Data Handling**: Optimized for the 12.0.5 "Secret Number" API. Health and Resource values are passed directly to the engine to ensure 100% taint-free combat tracking.
-- **Shorthand Formatting**: Non-secret values (like Ignore Pain absorb totals) are automatically formatted to `k` and `m` shorthand (e.g., `1.2m`, `450k`) for instant readability.
-- **Color-Coded Values**: Stat values use spec-appropriate colors (Green, Red, Orange, Blue) for clear visual distinction without cluttering the UI.
-- **Dynamic Hierarchy**: Stat cards display the category (Health, Resource, Power) at the top and the specific spec name (Health, Rage, Ignore Pain) at the bottom.
+### 📊 Spec-Aware HUD
+- **Taint-Free Stats**: Direct-to-engine rendering for Health and Resource values (12.0.5 compliant).
+- **Smart Shorthand**: Auto-formatting for large values (e.g., `1.2m`, `450k`).
+- **Dynamic Context**: Contextual stat tiles (Health, Rage, Holy Power) that adapt to your class and specialization.
 
-### ⚔️ Specialized Protection Modules
-Deeply integrated support for Protection Warriors and Paladins:
-- **Ignore Pain Tracking**: Secure, aura-based absorb tracking that avoids "Secret Number" taint errors.
-- **Shield Block Integration**: Independent tracking of Shield Block charges and active buff durations.
-- **Holy Power & SotR**: Minimalist tracking for Protection Paladin resources.
-
-### 🗺️ Minimap & Branding
-- **Brutalist "M" Icon**: A custom, flipped-W logo for the minimap.
-- **Independent Layout**: Every stat readout and ability icon is an independent frame. Unlock to drag them anywhere; Lock to save them forever.
+### ⚔️ Pro Combat Tracking
+- **Duration Timers**: Precision text tracking for Active Mitigations (Shield Block, SotR, Consecration).
+- **Defensive Rack**: Sharp, square icons for major cooldowns with neon status borders.
+- **Audio Alerts**: Curated sound library for critical missing buffs.
 
 ## Architecture
 
 ```
 MacUI/
-├── MacUI.lua              # Core registry, FormatNumber helper, Spec change logic
-├── Config.lua             # Ultra-compact options panel & UI layout
-├── PlayerStats.lua        # Health, Resource, and Power (Ignore Pain) tracking
-├── ClassMechanics.lua     # Class-specific aura tracking (Shield Block, etc.)
-├── AbilityTracker.lua     # Draggable custom spell icons with state machine
-├── Animations.lua         # PulseRed and Fade effects
-├── Square.lua             # Minimalist Shield Block status indicator
-└── MinimapButton.lua      # Custom "M" icon & AddonCompartment integration
+├── MacUI.lua            # Core registry & initialization
+├── Config.lua           # Modular Brutalist options panel
+├── PlayerStats.lua      # Secure Health, Resource, and Power tracking
+├── ClassMechanics.lua   # Active Mitigation & Duration engine (Pooled)
+├── AbilityTracker.lua   # Defensive cooldown indicator rack (Pooled)
+└── MinimapButton.lua    # Modern Compartment & legacy minimap integration
 ```
 
-## Technical Details
+## Performance
 - **Zero Dependencies**: No Ace3, no LibDataBroker.
-- **12.0.5 Compliant**: Uses modern `C_Spell` and `C_UnitAuras` table returns.
-- **Taint-Aware**: Uses safe number formatting to avoid protected value restrictions in combat.
-- **Performance**: Throttled `OnUpdate` handlers and upvalued globals for maximum FPS.
+- **Frame Pooling**: All dynamic elements utilize reuse pools to eliminate memory leaks.
+- **Load-Time Gating**: Class-specific modules return early if not matching, minimizing background footprint.
 
 ## Previews
 
-### Final Compact UI
-![Compact UI](preview/config_ui_final_compact.svg)
-*The final ultra-compact layout featuring the header-integrated lock toggle and slim stat cards.*
-
-### Spacing & Rhythm Analysis
+### Spacing & Rhythm
 ![Spacing Analysis](preview/config_ui_v6_analysis.svg)
-*MacUI follows a strict 24px/12px vertical rhythm for a professional, "locked-in" feel.*
+*MacUI follows a strict industrial grid for perfect visual alignment.*
 
 ## Installation
-1. Place the `MacUI` folder in `_retail_/Interface/AddOns/`.
-2. Type `/macui` or click the minimap icon to open the panel.
-3. **Shift-Click** any spell from your spellbook into the input box to track it.
+1. Place `MacUI` in `_retail_/Interface/AddOns/`.
+2. Use `/macui` or the minimap icon to open the panel.
+3. **Shift-Click** spells from your spellbook into the input box to add custom tracking.
 
 ## License
-See [LICENSE](LICENSE) for details.
+[MIT](LICENSE)

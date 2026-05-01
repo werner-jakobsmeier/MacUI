@@ -10,7 +10,6 @@ local table = table
 local PlaySound = PlaySound
 local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 local GetSpellInfo = C_Spell and C_Spell.GetSpellInfo or GetSpellInfo
-local math = math
 local string = string
 local tostring = tostring
 

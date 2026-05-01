@@ -3,16 +3,11 @@ local addonName, addonTable = ...
 local CreateFrame = CreateFrame
 local UnitPower = UnitPower
 local UnitHealth = UnitHealth
-local UnitHealthMax = UnitHealthMax
 local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 local Enum = Enum
-local string = string
-local tostring = tostring
-local math = math
 local UIParent = UIParent
 local table = table
 local ipairs = ipairs
-local unpack = unpack
 
 local classInfo = addonTable.ClassDisplayInfo and addonTable.ClassDisplayInfo[addonTable.playerClass]
 if not classInfo then return end -- Should never happen, but safety first

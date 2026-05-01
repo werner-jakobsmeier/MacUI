@@ -5,10 +5,8 @@ local GetPlayerAuraBySpellID = C_UnitAuras.GetPlayerAuraBySpellID
 local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges
 local GetTime = GetTime
 local string = string
-local tostring = tostring
 local UIParent = UIParent
 local table = table
-local pairs = pairs
 local ipairs = ipairs
 local unpack = unpack
 

@@ -29,7 +29,8 @@ This document contains rules and best practices that the AI assistant must verif
 ## 5. Code Hygiene & Review Lessons
 - **Cache immutable values at load time:** Data that never changes during a session (e.g., `UnitClass("player")`, `GetRealmName()`) must be read once at the top of the file and stored in a local variable. Never call these inside event handlers or `OnUpdate` scripts.
 - **Consistent upvaluing in every file:** Even files that only run once at load time should upvalue their globals (e.g., `local CreateFrame = CreateFrame`). This keeps the codebase consistent and makes it easier to spot actual global namespace leaks. **Common missed upvalues include: `table`, `math`, `pairs`, `ipairs`, `tonumber`, `print`, `PlaySound`, `GetSpellTexture`.**
-- **No dead code:** Variables that are set but never read, or functions that are defined but never called, must be removed. Dead code creates confusion and false assumptions about what the code does.
+- **No dead code (Zero-Waste Engineering):** Variables that are set but never read, or functions that are defined but never called, must be removed immediately. Do NOT add 'precautionary' upvalues (e.g., `local math = math`) unless they are explicitly used in the file logic. Dead code creates confusion and false assumptions about what the code does.
+- **Redundancy Audit:** After every feature implementation or refactor, perform a mandatory pass to find and remove any orphaned variables, unused upvalues, or stale forward declarations.
 - **No duplicate declarations:** Never declare the same `local` variable twice in the same file scope. The second declaration shadows the first, creating dead code and masking the original. Use `grep` to verify before adding new upvalues.
 - **Defensive guards on SavedVariables:** Always check that `MacUIDB` exists before writing to it. SavedVariables are `nil` until `ADDON_LOADED` fires, so any function that could theoretically be called early must guard against this.
 - **Comment intentional exceptions:** If you must break a guideline (e.g., creating `SLASH_` globals for the WoW slash command API), add a comment explaining why it is an intentional exception. This prevents future reviewers from "fixing" something that isn't broken.
@@ -106,3 +107,5 @@ Before finalizing any code change, verify the following:
 - [ ] Any `C_` API migration uses the correct return type (table vs positional).
 - [ ] Any intentional guideline exception has a `-- NOTE (Guideline #N exception):` comment.
 - [ ] Documentation in this file reflects the current architecture (no deleted file references).
+- [ ] **A Redundancy Audit has been performed and all unused variables/upvalues have been removed.**
+- [ ] **Every upvalued variable at the top of the file is actively used in the logic (verified via grep).**

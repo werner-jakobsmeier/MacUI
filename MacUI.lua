@@ -7,6 +7,9 @@ local UnitClass = UnitClass
 local GetSpecialization = GetSpecialization
 local table = table
 local ipairs = ipairs
+local string = string
+local tostring = tostring
+local math = math
 
 -- Cache player class at load time (never changes)
 local _, playerClass = UnitClass("player")

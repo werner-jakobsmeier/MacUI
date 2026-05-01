@@ -4,15 +4,12 @@ local CreateFrame = CreateFrame
 local UIParent = UIParent
 local InCombatLockdown = InCombatLockdown
 local math = math
-local tonumber = tonumber
 local pairs = pairs
 local ipairs = ipairs
 local table = table
-local GetSpellInfo = C_Spell and C_Spell.GetSpellInfo or GetSpellInfo
 local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 local PlaySound = PlaySound
 local print = print
-local string = string
 
 -- Slash Command Registration
 -- NOTE: SLASH_ globals are required by the WoW API to register commands.

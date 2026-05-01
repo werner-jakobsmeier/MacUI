@@ -1,0 +1,31 @@
+<svg width="400" height="600" viewBox="0 0 400 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="600" fill="#0F172A"/>
+  <rect x="10" y="10" width="380" height="580" stroke="#D1D5DB" stroke-width="2"/>
+  
+  <!-- Header -->
+  <text x="30" y="50" fill="#D1D5DB" font-family="Arial" font-size="24" font-weight="bold">MacUI</text>
+  <text x="30" y="75" fill="#64748B" font-family="Arial" font-size="12">UNIFIED RACK CONFIGURATION</text>
+  
+  <!-- Module 1: Shield Block (Extended) -->
+  <rect x="20" y="100" width="360" height="60" fill="#1E293B" stroke="#D1D5DB" stroke-width="2"/>
+  <text x="35" y="125" fill="#D1D5DB" font-family="Arial" font-size="14" font-weight="bold">SHIELD BLOCK</text>
+  <text x="35" y="145" fill="#94A3B8" font-family="Arial" font-size="10">DURATION: 12.0s</text>
+  <!-- Progress Bar -->
+  <rect x="150" y="135" width="210" height="8" fill="#0F172A"/>
+  <rect x="150" y="135" width="160" height="8" fill="#FACC15"/> <!-- Yellow Bar -->
+  <!-- Audio Icon -->
+  <rect x="340" y="110" width="24" height="24" fill="#334155" stroke="#D1D5DB" stroke-width="1"/>
+  
+  <!-- Module 2: Consecration -->
+  <rect x="20" y="170" width="360" height="60" fill="#1E293B" stroke="#F59E0B" stroke-width="2"/>
+  <text x="35" y="195" fill="#D1D5DB" font-family="Arial" font-size="14" font-weight="bold">CONSECRATION</text>
+  <text x="35" y="215" fill="#94A3B8" font-family="Arial" font-size="10">GROUND TIME: 8.5s</text>
+  <rect x="150" y="205" width="210" height="8" fill="#0F172A"/>
+  <rect x="150" y="205" width="120" height="8" fill="#F59E0B"/> <!-- Amber Bar -->
+  
+  <!-- Module 3: Standard Ability -->
+  <rect x="20" y="240" width="360" height="40" fill="#1E293B" stroke="#334155" stroke-width="2"/>
+  <text x="35" y="265" fill="#64748B" font-family="Arial" font-size="14" font-weight="bold">SHIELD WALL</text>
+  <rect x="340" y="248" width="24" height="24" fill="#1E293B" stroke="#334155" stroke-width="1" opacity="0.3"/>
+</svg>

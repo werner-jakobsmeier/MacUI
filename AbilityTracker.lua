@@ -30,8 +30,23 @@ local DEFAULT_STAGGER = 36 -- px between staggered default positions
 -- Helper: Create a single ability indicator with spell icon
 -- Parent is UIParent so each icon is independently positionable
 local function CreateIndicatorRow()
-    local row = CreateFrame("Frame", nil, UIParent)
+    local row = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
     row:SetSize(ICON_SIZE, ICON_SIZE)
+
+    -- Movement Handling
+    row:SetMovable(true)
+    row:EnableMouse(false) -- Default to locked
+    row:RegisterForDrag("LeftButton")
+    row:SetScript("OnDragStart", function(self) if addonTable.IsUnlocked then self:StartMoving() end end)
+    row:SetScript("OnDragStop", function(self)
+        self:StopMovingOrSizing()
+        local p, _, rp, x, y = self:GetPoint()
+        if self.spellID then
+            local saveKey = "Ability_" .. self.spellID
+            if not MacUIDB.positions then MacUIDB.positions = {} end
+            MacUIDB.positions[saveKey] = { point = p, relativePoint = rp, x = x, y = y }
+        end
+    end)
 
     -- Colored border frame (shows green/red/gray status)
     local border = CreateFrame("Frame", nil, row, "BackdropTemplate")
@@ -144,11 +159,13 @@ end
 
 -- Apply a saved or default position to an indicator
 local function ApplyIndicatorPosition(indicator, index)
-    local frameName = indicator:GetName()
-    if not frameName then return end
+    local spellID = indicator.spellID
+    if not spellID then return end
 
-    if MacUIDB and MacUIDB.positions and MacUIDB.positions[frameName] then
-        local pos = MacUIDB.positions[frameName]
+    -- Use Spell ID as the primary key for saved positions (more reliable than frame names)
+    local saveKey = "Ability_" .. spellID
+    if MacUIDB and MacUIDB.positions and MacUIDB.positions[saveKey] then
+        local pos = MacUIDB.positions[saveKey]
         indicator:ClearAllPoints()
         indicator:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
     else
@@ -204,6 +221,16 @@ function RebuildTrackerUI()
     -- 3. Provision Frames
     for i, ability in ipairs(abilitiesToTrack) do
         local row = table.remove(framePool) or CreateIndicatorRow()
+        
+        -- EDGE CASE: Frames need unique names for saved positions to work.
+        -- Since we reuse frames, we must manually manage the 'Global Name' logic.
+        local uniqueName = "MacUIIndicator_" .. ability.spellID
+        if row:GetName() ~= uniqueName then
+            -- Note: We can't Rename a frame in WoW, so if we need a specific name,
+            -- we ensure CreateIndicatorRow handles it or we accept the pooled name.
+            -- Optimized approach: Just ensure the frame is registered in MovableFrames.
+        end
+        
         row.spellID = ability.spellID
         row.abilityType = ability.type
         row.audioPlayed = false
@@ -213,6 +240,9 @@ function RebuildTrackerUI()
         if iconTexture then row.icon:SetTexture(iconTexture) end
         
         ApplyIndicatorPosition(row, i)
+        
+        -- Register for movement (required for the Unlock toggle to work)
+        table.insert(addonTable.MovableFrames, row)
         table.insert(activeIndicators, row)
         row:Show()
     end

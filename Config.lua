@@ -662,6 +662,7 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
         MacUIDB.trackedAbilities[ability.spellID] = isNowEnabled
         UpdateVisual(isNowEnabled)
         if addonTable.RebuildTrackerUI then addonTable.RebuildTrackerUI() end
+        if addonTable.RebuildMechanics then addonTable.RebuildMechanics() end
     end)
 
     audioBtn:SetScript("OnClick", function()

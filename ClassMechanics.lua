@@ -36,33 +36,53 @@ local function RebuildMechanics()
     if not mechanics then return end
     
     for i, mech in ipairs(mechanics) do
-        local frame = CreateFrame("Frame", "MacUIClassMechanic_" .. mech.id .. "_" .. i, UIParent)
-        frame:SetSize(150, 25)
-        local defaultPoint = mech.point or {0, -100 - (i*25)}
-        frame.defaultPoint = {"CENTER", UIParent, "CENTER", unpack(defaultPoint)}
-        
-        -- Try to restore saved point/scale
-        local frameName = frame:GetName()
-        if MacUIDB and MacUIDB.positions and MacUIDB.positions[frameName] then
-            local pos = MacUIDB.positions[frameName]
-            frame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
-        else
-            frame:SetPoint(unpack(frame.defaultPoint))
-        end
-        if MacUIDB and MacUIDB.scales and MacUIDB.scales[frameName] then
-            frame:SetScale(MacUIDB.scales[frameName])
+        -- Check Config: Only show if NOT disabled in the rack
+        local isEnabled = true
+        if MacUIDB and MacUIDB.trackedAbilities then
+            isEnabled = MacUIDB.trackedAbilities[mech.id] ~= false
         end
         
-        table.insert(addonTable.MovableFrames, frame)
-        table.insert(activeFrames, frame)
-        
-        local text = frame:CreateFontString(nil, "OVERLAY")
-        text:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
-        text:SetPoint("CENTER", frame, "CENTER", 0, 0)
-        frame.fontStrings = { text }
-        frame.text = text
-        frame.mech = mech
-        frame:Show()
+        if isEnabled then
+            local frame = CreateFrame("Frame", "MacUIClassMechanic_" .. mech.id .. "_" .. i, UIParent)
+            frame:SetSize(150, 25)
+            local defaultPoint = mech.point or {0, -100 - (i*25)}
+            frame.defaultPoint = {"CENTER", UIParent, "CENTER", unpack(defaultPoint)}
+            
+            -- Movement Handling
+            local frameName = frame:GetName()
+            frame:SetMovable(true)
+            frame:EnableMouse(false) -- Default to locked
+            frame:RegisterForDrag("LeftButton")
+            frame:SetScript("OnDragStart", function(self) if addonTable.IsUnlocked then self:StartMoving() end end)
+            frame:SetScript("OnDragStop", function(self)
+                self:StopMovingOrSizing()
+                local p, _, rp, x, y = self:GetPoint()
+                if not MacUIDB.positions then MacUIDB.positions = {} end
+                MacUIDB.positions[frameName] = { point = p, relativePoint = rp, x = x, y = y }
+            end)
+
+            -- Try to restore saved point/scale
+            if MacUIDB and MacUIDB.positions and MacUIDB.positions[frameName] then
+                local pos = MacUIDB.positions[frameName]
+                frame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
+            else
+                frame:SetPoint(unpack(frame.defaultPoint))
+            end
+            if MacUIDB and MacUIDB.scales and MacUIDB.scales[frameName] then
+                frame:SetScale(MacUIDB.scales[frameName])
+            end
+            
+            table.insert(addonTable.MovableFrames, frame)
+            table.insert(activeFrames, frame)
+            
+            local text = frame:CreateFontString(nil, "OVERLAY")
+            text:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
+            text:SetPoint("CENTER", frame, "CENTER", 0, 0)
+            frame.fontStrings = { text }
+            frame.text = text
+            frame.mech = mech
+            frame:Show()
+        end
     end
     
     -- Force an initial update
@@ -176,3 +196,5 @@ end)
 table.insert(addonTable.OnSpecChanged, function()
     RebuildMechanics()
 end)
+
+addonTable.RebuildMechanics = RebuildMechanics

@@ -24,3 +24,14 @@ This document contains rules and best practices that the AI assistant must verif
 - **Design:** Ensure UI elements are clean, using proper `BackdropTemplate`, modern fonts, and consistent pixel-perfect positioning.
 - **Textures:** When using custom assets, try to keep dimensions to powers of 2 (e.g., 16x16, 64x64, 256x256) for optimal rendering performance.
 - **Frame Strata/Level:** Manage your `FrameStrata` (e.g., "BACKGROUND", "MEDIUM", "HIGH", "DIALOG") and `FrameLevel` explicitly to prevent your custom UI elements from overlapping randomly or hiding behind default game elements.
+
+## 5. Code Hygiene & Review Lessons
+- **Cache immutable values at load time:** Data that never changes during a session (e.g., `UnitClass("player")`, `GetRealmName()`) must be read once at the top of the file and stored in a local variable. Never call these inside event handlers or `OnUpdate` scripts.
+- **Consistent upvaluing in every file:** Even files that only run once at load time should upvalue their globals (e.g., `local CreateFrame = CreateFrame`). This keeps the codebase consistent and makes it easier to spot actual global namespace leaks.
+- **No dead code:** Variables that are set but never read, or functions that are defined but never called, must be removed. Dead code creates confusion and false assumptions about what the code does.
+- **Defensive guards on SavedVariables:** Always check that `MacUIDB` exists before writing to it. SavedVariables are `nil` until `ADDON_LOADED` fires, so any function that could theoretically be called early must guard against this.
+- **Comment intentional exceptions:** If you must break a guideline (e.g., creating `SLASH_` globals for the WoW slash command API), add a comment explaining why it is an intentional exception. This prevents future reviewers from "fixing" something that isn't broken.
+
+## 6. API Version Compatibility
+- **Use safe fallbacks for deprecated APIs:** When Blizzard moves an API from the global namespace into a `C_` namespace (e.g., `GetSpellCharges` → `C_Spell.GetSpellCharges`), use a fallback pattern: `local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges`. This ensures the addon works across patch boundaries.
+- **Verify API changes before each major patch:** Before a new WoW patch drops, search Blizzard's patch notes and the community API changelog for any renamed, moved, or removed functions that the addon currently uses.

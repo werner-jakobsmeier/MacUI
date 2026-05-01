@@ -1,5 +1,8 @@
 local addonName, addonTable = ...
 
+local CreateFrame = CreateFrame
+local print = print
+
 -- Initialize global registry for movable frames
 addonTable.MovableFrames = {}
 -- Main addon frame to handle events

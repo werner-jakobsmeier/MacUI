@@ -8,15 +8,16 @@ local tonumber = tonumber
 local string = string
 
 -- Slash Command Registration
+-- NOTE: SLASH_ globals are required by the WoW API to register commands.
+-- This is an intentional exception to the "no globals" rule.
 SLASH_MACUI1 = "/macui"
 SLASH_MACUI2 = "/mu"
-
-local isUnlocked = false
 local configFrame = CreateFrame("Frame")
 
 -- Applies the saved font size to all registered font strings
 local function ApplyFontSize(size)
     if not size or size <= 0 then return end
+    if not MacUIDB then return end
     MacUIDB.fontSize = size
     
     for _, frame in ipairs(addonTable.MovableFrames or {}) do
@@ -138,13 +139,17 @@ slider:SetMinMaxValues(8, 32)
 slider:SetValueStep(1)
 slider:SetObeyStepOnDrag(true)
 
--- Slider text setup
-_G[slider:GetName() .. "Low"]:SetText("8")
-_G[slider:GetName() .. "High"]:SetText("32")
-_G[slider:GetName() .. "Text"]:SetText("Font Size")
+-- Cache slider text references to avoid repeated _G lookups
+local sliderLow = _G[slider:GetName() .. "Low"]
+local sliderHigh = _G[slider:GetName() .. "High"]
+local sliderText = _G[slider:GetName() .. "Text"]
+
+sliderLow:SetText("8")
+sliderHigh:SetText("32")
+sliderText:SetText("Font Size")
 
 slider:SetScript("OnValueChanged", function(self, value)
-    _G[self:GetName() .. "Text"]:SetText("Font Size: " .. value)
+    sliderText:SetText("Font Size: " .. value)
     ApplyFontSize(value)
 end)
 

@@ -4,6 +4,10 @@ local CreateFrame = CreateFrame
 local UIParent = UIParent
 local UnitAffectingCombat = UnitAffectingCombat
 local C_UnitAuras = C_UnitAuras
+local UnitClass = UnitClass
+
+-- Cache the player's class once at load time (it never changes)
+local _, playerClass = UnitClass("player")
 
 local SPELL_SHIELD_BLOCK = 2565
 
@@ -26,8 +30,7 @@ squareFrame:SetBackdropBorderColor(1, 1, 1, 1) -- White border (R, G, B, Alpha)
 
 -- Logic to change color based on Combat and Shield Block status
 local function UpdateSquareColor()
-    -- Only check if we are playing a warrior, otherwise skip
-    local _, playerClass = UnitClass("player")
+    -- Only run warrior-specific logic
     if playerClass ~= "WARRIOR" then return end
 
     local inCombat = UnitAffectingCombat("player")

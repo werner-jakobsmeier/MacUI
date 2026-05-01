@@ -9,7 +9,8 @@ local CreateFrame = CreateFrame
 local UnitPower = UnitPower
 local Enum = Enum
 local C_UnitAuras = C_UnitAuras
-local GetSpellCharges = GetSpellCharges
+-- C_Spell.GetSpellCharges replaces GetSpellCharges in 12.0.5+
+local GetSpellCharges = C_Spell and C_Spell.GetSpellCharges or GetSpellCharges
 local GetTime = GetTime
 local string = string
 local tostring = tostring

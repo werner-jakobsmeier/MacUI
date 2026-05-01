@@ -144,7 +144,7 @@ end
 
 -- Custom black panel with NO border (floating brutalist style)
 local optionsPanel = CreateFrame("Frame", "MacUIOptionsPanel", UIParent, "BackdropTemplate")
-optionsPanel:SetSize(420, 560)
+optionsPanel:SetSize(320, 560)
 optionsPanel:SetPoint("CENTER")
 optionsPanel:Hide()
 optionsPanel:SetMovable(true)
@@ -182,7 +182,7 @@ titleThin:SetText("UI")
 local descText = optionsPanel:CreateFontString(nil, "OVERLAY")
 descText:SetFont("Fonts\\ARIALN.TTF", 12)
 descText:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -48) -- 20px margin
-descText:SetWidth(380)
+descText:SetWidth(280)
 descText:SetJustifyH("LEFT")
 descText:SetTextColor(0.8, 0.8, 0.8) -- Lighter grey for better readability
 descText:SetText("Minimalist combat tracking for critical player stats, resources, and active defensive abilities. Health and mana percentages are restricted by Blizzard security policy.")
@@ -190,7 +190,7 @@ descText:SetText("Minimalist combat tracking for critical player stats, resource
 -- Top Right System Buttons (LOCK / RELOAD / CLOSE)
 local btnToggleLock = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
 btnToggleLock:SetSize(58, 18)
-btnToggleLock:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -126, -14)
+btnToggleLock:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -124, -14)
 btnToggleLock:SetBackdrop({
     bgFile = "Interface\\Buttons\\WHITE8x8",
     edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -248,7 +248,7 @@ btnReload:SetScript("OnClick", function() ReloadUI() end)
 
 local btnClose = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
 btnClose:SetSize(48, 18)
-btnClose:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -16, -14)
+btnClose:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -20, -14)
 btnClose:SetBackdrop({
     bgFile = "Interface\\Buttons\\WHITE8x8",
     edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -329,8 +329,8 @@ statsLabel:Hide() -- Removed for testing
 
 local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColor)
     local tile = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    tile:SetSize(80, 40)
-    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -84) -- 24px gap from desc
+    tile:SetSize(88, 48) -- Equal thirds of 280px inner width (88×3 + 8gap×2 = 280)
+    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -104) -- Pushed down to clear desc text
     tile:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -384,8 +384,8 @@ end
 
 -- Create the 3 tiles (Now always created, content updated dynamically)
 local healthTile = CreateStatTile(optionsPanel, "health", 0, "Health", "Health", {0, 1, 0})
-local resourceTile = CreateStatTile(optionsPanel, "resource", 90, "Resource", "Resource", {1, 1, 1})
-local powerTile = CreateStatTile(optionsPanel, "power", 180, "Power", "Power", {1, 1, 1})
+local resourceTile = CreateStatTile(optionsPanel, "resource", 96, "Resource", "Resource", {1, 1, 1})
+local powerTile = CreateStatTile(optionsPanel, "power", 192, "Power", "Power", {1, 1, 1})
 
 local function RefreshStatTiles()
     if not MacUIDB or not MacUIDB.displays then return end
@@ -575,7 +575,7 @@ optionsPanel:HookScript("OnHide", function() audioDropdown:Hide() end)
 -- Helper: Create a brutalist checkbox row
 local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     local row = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    row:SetSize(380, 44) -- Wider Module Design
+    row:SetSize(280, 44) -- Wider Module Design
     row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset)
     row:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
@@ -719,25 +719,16 @@ local function BuildAbilityCheckboxes()
     sectionHeaders = {}
 
     local visibleIndex = 0
-    local yOffsetBase = -130 -- Start a bit higher to make room
+    local yOffsetBase = -170 -- 20px below stat tiles
 
     -- Helper to create a section header
     local function CreateHeader(text, yOffset)
-        -- The text itself
         local header = optionsPanel:CreateFontString(nil, "OVERLAY")
         header:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
         header:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, yOffset)
         header:SetText(text)
-        header:SetTextColor(0.9, 0.9, 0.9) -- Bright brutalist white/grey
+        header:SetTextColor(0.9, 0.9, 0.9)
         table.insert(sectionHeaders, header)
-        
-        -- The underline accent
-        local line = optionsPanel:CreateTexture(nil, "OVERLAY")
-        line:SetColorTexture(1, 1, 1, 0.8) -- White underline
-        line:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -4)
-        line:SetSize(380, 2)
-        table.insert(sectionHeaders, line) -- Insert as header so it gets cleared on rebuild
-        
         return header
     end
 
@@ -752,8 +743,8 @@ local function BuildAbilityCheckboxes()
             -- Skip raw power types (like Holy Power) and prevent duplicate checkboxes (e.g. Shield Block has 2 entries)
             if mech.type ~= "power" and not processedIDs[mech.id] then
                 if not hasMechanics then
-                    CreateHeader("ACTIVE MITIGATION", yOffsetBase - (visibleIndex * 40))
-                    visibleIndex = visibleIndex + 0.6 -- Header takes a bit of vertical space
+                    CreateHeader("Active Mitigation", yOffsetBase - (visibleIndex * 40))
+                    visibleIndex = visibleIndex + 0.5 -- ~23px header-to-row gap
                     hasMechanics = true
                 end
                 
@@ -769,7 +760,7 @@ local function BuildAbilityCheckboxes()
         end
         
         if hasMechanics then
-            visibleIndex = visibleIndex + 0.3 -- Add a small gap before the next section
+            visibleIndex = visibleIndex + 0.41 -- ~5px extra space above next section header
         end
     end
 
@@ -778,8 +769,8 @@ local function BuildAbilityCheckboxes()
     local specDefaults = classDefaults and classDefaults[addonTable.playerSpec]
     
     if specDefaults and #specDefaults > 0 then
-        CreateHeader("DEFENSIVE COOLDOWNS", yOffsetBase - (visibleIndex * 46))
-        visibleIndex = visibleIndex + 0.6
+        CreateHeader("Defensive Cooldowns", yOffsetBase - (visibleIndex * 46))
+        visibleIndex = visibleIndex + 0.5 -- ~23px header-to-row gap
         
         for _, ability in ipairs(specDefaults) do
             local yOffset = yOffsetBase - (visibleIndex * 46)

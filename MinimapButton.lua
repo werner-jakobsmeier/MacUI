@@ -52,15 +52,12 @@ button:RegisterForDrag("LeftButton")
 button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 
 local icon = button:CreateTexture(nil, "BACKGROUND")
-icon:SetTexture("Interface\\Icons\\INV_Misc_EngGizmos_17")
+icon:SetTexture("Interface\\AddOns\\MacUI\\MinimapIcon")
 icon:SetSize(20, 20)
 icon:SetPoint("CENTER")
 
--- Circular mask so the icon doesn't poke out of the border
-local mask = button:CreateMaskTexture()
-mask:SetTexture("Interface\\CharacterFrame\\TempPortraitAlphaMask")
-mask:SetAllPoints(icon)
-icon:AddMaskTexture(mask)
+-- No mask needed for the new brutalist square icon
+-- (Mask logic removed)
 
 local border = button:CreateTexture(nil, "OVERLAY")
 border:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")

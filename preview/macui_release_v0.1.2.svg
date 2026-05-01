@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="560" viewBox="0 0 900 560">
+  <!-- Dark game background -->
+  <rect width="900" height="560" fill="#0A0D14"/>
+  
+  <!-- Version Header -->
+  <text x="450" y="30" font-family="Arial, sans-serif" font-size="11" fill="#424550" text-anchor="middle">— MacUI Release v0.1.2-alpha (Midnight 12.0.5) —</text>
+
+  <!-- ========================================== -->
+  <!-- CONFIG PANEL (Left) -->
+  <!-- ========================================== -->
+  <g transform="translate(50, 60)">
+    <rect width="320" height="460" fill="#060910" stroke="#D1D5DB" stroke-width="2"/>
+    
+    <!-- Header -->
+    <text x="20" y="35" font-family="Arial Black, sans-serif" font-size="26" fill="#D1D5DB">MAC</text>
+    <text x="84" y="35" font-family="Arial, sans-serif" font-size="18" fill="#6B7280">UI</text>
+    
+    <!-- System Buttons -->
+    <g transform="translate(140, 15)">
+       <rect width="45" height="18" fill="#D1D5DB"/>
+       <text x="22.5" y="12" font-family="Arial, sans-serif" font-size="8" fill="#060910" text-anchor="middle">LOCKED</text>
+       
+       <rect x="50" width="45" height="18" fill="none" stroke="#424550" stroke-width="1"/>
+       <text x="72.5" y="12" font-family="Arial, sans-serif" font-size="8" fill="#D1D5DB" text-anchor="middle">RELOAD</text>
+       
+       <rect x="100" width="45" height="18" fill="none" stroke="#424550" stroke-width="1"/>
+       <text x="122.5" y="12" font-family="Arial, sans-serif" font-size="8" fill="#D1D5DB" text-anchor="middle">CLOSE</text>
+    </g>
+
+    <!-- Sub-header (Description) -->
+    <text x="20" y="65" font-family="Arial, sans-serif" font-size="10" fill="#9CA3AF" width="280">
+      <tspan x="20" dy="1.2em">Minimalist combat tracking for critical player stats,</tspan>
+      <tspan x="20" dy="1.2em">resources, and active defensive abilities.</tspan>
+    </text>
+
+    <!-- Section: STATS (Tiles) -->
+    <text x="20" y="120" font-family="Arial Black, sans-serif" font-size="9" fill="#4B5563">STATS</text>
+    
+    <!-- Stat Tiles (3 Cards) -->
+    <g transform="translate(20, 130)">
+       <!-- Health Tile -->
+       <rect width="88" height="44" fill="#0D1117" stroke="#D1D5DB" stroke-width="1"/>
+       <text x="44" y="15" font-family="Arial, sans-serif" font-size="8" fill="#4B5563" text-anchor="middle">HEALTH</text>
+       <text x="44" y="32" font-family="Arial Black, sans-serif" font-size="11" fill="#22C55E" text-anchor="middle">Health</text>
+       
+       <!-- Resource Tile (Rage) -->
+       <rect x="96" width="88" height="44" fill="#0D1117" stroke="#D1D5DB" stroke-width="1"/>
+       <text x="140" y="15" font-family="Arial, sans-serif" font-size="8" fill="#4B5563" text-anchor="middle">RESOURCE</text>
+       <text x="140" y="32" font-family="Arial Black, sans-serif" font-size="11" fill="#EF4444" text-anchor="middle">Rage</text>
+       
+       <!-- Power Tile (Ignore Pain) -->
+       <rect x="192" width="88" height="44" fill="#0D1117" stroke="#D1D5DB" stroke-width="1"/>
+       <text x="236" y="15" font-family="Arial, sans-serif" font-size="8" fill="#4B5563" text-anchor="middle">POWER</text>
+       <text x="236" y="32" font-family="Arial Black, sans-serif" font-size="11" fill="#FFFFFF" text-anchor="middle">Ignore Pain</text>
+    </g>
+
+    <!-- Section: ABILITIES -->
+    <text x="20" y="210" font-family="Arial Black, sans-serif" font-size="9" fill="#4B5563">ACTIVE MITIGATION</text>
+    
+    <!-- Row 1: SB Charges -->
+    <g transform="translate(20, 220)">
+       <rect width="280" height="40" fill="#111827" stroke="#D1D5DB" stroke-width="1"/>
+       <rect x="8" y="8" width="24" height="24" fill="#1e293b"/>
+       <text x="20" y="24" font-family="Arial Black, sans-serif" font-size="10" fill="#818CF8" text-anchor="middle">SB</text>
+       <text x="40" y="20" font-family="Arial Black, sans-serif" font-size="13" fill="#FFFFFF">Shield Block Charges</text>
+       <text x="40" y="32" font-family="Arial, sans-serif" font-size="8" fill="#4B5563">SOUND: PVP Horn</text>
+    </g>
+    
+    <!-- Row 2: SB Duration -->
+    <g transform="translate(20, 266)">
+       <rect width="280" height="40" fill="#111827" stroke="#D1D5DB" stroke-width="1"/>
+       <rect x="8" y="8" width="24" height="24" fill="#1e293b"/>
+       <text x="20" y="24" font-family="Arial Black, sans-serif" font-size="10" fill="#818CF8" text-anchor="middle">SB</text>
+       <text x="40" y="20" font-family="Arial Black, sans-serif" font-size="13" fill="#FFFFFF">Shield Block Duration</text>
+       <text x="40" y="32" font-family="Arial, sans-serif" font-size="8" fill="#4B5563">SOUND: None</text>
+    </g>
+    
+    <!-- Row 3: Ignore Pain -->
+    <g transform="translate(20, 312)">
+       <rect width="280" height="40" fill="#111827" stroke="#D1D5DB" stroke-width="1"/>
+       <rect x="8" y="8" width="24" height="24" fill="#1e293b"/>
+       <text x="20" y="24" font-family="Arial Black, sans-serif" font-size="10" fill="#F87171" text-anchor="middle">IP</text>
+       <text x="40" y="20" font-family="Arial Black, sans-serif" font-size="13" fill="#FFFFFF">Ignore Pain</text>
+       <text x="40" y="32" font-family="Arial, sans-serif" font-size="8" fill="#4B5563">SOUND: Achievement</text>
+    </g>
+
+    <text x="160" y="440" font-family="Arial, sans-serif" font-size="8" fill="#424550" text-anchor="middle">Industrial Brutalist Configuration Rack</text>
+  </g>
+
+  <!-- ========================================== -->
+  <!-- PLAYER HUD (Right Center) -->
+  <!-- ========================================== -->
+  <g transform="translate(550, 240)">
+     <!-- Health -->
+     <text x="0" y="0" font-family="Arial Black, Helvetica, sans-serif" font-size="32" fill="#D1D5DB" text-anchor="middle">1.4m</text>
+     <text x="0" y="15" font-family="Arial Black, sans-serif" font-size="8" fill="#4B5563" text-anchor="middle">HEALTH</text>
+
+     <!-- Resource -->
+     <text x="0" y="50" font-family="Arial Black, Helvetica, sans-serif" font-size="22" fill="#EF4444" text-anchor="middle">85</text>
+     <text x="0" y="62" font-family="Arial Black, sans-serif" font-size="8" fill="#4B5563" text-anchor="middle">RAGE</text>
+     
+     <!-- Mechanics Staggered -->
+     <g transform="translate(0, 90)">
+        <text x="0" y="0" font-family="Arial Black, sans-serif" font-size="18" fill="#818CF8" text-anchor="middle">2</text>
+        <text x="0" y="25" font-family="Arial Black, sans-serif" font-size="18" fill="#818CF8" text-anchor="middle">5.4s</text>
+        <text x="0" y="50" font-family="Arial Black, sans-serif" font-size="18" fill="#F87171" text-anchor="middle">342k</text>
+     </g>
+  </g>
+
+</svg>

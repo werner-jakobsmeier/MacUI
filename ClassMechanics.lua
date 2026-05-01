@@ -26,76 +26,10 @@ local function ClearFrames()
     eventFrame.onUpdateActive = false
 end
 
-local function RebuildMechanics()
-    ClearFrames()
-    
-    local classData = addonTable.ClassMechanics and addonTable.ClassMechanics[addonTable.playerClass]
-    if not classData then return end
-    
-    local mechanics = classData[addonTable.playerSpec]
-    if not mechanics then return end
-    
-    for i, mech in ipairs(mechanics) do
-        -- Check Config: Only show if NOT disabled in the rack
-        local isEnabled = true
-        if MacUIDB and MacUIDB.trackedAbilities then
-            isEnabled = MacUIDB.trackedAbilities[mech.id] ~= false
-        end
-        
-        if isEnabled then
-            local frame = CreateFrame("Frame", "MacUIClassMechanic_" .. mech.id .. "_" .. i, UIParent)
-            frame:SetSize(150, 25)
-            local defaultPoint = mech.point or {0, -100 - (i*25)}
-            frame.defaultPoint = {"CENTER", UIParent, "CENTER", unpack(defaultPoint)}
-            
-            -- Movement Handling
-            local frameName = frame:GetName()
-            frame:SetMovable(true)
-            frame:EnableMouse(false) -- Default to locked
-            frame:RegisterForDrag("LeftButton")
-            frame:SetScript("OnDragStart", function(self) if addonTable.IsUnlocked then self:StartMoving() end end)
-            frame:SetScript("OnDragStop", function(self)
-                self:StopMovingOrSizing()
-                local p, _, rp, x, y = self:GetPoint()
-                if not MacUIDB.positions then MacUIDB.positions = {} end
-                MacUIDB.positions[frameName] = { point = p, relativePoint = rp, x = x, y = y }
-            end)
 
-            -- Try to restore saved point/scale
-            if MacUIDB and MacUIDB.positions and MacUIDB.positions[frameName] then
-                local pos = MacUIDB.positions[frameName]
-                frame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
-            else
-                frame:SetPoint(unpack(frame.defaultPoint))
-            end
-            if MacUIDB and MacUIDB.scales and MacUIDB.scales[frameName] then
-                frame:SetScale(MacUIDB.scales[frameName])
-            end
-            
-            table.insert(addonTable.MovableFrames, frame)
-            table.insert(activeFrames, frame)
-            
-            local text = frame:CreateFontString(nil, "OVERLAY")
-            text:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
-            text:SetPoint("CENTER", frame, "CENTER", 0, 0)
-            frame.fontStrings = { text }
-            frame.text = text
-            frame.mech = mech
-            frame:Show()
-        end
-    end
-    
-    -- Force an initial update
-    for _, frame in ipairs(activeFrames) do
-        if frame.mech.type == "charges" then
-            eventFrame:GetScript("OnEvent")(eventFrame, "SPELL_UPDATE_CHARGES")
-        else
-            eventFrame:GetScript("OnEvent")(eventFrame, "UNIT_AURA", "player")
-        end
-    end
-end
+local RebuildMechanics, UpdateAuras, UpdateCharges, UpdatePower
 
-local function UpdateAuras()
+UpdateAuras = function()
     local needsOnUpdate = false
     
     for _, frame in ipairs(activeFrames) do
@@ -165,7 +99,7 @@ local function UpdateAuras()
     end
 end
 
-local function UpdateCharges()
+UpdateCharges = function()
     for _, frame in ipairs(activeFrames) do
         local mech = frame.mech
         if mech.type == "charges" then
@@ -179,7 +113,20 @@ local function UpdateCharges()
     end
 end
 
+UpdatePower = function()
+    for _, frame in ipairs(activeFrames) do
+        local mech = frame.mech
+        if mech.type == "power" then
+            local c = mech.color
+            local hexColor = string.format("%02x%02x%02x", c[1]*255, c[2]*255, c[3]*255)
+            local power = UnitPower("player", mech.id)
+            frame.text:SetText(string.format("|cFF%s%d|r", hexColor, power))
+        end
+    end
+end
+
 eventFrame:RegisterEvent("UNIT_AURA")
+eventFrame:RegisterEvent("UNIT_POWER_UPDATE")
 eventFrame:RegisterEvent("SPELL_UPDATE_CHARGES")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
@@ -188,6 +135,8 @@ eventFrame:SetScript("OnEvent", function(self, event, unit)
         RebuildMechanics()
     elseif event == "UNIT_AURA" and unit == "player" then
         UpdateAuras()
+    elseif event == "UNIT_POWER_UPDATE" and unit == "player" then
+        UpdatePower()
     elseif event == "SPELL_UPDATE_CHARGES" then
         UpdateCharges()
     end
@@ -196,5 +145,70 @@ end)
 table.insert(addonTable.OnSpecChanged, function()
     RebuildMechanics()
 end)
+
+RebuildMechanics = function()
+    ClearFrames()
+    
+    local classData = addonTable.ClassMechanics and addonTable.ClassMechanics[addonTable.playerClass]
+    if not classData then return end
+    
+    local mechanics = classData[addonTable.playerSpec]
+    if not mechanics then return end
+    
+    for i, mech in ipairs(mechanics) do
+        -- Check Config: Only show if NOT disabled in the rack
+        local isEnabled = true
+        if MacUIDB and MacUIDB.trackedAbilities then
+            isEnabled = MacUIDB.trackedAbilities[mech.id] ~= false
+        end
+        
+        if isEnabled then
+            local frame = CreateFrame("Frame", "MacUIClassMechanic_" .. mech.id .. "_" .. i, UIParent)
+            frame:SetSize(150, 25)
+            local defaultPoint = mech.point or {0, -100 - (i*25)}
+            frame.defaultPoint = {"CENTER", UIParent, "CENTER", unpack(defaultPoint)}
+            
+            -- Movement Handling
+            local frameName = frame:GetName()
+            frame:SetMovable(true)
+            frame:EnableMouse(false) -- Default to locked
+            frame:RegisterForDrag("LeftButton")
+            frame:SetScript("OnDragStart", function(self) if addonTable.IsUnlocked then self:StartMoving() end end)
+            frame:SetScript("OnDragStop", function(self)
+                self:StopMovingOrSizing()
+                local p, _, rp, x, y = self:GetPoint()
+                if not MacUIDB.positions then MacUIDB.positions = {} end
+                MacUIDB.positions[frameName] = { point = p, relativePoint = rp, x = x, y = y }
+            end)
+
+            -- Try to restore saved point/scale
+            if MacUIDB and MacUIDB.positions and MacUIDB.positions[frameName] then
+                local pos = MacUIDB.positions[frameName]
+                frame:SetPoint(pos.point, UIParent, pos.relativePoint, pos.x, pos.y)
+            else
+                frame:SetPoint(unpack(frame.defaultPoint))
+            end
+            if MacUIDB and MacUIDB.scales and MacUIDB.scales[frameName] then
+                frame:SetScale(MacUIDB.scales[frameName])
+            end
+            
+            table.insert(addonTable.MovableFrames, frame)
+            table.insert(activeFrames, frame)
+            
+            local text = frame:CreateFontString(nil, "OVERLAY")
+            text:SetFont("Fonts\\ARIALN.TTF", 18, "OUTLINE")
+            text:SetPoint("CENTER", frame, "CENTER", 0, 0)
+            frame.fontStrings = { text }
+            frame.text = text
+            frame.mech = mech
+            frame:Show()
+        end
+    end
+    
+    -- Force an initial update
+    UpdateAuras()
+    UpdateCharges()
+    UpdatePower()
+end
 
 addonTable.RebuildMechanics = RebuildMechanics

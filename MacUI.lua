@@ -106,8 +106,9 @@ addonTable.ClassMechanics = {
     },
     PALADIN = {
         [2] = { -- Protection
-            { id = 132403, type = "buff", label = "SotR Buff", color = {1, 1, 0}, point = {0, -150} },
-            { id = 188370, type = "totem", label = "Cons Duration", color = {0.97, 0.72, 0.19}, point = {0, -175} },
+            { id = 9, type = "power", label = "Holy Power", color = {0.5, 0.5, 1}, point = {0, -150} },
+            { id = 132403, type = "buff", label = "SotR Buff", color = {0.5, 0.5, 1}, point = {0, -175} },
+            { id = 188370, type = "totem", label = "Cons Duration", color = {0.97, 0.72, 0.19}, point = {0, -200} },
         }
     }
 }

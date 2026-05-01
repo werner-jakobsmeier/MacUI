@@ -84,6 +84,7 @@ This document contains rules and best practices that the AI assistant must verif
       self.updateTimer = self.updateTimer + elapsed
   end)
   ```
+- **Avoid Hoisting Errors with Forward Declarations:** In Lua, functions and variables must be defined before they are called. Calling a local function before its definition results in a "nil value" error. Instead of shuffling large blocks of code to maintain order, use **Forward Declarations** at the top of the file (e.g., `local FunctionA, FunctionB`). Then, assign them later (`FunctionA = function() ... end`). This completely eliminates hoisting errors and allows functions to call each other regardless of definition order.
 - **Never reference a `local` variable before its declaration:** Lua locals are scoped from their declaration line downward. If you assign `addonTable.foo = someLocal` *before* `local someLocal = CreateFrame(...)`, `addonTable.foo` will be `nil`. Always ensure the variable exists before exporting it.
   ```lua
   -- ❌ WRONG: optionsPanel is nil at this point

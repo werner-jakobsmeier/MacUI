@@ -19,9 +19,10 @@ Access your settings via `/macui` or the custom minimap button. The config panel
 
 ### 📊 Spec-Aware Player Stats
 Real-time tracking of your most critical metrics, optimized for the 12.0.5 API:
-- **Shorthand Formatting**: Large values (like Health or Ignore Pain) are automatically formatted to `k` and `m` shorthand (e.g., `1.2m`, `450k`) for instant readability.
-- **Dynamic Hierarchy**: Stat cards display the category (Health, Resource, Power) at the top and the specific spec name (Health, Rage, Ignore Pain) at the bottom.
+- **Secure Data Handling**: Optimized for the 12.0.5 "Secret Number" API. Health and Resource values are passed directly to the engine to ensure 100% taint-free combat tracking.
+- **Shorthand Formatting**: Non-secret values (like Ignore Pain absorb totals) are automatically formatted to `k` and `m` shorthand (e.g., `1.2m`, `450k`) for instant readability.
 - **Color-Coded Values**: Stat values use spec-appropriate colors (Green, Red, Orange, Blue) for clear visual distinction without cluttering the UI.
+- **Dynamic Hierarchy**: Stat cards display the category (Health, Resource, Power) at the top and the specific spec name (Health, Rage, Ignore Pain) at the bottom.
 
 ### ⚔️ Specialized Protection Modules
 Deeply integrated support for Protection Warriors and Paladins:

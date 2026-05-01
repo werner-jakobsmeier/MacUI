@@ -84,12 +84,24 @@ end
 local function UpdatePower()
     if not powerFrame or not classInfo.power then return end
     
-    local pType = GetPowerTypeByName(classInfo.power.name)
-    local val = pType and UnitPower("player", pType)
+    local val
+    if classInfo.power.name == "Ignore Pain" then
+        -- Use aura points to avoid "Secret Number" taint (UnitGetTotalAbsorbs is protected)
+        local auraData = C_UnitAuras.GetPlayerAuraBySpellID(190456)
+        val = (auraData and auraData.points and auraData.points[1]) or 0
+    else
+        local pType = GetPowerTypeByName(classInfo.power.name)
+        val = pType and UnitPower("player", pType)
+    end
+    
     if val then
         local c = classInfo.power.color
         powerFrame.text:SetTextColor(c[1], c[2], c[3])
-        powerFrame.text:SetText(val)
+        if classInfo.power.name == "Ignore Pain" then
+            powerFrame.text:SetText(addonTable.FormatNumber(val))
+        else
+            powerFrame.text:SetText(val)
+        end
     end
 end
 
@@ -135,13 +147,16 @@ local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("UNIT_HEALTH")
 eventFrame:RegisterEvent("UNIT_MAXHEALTH")
 eventFrame:RegisterEvent("UNIT_POWER_UPDATE")
+eventFrame:RegisterEvent("UNIT_ABSORB_AMOUNT_CHANGED")
+eventFrame:RegisterEvent("UNIT_AURA")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 
 eventFrame:SetScript("OnEvent", function(self, event, unit, powerType)
     if event == "PLAYER_ENTERING_WORLD" then
         RebuildStats()
-    elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH") and unit == "player" then
+    elseif (event == "UNIT_HEALTH" or event == "UNIT_MAXHEALTH" or event == "UNIT_ABSORB_AMOUNT_CHANGED" or event == "UNIT_AURA") and unit == "player" then
         UpdateHealth()
+        UpdatePower() -- Absorbs/Auras map to Power for some classes
     elseif event == "UNIT_POWER_UPDATE" and unit == "player" then
         -- Ideally we'd map string powerType back, but simple enough to just update both if active
         UpdateResource()

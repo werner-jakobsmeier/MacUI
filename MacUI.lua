@@ -27,7 +27,7 @@ addonTable.OnDisplayChanged = {}
 addonTable.ClassDisplayInfo = {
     WARRIOR = {
         resource = { name = "Rage", color = {1, 0, 0} },
-        -- No secondary power for Warriors
+        power = { name = "Ignore Pain", color = {1, 0.5, 0}, specs = {3} },
     },
     PALADIN = {
         resource = { name = "Mana", color = {0, 0, 1} },
@@ -78,7 +78,6 @@ addonTable.ClassDisplayInfo = {
 addonTable.ClassMechanics = {
     WARRIOR = {
         [3] = { -- Protection
-            { id = 190456, type = "absorb", label = "Ignore Pain", color = {1, 0.5, 0}, point = {0, -125} },
             { id = 2565, type = "charges", label = "SB Charges", color = {0.5, 0.5, 1}, point = {0, -150} },
             { id = 2565, type = "buff", label = "SB Buff", color = {0.5, 0.5, 1}, point = {0, -175} },
         }
@@ -112,7 +111,18 @@ local function UpdatePlayerSpec()
     end
 end
 
--- Initialize global registry for movable frames
+-- Global Helpers
+local function FormatNumber(num)
+    if num >= 1000000 then
+        return string.format("%.1fm", num / 1000000)
+    elseif num >= 1000 then
+        return string.format("%.1fk", num / 1000)
+    end
+    return tostring(num)
+end
+addonTable.FormatNumber = FormatNumber
+
+-- Initialize registry for movable frames
 addonTable.MovableFrames = {}
 -- Main addon frame to handle events
 local frame = CreateFrame("Frame")

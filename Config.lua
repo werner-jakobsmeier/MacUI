@@ -287,11 +287,13 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
     nameText:SetFont("Fonts\\ARIALN.TTF", 9)
     nameText:SetPoint("TOP", tile, "TOP", 0, -12)
     nameText:SetText(label)
+    tile.nameText = nameText
     
     local typeText = tile:CreateFontString(nil, "OVERLAY")
     typeText:SetFont("Fonts\\ARIALN.TTF", 8)
     typeText:SetPoint("BOTTOM", tile, "BOTTOM", 0, 12)
     typeText:SetText(typeLabel)
+    tile.typeText = typeText
     
     tile.id = id
     tile.color = defaultColor
@@ -325,41 +327,55 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
     return tile
 end
 
--- Create the 3 tiles
+-- Create the 3 tiles (Now always created, content updated dynamically)
 local healthTile = CreateStatTile(optionsPanel, "health", 0, "HEALTH", "HP Value", {0, 1, 0})
-local resourceTile, powerTile
+local resourceTile = CreateStatTile(optionsPanel, "resource", 82, "RESOURCE", "Value", {1, 1, 1})
+local powerTile = CreateStatTile(optionsPanel, "power", 164, "POWER", "Value", {1, 1, 1})
 
-local classInfo = addonTable.ClassDisplayInfo and addonTable.ClassDisplayInfo[addonTable.playerClass]
-if classInfo and classInfo.resource then
-    resourceTile = CreateStatTile(optionsPanel, "resource", 82, string.upper(classInfo.resource.name), "Resource", classInfo.resource.color)
-end
-
-if classInfo and classInfo.power then
-    powerTile = CreateStatTile(optionsPanel, "power", 164, string.upper(classInfo.power.name), "Power", classInfo.power.color)
-else
-    -- Dimmed N/A tile
-    local naTile = CreateFrame("Frame", nil, optionsPanel, "BackdropTemplate")
-    naTile:SetSize(76, 50)
-    naTile:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 184, -120)
-    naTile:SetBackdrop({
-        bgFile = "Interface\\Buttons\\WHITE8x8",
-        edgeFile = "Interface\\Buttons\\WHITE8x8",
-        edgeSize = 1,
-    })
-    naTile:SetBackdropColor(0.04, 0.04, 0.04, 1)
-    naTile:SetBackdropBorderColor(0.13, 0.13, 0.13, 1)
+local function RefreshStatTiles()
+    if not MacUIDB or not MacUIDB.displays then return end
+    local classInfo = addonTable.ClassDisplayInfo and addonTable.ClassDisplayInfo[addonTable.playerClass]
     
-    local nameText = naTile:CreateFontString(nil, "OVERLAY")
-    nameText:SetFont("Fonts\\ARIALN.TTF", 9)
-    nameText:SetPoint("TOP", naTile, "TOP", 0, -12)
-    nameText:SetText("POWER")
-    nameText:SetTextColor(0.2, 0.2, 0.2)
+    -- 1. Health
+    healthTile.UpdateVisual(MacUIDB.displays.health)
     
-    local typeText = naTile:CreateFontString(nil, "OVERLAY")
-    typeText:SetFont("Fonts\\ARIALN.TTF", 8)
-    typeText:SetPoint("BOTTOM", naTile, "BOTTOM", 0, 12)
-    typeText:SetText("N/A")
-    typeText:SetTextColor(0.13, 0.13, 0.13)
+    -- 2. Resource
+    if classInfo and classInfo.resource then
+        resourceTile:Show()
+        resourceTile.nameText:SetText(string.upper(classInfo.resource.name))
+        resourceTile.color = classInfo.resource.color
+        resourceTile.UpdateVisual(MacUIDB.displays.resource)
+    else
+        resourceTile:Hide()
+    end
+    
+    -- 3. Power
+    local hasPower = false
+    if classInfo and classInfo.power then
+        for _, s in ipairs(classInfo.power.specs) do
+            if s == addonTable.playerSpec then hasPower = true break end
+        end
+    end
+    
+    if hasPower then
+        powerTile:SetAlpha(1)
+        powerTile:EnableMouse(true)
+        powerTile.nameText:SetText(string.upper(classInfo.power.name))
+        powerTile.nameText:SetTextColor(1, 1, 1)
+        powerTile.typeText:SetText("Power")
+        powerTile.color = classInfo.power.color
+        powerTile.UpdateVisual(MacUIDB.displays.power)
+    else
+        -- Dimmed N/A state
+        powerTile:SetAlpha(1) -- Keep visible but dimmed visuals
+        powerTile:EnableMouse(false)
+        powerTile.nameText:SetText("POWER")
+        powerTile.nameText:SetTextColor(0.2, 0.2, 0.2)
+        powerTile.typeText:SetText("N/A")
+        powerTile.typeText:SetTextColor(0.13, 0.13, 0.13)
+        powerTile:SetBackdropColor(0.04, 0.04, 0.04, 1)
+        powerTile:SetBackdropBorderColor(0.13, 0.13, 0.13, 1)
+    end
 end
 
 ------------------------------------------------
@@ -642,6 +658,7 @@ end
 table.insert(addonTable.OnSpecChanged, function()
     BuildAbilityCheckboxes()
     RefreshAbilityCheckboxes()
+    RefreshStatTiles()
 end)
 
 ------------------------------------------------
@@ -657,9 +674,7 @@ SlashCmdList["MACUI"] = function()
         
         -- Refresh stats grid tiles
         if not MacUIDB.displays then MacUIDB.displays = { health = true, resource = true, power = true } end
-        if healthTile then healthTile.UpdateVisual(MacUIDB.displays.health) end
-        if resourceTile then resourceTile.UpdateVisual(MacUIDB.displays.resource) end
-        if powerTile then powerTile.UpdateVisual(MacUIDB.displays.power) end
+        RefreshStatTiles()
     end
 end
 
@@ -683,9 +698,7 @@ configFrame:SetScript("OnEvent", function(self, event, arg1)
         RefreshAbilityCheckboxes()
         
         if not MacUIDB.displays then MacUIDB.displays = { health = true, resource = true, power = true } end
-        if healthTile then healthTile.UpdateVisual(MacUIDB.displays.health) end
-        if resourceTile then resourceTile.UpdateVisual(MacUIDB.displays.resource) end
-        if powerTile then powerTile.UpdateVisual(MacUIDB.displays.power) end
+        RefreshStatTiles()
         
         self:UnregisterEvent("ADDON_LOADED")
     end

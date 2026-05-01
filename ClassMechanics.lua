@@ -12,14 +12,7 @@ local pairs = pairs
 local ipairs = ipairs
 
 -- Helper for large numbers
-local function FormatNumber(num)
-    if num >= 1000000 then
-        return string.format("%.1fm", num / 1000000)
-    elseif num >= 1000 then
-        return string.format("%.1fk", num / 1000)
-    end
-    return tostring(num)
-end
+
 
 local activeFrames = {}
 local eventFrame = CreateFrame("Frame", "MacUIClassMechanicsEvents", UIParent)
@@ -97,7 +90,7 @@ local function UpdateAuras()
             if mech.type == "absorb" then
                 local absorb = (auraData and auraData.points and auraData.points[1]) or 0
                 if absorb > 0 then
-                    frame.text:SetText(string.format("|cFF%s%s|r", hexColor, FormatNumber(absorb)))
+                    frame.text:SetText(string.format("|cFF%s%s|r", hexColor, addonTable.FormatNumber(absorb)))
                 else
                     frame.text:SetText(string.format("|cFF%s0|r", hexColor))
                 end

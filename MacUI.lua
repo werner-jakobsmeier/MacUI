@@ -95,8 +95,8 @@ addonTable.ClassDisplayInfo = {
 addonTable.ClassMechanics = {
     WARRIOR = {
         [3] = { -- Protection
-            { id = 2565, type = "charges", label = "SB Charges", color = {0.5, 0.5, 1}, point = {0, -150} },
-            { id = 2565, type = "buff", label = "SB Buff", color = {0.5, 0.5, 1}, point = {0, -175} },
+            { id = 2565, type = "charges", label = "Shield Block Charges", color = {0.5, 0.5, 1}, point = {0, -150}, isBaseline = true },
+            { id = 132404, type = "buff", label = "Shield Block Duration", color = {0.5, 0.5, 1}, point = {0, -175}, isBaseline = true },
             { id = 190456, type = "absorb", label = "Ignore Pain", color = {0.9, 0.1, 0.1}, point = {0, -200} },
         }
     },

@@ -750,8 +750,8 @@ local function BuildAbilityCheckboxes()
         local hasMechanics = false
         local processedIDs = {}
         for _, mech in ipairs(specMechanics) do
-            -- Skip raw power types (like Holy Power) and prevent duplicate checkboxes (e.g. Shield Block has 2 entries)
-            if mech.type ~= "power" and not processedIDs[mech.id] then
+            -- Skip raw power types (like Holy Power) and prevent duplicate checkboxes
+            if mech.type ~= "power" and not processedIDs[mech.label] then
                 if not hasMechanics then
                     CreateHeader("Active Mitigation", yOffsetBase - (visibleIndex * 40))
                     visibleIndex = visibleIndex + 0.5 -- ~23px header-to-row gap
@@ -765,7 +765,7 @@ local function BuildAbilityCheckboxes()
                 local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false, missingTalent)
                 table.insert(abilityCheckboxes, row)
                 
-                processedIDs[mech.id] = true
+                processedIDs[mech.label] = true
                 visibleIndex = visibleIndex + 1
             end
         end

@@ -2,7 +2,7 @@
 ## Title: MacUI
 ## Notes: A custom user interface for World of Warcraft.
 ## Author: MacPewPew
-## Version: 0.1.1-alpha
+## Version: 0.1.2-alpha
 ## SavedVariables: MacUIDB
 ## IconTexture: Interface\Icons\INV_Misc_EngGizmos_17
 ## AddonCompartmentFunc: MacUI_OnAddonCompartmentClick

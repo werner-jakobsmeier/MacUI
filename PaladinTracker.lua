@@ -107,6 +107,12 @@ local allFrames = { holyPowerFrame, sotrFrame, consecFrame }
 local function RebuildTracker()
     if addonTable.playerSpec == 2 then
         for _, f in ipairs(allFrames) do f:Show() end
+        
+        -- Respect user's power display preference
+        if MacUIDB and MacUIDB.displays and MacUIDB.displays.power == false then
+            holyPowerFrame:Hide()
+        end
+        
         UpdateHolyPower()
         UpdateSotRBuff()
         UpdateConsecration()
@@ -120,6 +126,13 @@ end
 -- Hook into the spec change callback system
 table.insert(addonTable.OnSpecChanged, function()
     RebuildTracker()
+end)
+
+-- Hook into the display toggle callback system
+table.insert(addonTable.OnDisplayChanged, function(displayId, isEnabled)
+    if displayId == "power" then
+        RebuildTracker()
+    end
 end)
 
 ------------------------------------------------

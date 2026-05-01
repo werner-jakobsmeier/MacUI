@@ -22,6 +22,13 @@ frame.fontStrings = { healthText }
 
 -- Update Function
 local function UpdateHealth()
+    if MacUIDB and MacUIDB.displays and MacUIDB.displays.health == false then
+        frame:Hide()
+        return
+    else
+        frame:Show()
+    end
+
     local health = UnitHealth("player") or 0
     local maxHealth = UnitHealthMax("player") or 1
     
@@ -34,6 +41,13 @@ local function UpdateHealth()
     -- Green font
     healthText:SetText(string.format("|cFF00FF00Health: %d%%|r", percent))
 end
+
+-- Hook into display changes
+table.insert(addonTable.OnDisplayChanged, function(displayId, isEnabled)
+    if displayId == "health" then
+        UpdateHealth()
+    end
+end)
 
 -- Event Registration
 frame:RegisterEvent("UNIT_HEALTH")

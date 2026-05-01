@@ -254,20 +254,123 @@ slider:SetScript("OnValueChanged", function(self, value)
 end)
 
 ------------------------------------------------
+-- Player Stats (Grid Tiles)
+------------------------------------------------
+
+local statsLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
+statsLabel:SetFont("Fonts\\FRIZQT__.TTF", 10)
+statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -150)
+statsLabel:SetText("|cFF888888PLAYER STATS|r")
+
+local statsSeparator = optionsPanel:CreateTexture(nil, "OVERLAY")
+statsSeparator:SetColorTexture(0.3, 0.3, 0.3, 1)
+statsSeparator:SetSize(240, 1)
+statsSeparator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -163)
+
+local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColor)
+    local tile = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    tile:SetSize(74, 50)
+    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -170)
+    tile:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    })
+    
+    local nameText = tile:CreateFontString(nil, "OVERLAY")
+    nameText:SetFont("Fonts\\FRIZQT__.TTF", 9)
+    nameText:SetPoint("TOP", tile, "TOP", 0, -12)
+    nameText:SetText(label)
+    
+    local typeText = tile:CreateFontString(nil, "OVERLAY")
+    typeText:SetFont("Fonts\\FRIZQT__.TTF", 8)
+    typeText:SetPoint("BOTTOM", tile, "BOTTOM", 0, 12)
+    typeText:SetText(typeLabel)
+    
+    tile.id = id
+    tile.color = defaultColor
+    
+    local function UpdateVisual(isEnabled)
+        if isEnabled then
+            tile:SetBackdropColor(0.06, 0.06, 0.06, 1)
+            tile:SetBackdropBorderColor(defaultColor[1], defaultColor[2], defaultColor[3], 1)
+            nameText:SetTextColor(defaultColor[1], defaultColor[2], defaultColor[3])
+            typeText:SetTextColor(0.4, 0.4, 0.4)
+        else
+            tile:SetBackdropColor(0.04, 0.04, 0.04, 1)
+            tile:SetBackdropBorderColor(0.2, 0.2, 0.2, 1)
+            nameText:SetTextColor(0.4, 0.4, 0.4)
+            typeText:SetTextColor(0.3, 0.3, 0.3)
+        end
+    end
+    
+    tile:SetScript("OnClick", function(self)
+        if not MacUIDB.displays then MacUIDB.displays = { health = true, resource = true, power = true } end
+        MacUIDB.displays[id] = not MacUIDB.displays[id]
+        UpdateVisual(MacUIDB.displays[id])
+        
+        -- Notify modules
+        for _, cb in ipairs(addonTable.OnDisplayChanged) do
+            cb(id, MacUIDB.displays[id])
+        end
+    end)
+    
+    tile.UpdateVisual = UpdateVisual
+    return tile
+end
+
+-- Create the 3 tiles
+local healthTile = CreateStatTile(optionsPanel, "health", 0, "HEALTH", "HP %", {0, 1, 0})
+local resourceTile, powerTile
+
+local classInfo = addonTable.ClassDisplayInfo and addonTable.ClassDisplayInfo[addonTable.playerClass]
+if classInfo and classInfo.resource then
+    resourceTile = CreateStatTile(optionsPanel, "resource", 82, string.upper(classInfo.resource.name), "Resource", classInfo.resource.color)
+end
+
+if classInfo and classInfo.power then
+    powerTile = CreateStatTile(optionsPanel, "power", 164, string.upper(classInfo.power.name), "Power", classInfo.power.color)
+else
+    -- Dimmed N/A tile
+    local naTile = CreateFrame("Frame", nil, optionsPanel, "BackdropTemplate")
+    naTile:SetSize(76, 50)
+    naTile:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 184, -170)
+    naTile:SetBackdrop({
+        bgFile = "Interface\\Buttons\\WHITE8x8",
+        edgeFile = "Interface\\Buttons\\WHITE8x8",
+        edgeSize = 1,
+    })
+    naTile:SetBackdropColor(0.04, 0.04, 0.04, 1)
+    naTile:SetBackdropBorderColor(0.13, 0.13, 0.13, 1)
+    
+    local nameText = naTile:CreateFontString(nil, "OVERLAY")
+    nameText:SetFont("Fonts\\FRIZQT__.TTF", 9)
+    nameText:SetPoint("TOP", naTile, "TOP", 0, -12)
+    nameText:SetText("POWER")
+    nameText:SetTextColor(0.2, 0.2, 0.2)
+    
+    local typeText = naTile:CreateFontString(nil, "OVERLAY")
+    typeText:SetFont("Fonts\\FRIZQT__.TTF", 8)
+    typeText:SetPoint("BOTTOM", naTile, "BOTTOM", 0, 12)
+    typeText:SetText("N/A")
+    typeText:SetTextColor(0.13, 0.13, 0.13)
+end
+
+------------------------------------------------
 -- Ability Selector Checkboxes
 ------------------------------------------------
 
 -- Section label
 local abilitiesLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 abilitiesLabel:SetFont("Fonts\\FRIZQT__.TTF", 10)
-abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -150)
-abilitiesLabel:SetText("|cFF888888ABILITIES|r")
+abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -235)
+abilitiesLabel:SetText("|cFF888888ABILITY TRACKING|r")
 
 -- Separator line
 local separator = optionsPanel:CreateTexture(nil, "OVERLAY")
 separator:SetColorTexture(0.3, 0.3, 0.3, 1)
-separator:SetSize(220, 1)
-separator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -163)
+separator:SetSize(240, 1)
+separator:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -248)
 
 ------------------------------------------------
 -- Audio Dropdown Menu
@@ -494,7 +597,7 @@ local function BuildAbilityCheckboxes()
             if spellInfo and spellInfo.name then
                 local name = spellInfo.name
                 visibleIndex = visibleIndex + 1
-                local yOffset = -175 - ((visibleIndex - 1) * 24)
+                local yOffset = -260 - ((visibleIndex - 1) * 24)
                 -- custom abilities default to "buff" type for tracking
                 local ability = { spellID = spellID, name = name, type = "buff" } 
                 local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, true)
@@ -508,13 +611,13 @@ local function BuildAbilityCheckboxes()
     if not emptyStateMessage then
         emptyStateMessage = optionsPanel:CreateFontString(nil, "OVERLAY")
         emptyStateMessage:SetFont("Fonts\\FRIZQT__.TTF", 10)
-        emptyStateMessage:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -175)
+        emptyStateMessage:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -260)
         emptyStateMessage:SetText("|cFF888888You are not tracking any abilities.\nShift-Click a spell from your spellbook\nbelow to get started.|r")
         optionsPanel.emptyStateMessage = emptyStateMessage
     end
     
     -- Position Smart Input Box
-    local inputYOffset = -175 - (visibleIndex * 24) - 5
+    local inputYOffset = -260 - (visibleIndex * 24) - 5
     
     if visibleIndex == 0 then
         emptyStateMessage:Show()
@@ -630,6 +733,12 @@ SlashCmdList["MACUI"] = function()
         slider:SetValue(MacUIDB and MacUIDB.fontSize or 14)
         -- Refresh checkboxes to reflect current DB state
         RefreshAbilityCheckboxes()
+        
+        -- Refresh stats grid tiles
+        if not MacUIDB.displays then MacUIDB.displays = { health = true, resource = true, power = true } end
+        if healthTile then healthTile.UpdateVisual(MacUIDB.displays.health) end
+        if resourceTile then resourceTile.UpdateVisual(MacUIDB.displays.resource) end
+        if powerTile then powerTile.UpdateVisual(MacUIDB.displays.power) end
     end
 end
 
@@ -652,6 +761,11 @@ configFrame:SetScript("OnEvent", function(self, event, arg1)
         -- Build ability checkboxes now that the DB is ready
         BuildAbilityCheckboxes()
         RefreshAbilityCheckboxes()
+        
+        if not MacUIDB.displays then MacUIDB.displays = { health = true, resource = true, power = true } end
+        if healthTile then healthTile.UpdateVisual(MacUIDB.displays.health) end
+        if resourceTile then resourceTile.UpdateVisual(MacUIDB.displays.resource) end
+        if powerTile then powerTile.UpdateVisual(MacUIDB.displays.power) end
         
         self:UnregisterEvent("ADDON_LOADED")
     end

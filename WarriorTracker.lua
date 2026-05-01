@@ -127,6 +127,12 @@ local allFrames = { rageFrame, ipFrame, sbChargesFrame, sbBuffFrame }
 local function RebuildTracker()
     if addonTable.playerSpec == 3 then
         for _, f in ipairs(allFrames) do f:Show() end
+        
+        -- Respect user's resource display preference
+        if MacUIDB and MacUIDB.displays and MacUIDB.displays.resource == false then
+            rageFrame:Hide()
+        end
+        
         UpdateRage()
         UpdateIgnorePain()
         UpdateShieldBlockCharges()
@@ -141,6 +147,13 @@ end
 -- Hook into the spec change callback system
 table.insert(addonTable.OnSpecChanged, function()
     RebuildTracker()
+end)
+
+-- Hook into the display toggle callback system
+table.insert(addonTable.OnDisplayChanged, function(displayId, isEnabled)
+    if displayId == "resource" then
+        RebuildTracker()
+    end
 end)
 
 ------------------------------------------------

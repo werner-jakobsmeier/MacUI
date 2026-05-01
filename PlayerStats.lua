@@ -61,9 +61,6 @@ end
 local function UpdateHealth()
     if not healthFrame then return end
     
-    -- In 12.0.5, both UnitHealth and UnitHealthPercent return "secret number values"
-    -- We cannot perform arithmetic (* 100) on the percentage float.
-    -- We must use the absolute health value directly to avoid Lua taint.
     local health = UnitHealth("player")
     if health then
         healthFrame.text:SetTextColor(0, 1, 0)

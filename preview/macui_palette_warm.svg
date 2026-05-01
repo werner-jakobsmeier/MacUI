@@ -1,0 +1,46 @@
+<svg width="300" height="360" viewBox="0 0 300 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="300" height="360" fill="#121212"/>
+  <rect x="1" y="1" width="298" height="358" stroke="#E5E5E5" stroke-width="2"/>
+  
+  <!-- Title: MacUI (Off-White) -->
+  <text x="18" y="34" font-family="Arial Narrow" font-size="22" font-weight="bold" fill="#E5E5E5">Mac</text>
+  <text x="58" y="34" font-family="Arial Narrow" font-size="22" fill="#E5E5E5">UI</text>
+  
+  <!-- Description (Ash) -->
+  <text x="18" y="54" font-family="Arial Narrow" font-size="9" fill="#757575">
+    <tspan x="18" dy="12">Minimalist combat tracking for critical player stats,</tspan>
+    <tspan x="18" dy="12">resources, and active defensive abilities.</tspan>
+  </text>
+
+  <!-- Top Buttons -->
+  <rect x="174" y="14" width="58" height="18" stroke="#333" fill="none"/>
+  <text x="203" y="27" font-family="Arial Narrow" font-size="8" fill="#757575" text-anchor="middle">LOCKED</text>
+  
+  <rect x="236" y="14" width="48" height="18" stroke="#E5E5E5" fill="none"/>
+  <text x="260" y="27" font-family="Arial Narrow" font-size="8" fill="#E5E5E5" text-anchor="middle">CLOSE</text>
+
+  <!-- Stats Grid -->
+  <rect x="20" y="92" width="80" height="40" stroke="#E5E5E5" fill="black"/>
+  <text x="60" y="108" font-family="Arial Narrow" font-size="8" fill="#E5E5E5" text-anchor="middle">Health</text>
+  <text x="60" y="124" font-family="Arial Narrow" font-size="9" fill="#81C784" text-anchor="middle">Health</text>
+
+  <rect x="110" y="92" width="80" height="40" stroke="#E5E5E5" fill="black"/>
+  <text x="150" y="108" font-family="Arial Narrow" font-size="8" fill="#E5E5E5" text-anchor="middle">Resource</text>
+  <text x="150" y="124" font-family="Arial Narrow" font-size="9" fill="#E5E5E5" text-anchor="middle">Rage</text>
+
+  <rect x="200" y="92" width="80" height="40" stroke="#E5E5E5" fill="black"/>
+  <text x="240" y="108" font-family="Arial Narrow" font-size="8" fill="#E5E5E5" text-anchor="middle">Power</text>
+  <text x="240" y="124" font-family="Arial Narrow" font-size="9" fill="#E5E5E5" text-anchor="middle">Ignore Pain</text>
+
+  <!-- Abilities -->
+  <rect x="20" y="160" width="12" height="12" stroke="#E5E5E5" fill="none"/>
+  <text x="26" y="170" font-family="Arial Narrow" font-size="10" fill="#E5E5E5" text-anchor="middle">X</text>
+  <rect x="38" y="158" width="16" height="16" fill="#222"/>
+  <text x="60" y="170" font-family="Arial Narrow" font-size="11" fill="#E5E5E5">Shield Block</text>
+
+  <rect x="20" y="184" width="12" height="12" stroke="#E5E5E5" fill="none"/>
+  <text x="26" y="194" font-family="Arial Narrow" font-size="10" fill="#E5E5E5" text-anchor="middle">X</text>
+  <rect x="38" y="182" width="16" height="16" fill="#222"/>
+  <text x="60" y="194" font-family="Arial Narrow" font-size="11" fill="#E5E5E5">Spell Block</text>
+</svg>

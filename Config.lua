@@ -160,19 +160,29 @@ optionsPanel:SetBackdrop({
     edgeFile = "Interface\\Buttons\\WHITE8x8",
     edgeSize = 2,
 })
-optionsPanel:SetBackdropColor(0, 0, 0, 0.95)
-optionsPanel:SetBackdropBorderColor(1, 1, 1, 1)
+optionsPanel:SetBackdropColor(0.06, 0.09, 0.16, 0.95)
+optionsPanel:SetBackdropBorderColor(0.82, 0.84, 0.86, 1)
 
 -- Split-weight title: bold "MAC" + thin "UI"
 local titleBold = optionsPanel:CreateFontString(nil, "OVERLAY")
-titleBold:SetFont("Fonts\\ARIALN.TTF", 22, "OUTLINE")
-titleBold:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 16, -14)
-titleBold:SetText("|cFFFFFFFFMAC|r")
+titleBold:SetFont("Fonts\\ARIALN.TTF", 26, "THICKOUTLINE")
+titleBold:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 16, -12)
+titleBold:SetText("|cFFD1D5DBMac|r")
 
 local titleThin = optionsPanel:CreateFontString(nil, "OVERLAY")
-titleThin:SetFont("Fonts\\ARIALN.TTF", 22)
-titleThin:SetPoint("LEFT", titleBold, "RIGHT", 0, 0)
-titleThin:SetText("|cFFFFFFFFUI|r")
+titleThin:SetFont("Fonts\\ARIALN.TTF", 18)
+titleThin:SetPoint("BOTTOMLEFT", titleBold, "BOTTOMRIGHT", 2, 2) -- Lowered to align baselines better
+titleThin:SetTextColor(0.42, 0.45, 0.50) -- Muted Slate
+titleThin:SetText("UI")
+
+-- Introductory Description
+local descText = optionsPanel:CreateFontString(nil, "OVERLAY")
+descText:SetFont("Fonts\\ARIALN.TTF", 9) -- Bumped to 9pt
+descText:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 18, -44)
+descText:SetWidth(260)
+descText:SetJustifyH("LEFT")
+descText:SetTextColor(0.42, 0.45, 0.50) -- Slate
+descText:SetText("Minimalist combat tracking for critical player stats, resources, and active defensive abilities.")
 
 -- Top Right System Buttons (LOCK / RELOAD / CLOSE)
 local btnToggleLock = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
@@ -192,13 +202,13 @@ btnToggleLock.text = lockText
 function btnToggleLock:SetText(newText) self.text:SetText(newText) end
 function btnToggleLock:SetState(isActive)
     if isActive then
-        self:SetBackdropColor(1, 1, 1, 1)
-        self:SetBackdropBorderColor(1, 1, 1, 1)
-        self.text:SetTextColor(0, 0, 0, 1)
+        self:SetBackdropColor(0.82, 0.84, 0.86, 1) -- Silver
+        self:SetBackdropBorderColor(0.82, 0.84, 0.86, 1)
+        self.text:SetTextColor(0.06, 0.09, 0.16, 1) -- Nordic Navy
     else
         self:SetBackdropColor(0, 0, 0, 0)
-        self:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
-        self.text:SetTextColor(1, 1, 1, 1)
+        self:SetBackdropBorderColor(0.42, 0.45, 0.50, 1) -- Slate
+        self.text:SetTextColor(0.82, 0.84, 0.86, 1) -- Silver
     end
 end
 
@@ -219,14 +229,17 @@ local btnReload = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
 btnReload:SetSize(48, 18)
 btnReload:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -72, -14)
 btnReload:SetBackdrop({
+    bgFile = "Interface\\Buttons\\WHITE8x8",
     edgeFile = "Interface\\Buttons\\WHITE8x8",
     edgeSize = 1,
 })
-btnReload:SetBackdropBorderColor(1, 1, 1, 1)
+btnReload:SetBackdropColor(0, 0, 0, 0)
+btnReload:SetBackdropBorderColor(0.42, 0.45, 0.50, 1) -- Slate
 
 local reloadText = btnReload:CreateFontString(nil, "OVERLAY")
 reloadText:SetFont("Fonts\\ARIALN.TTF", 8)
 reloadText:SetPoint("CENTER")
+reloadText:SetTextColor(0.82, 0.84, 0.86) -- Silver
 reloadText:SetText("RELOAD")
 btnReload:SetScript("OnClick", function() ReloadUI() end)
 
@@ -234,14 +247,17 @@ local btnClose = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")
 btnClose:SetSize(48, 18)
 btnClose:SetPoint("TOPRIGHT", optionsPanel, "TOPRIGHT", -16, -14)
 btnClose:SetBackdrop({
+    bgFile = "Interface\\Buttons\\WHITE8x8",
     edgeFile = "Interface\\Buttons\\WHITE8x8",
     edgeSize = 1,
 })
-btnClose:SetBackdropBorderColor(1, 1, 1, 1)
+btnClose:SetBackdropColor(0, 0, 0, 0)
+btnClose:SetBackdropBorderColor(0.42, 0.45, 0.50, 1) -- Slate
 
 local closeText = btnClose:CreateFontString(nil, "OVERLAY")
 closeText:SetFont("Fonts\\ARIALN.TTF", 8)
 closeText:SetPoint("CENTER")
+closeText:SetTextColor(0.82, 0.84, 0.86) -- Silver
 closeText:SetText("CLOSE")
 btnClose:SetScript("OnClick", function() optionsPanel:Hide() end)
 
@@ -304,13 +320,14 @@ addonTable.ToggleLock = ToggleLock
 
 local statsLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 statsLabel:SetFont("Fonts\\ARIALN.TTF", 10)
-statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -50)
-statsLabel:SetText("PLAYER STATS")
+statsLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -74) 
+statsLabel:SetText("STATS")
+statsLabel:Hide() -- Removed for testing
 
 local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColor)
     local tile = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    tile:SetSize(80, 40) -- Slimmer
-    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -68) -- 18px gap
+    tile:SetSize(80, 40)
+    tile:SetPoint("TOPLEFT", parent, "TOPLEFT", 20 + xOffset, -74) -- Shifted up to header's spot
     tile:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
         edgeFile = "Interface\\Buttons\\WHITE8x8",
@@ -334,16 +351,16 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
     
     local function UpdateVisual(isEnabled)
         if isEnabled then
-            tile:SetBackdropColor(0, 0, 0, 1)
-            tile:SetBackdropBorderColor(1, 1, 1, 1) -- Pure White
+            tile:SetBackdropColor(0.01, 0.02, 0.09, 1) -- Darker Nordic
+            tile:SetBackdropBorderColor(0.82, 0.84, 0.86, 1) -- Silver
             local c = tile.color or {1, 1, 1}
-            nameText:SetTextColor(c[1], c[2], c[3]) -- Spec Color for the Name (Value)
-            typeText:SetTextColor(1, 1, 1) -- Pure White for Category
+            nameText:SetTextColor(c[1], c[2], c[3]) -- Spec Color
+            typeText:SetTextColor(0.42, 0.45, 0.50) -- Slate
         else
             tile:SetBackdropColor(0, 0, 0, 0.5)
-            tile:SetBackdropBorderColor(0.2, 0.2, 0.2, 1) -- Dark Grey
-            nameText:SetTextColor(0.3, 0.3, 0.3)
-            typeText:SetTextColor(0.2, 0.2, 0.2)
+            tile:SetBackdropBorderColor(0.18, 0.23, 0.32, 1) -- Muted Navy
+            nameText:SetTextColor(0.25, 0.3, 0.4)
+            typeText:SetTextColor(0.18, 0.23, 0.32)
         end
     end
     
@@ -421,8 +438,9 @@ end
 -- Section label
 local abilitiesLabel = optionsPanel:CreateFontString(nil, "OVERLAY")
 abilitiesLabel:SetFont("Fonts\\ARIALN.TTF", 10)
-abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -132) -- 24px Gap from tiles
-abilitiesLabel:SetText("ABILITY TRACKING")
+abilitiesLabel:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -132) 
+abilitiesLabel:SetText("ABILITIES")
+abilitiesLabel:Hide() -- Removed for testing
 
 -- (Underline separator removed)
 
@@ -486,7 +504,7 @@ optionsPanel:HookScript("OnHide", function() audioDropdown:Hide() end)
 local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     local row = CreateFrame("Button", nil, parent)
     row:SetSize(220, 20)
-    row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset)
+    row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset - 4) -- Shifted up for tighter flow
 
     -- Checkbox square
     local checkbox = CreateFrame("Frame", nil, row, "BackdropTemplate")
@@ -496,12 +514,13 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
         edgeFile = "Interface\\Buttons\\WHITE8x8",
         edgeSize = 1,
     })
-    checkbox:SetBackdropBorderColor(1, 1, 1, 1)
+    checkbox:SetBackdropBorderColor(0.82, 0.84, 0.86, 1) -- Silver
 
     local checkText = checkbox:CreateFontString(nil, "OVERLAY")
     checkText:SetFont("Fonts\\ARIALN.TTF", 10, "OUTLINE")
     checkText:SetPoint("CENTER", checkbox, "CENTER", 0, 0)
     checkText:SetText("X")
+    checkText:SetTextColor(0.82, 0.84, 0.86) -- Silver
     checkText:Hide()
     row.checkText = checkText
 
@@ -519,7 +538,8 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     local nameText = row:CreateFontString(nil, "OVERLAY")
     nameText:SetFont("Fonts\\ARIALN.TTF", 11)
     nameText:SetPoint("LEFT", iconPreview, "RIGHT", 6, 0)
-    nameText:SetText("|cFFFFFFFF" .. ability.name .. "|r")
+    nameText:SetTextColor(0.82, 0.84, 0.86) -- Silver
+    nameText:SetText(ability.name)
 
     -- Custom delete button
     if isCustom then
@@ -596,12 +616,14 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     -- State management
     local function UpdateVisual(isEnabled)
         if isEnabled then
-            checkbox:SetBackdropBorderColor(1, 1, 1, 1)
+            checkbox:SetBackdropBorderColor(0.82, 0.84, 0.86, 1) -- Silver
             row.checkText:Show()
+            nameText:SetAlpha(1)
         else
             checkbox:SetBackdropColor(0, 0, 0, 0)
-            checkbox:SetBackdropBorderColor(0.4, 0.4, 0.4, 1)
+            checkbox:SetBackdropBorderColor(0.18, 0.23, 0.32, 1) -- Muted Navy
             row.checkText:Hide()
+            nameText:SetAlpha(0.3)
         end
     end
 

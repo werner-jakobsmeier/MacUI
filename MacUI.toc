@@ -7,6 +7,7 @@
 
 MacUI.lua
 Config.lua
+Animations.lua
 Square.lua
 PlayerHealth.lua
 WarriorTracker.lua

@@ -17,6 +17,9 @@ A sleek, lightweight, and highly optimized custom user interface for World of Wa
 ### Unlocked Layout Mode
 ![MacUI Unlocked Layout](preview/macui_unlocked_state.png)
 
+### Active Combat Warning
+![MacUI Combat Warning](preview/macui_combat_warning.png)
+
 ## Installation
 1. Download or clone this repository.
 2. Place the `MacUI` folder inside your `World of Warcraft/_retail_/Interface/AddOns/` directory.

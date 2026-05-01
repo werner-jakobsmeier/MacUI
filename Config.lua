@@ -328,9 +328,9 @@ local function CreateStatTile(parent, id, xOffset, label, typeLabel, defaultColo
 end
 
 -- Create the 3 tiles (Now always created, content updated dynamically)
-local healthTile = CreateStatTile(optionsPanel, "health", 0, "HEALTH", "HP Value", {0, 1, 0})
-local resourceTile = CreateStatTile(optionsPanel, "resource", 82, "RESOURCE", "Value", {1, 1, 1})
-local powerTile = CreateStatTile(optionsPanel, "power", 164, "POWER", "Value", {1, 1, 1})
+local healthTile = CreateStatTile(optionsPanel, "health", 0, "HEALTH", "Health", {0, 1, 0})
+local resourceTile = CreateStatTile(optionsPanel, "resource", 82, "RESOURCE", "Resource", {1, 1, 1})
+local powerTile = CreateStatTile(optionsPanel, "power", 164, "POWER", "Power", {1, 1, 1})
 
 local function RefreshStatTiles()
     if not MacUIDB or not MacUIDB.displays then return end
@@ -343,6 +343,7 @@ local function RefreshStatTiles()
     if classInfo and classInfo.resource then
         resourceTile:Show()
         resourceTile.nameText:SetText(string.upper(classInfo.resource.name))
+        resourceTile.typeText:SetText("Resource")
         resourceTile.color = classInfo.resource.color
         resourceTile.UpdateVisual(MacUIDB.displays.resource)
     else

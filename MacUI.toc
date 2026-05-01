@@ -11,9 +11,7 @@
 
 MacUI.lua
 Config.lua
-Animations.lua
 AbilityTracker.lua
-Square.lua
 PlayerStats.lua
 ClassMechanics.lua
 MinimapButton.lua

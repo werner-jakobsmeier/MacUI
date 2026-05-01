@@ -707,7 +707,6 @@ SlashCmdList["MACUI"] = function()
         RefreshAbilityCheckboxes()
         
         -- Refresh stats grid tiles
-        if not MacUIDB.displays then MacUIDB.displays = { health = true, resource = true, power = true } end
         RefreshStatTiles()
     end
 end
@@ -718,11 +717,6 @@ end
 configFrame:RegisterEvent("ADDON_LOADED")
 configFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
-        if not MacUIDB then MacUIDB = {} end
-        if not MacUIDB.positions then MacUIDB.positions = {} end
-        if not MacUIDB.scales then MacUIDB.scales = {} end
-        if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
-        
         for _, frame in ipairs(addonTable.MovableFrames or {}) do
             ApplyFrameSettings(frame)
         end
@@ -731,7 +725,6 @@ configFrame:SetScript("OnEvent", function(self, event, arg1)
         BuildAbilityCheckboxes()
         RefreshAbilityCheckboxes()
         
-        if not MacUIDB.displays then MacUIDB.displays = { health = true, resource = true, power = true } end
         RefreshStatTiles()
         
         self:UnregisterEvent("ADDON_LOADED")

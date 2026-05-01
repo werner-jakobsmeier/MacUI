@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="300" viewBox="0 0 600 300">
+  <defs>
+    <style>
+      @keyframes combatPulse {
+        0%   { fill: #000000; stroke: #FFFFFF; }
+        20%  { fill: #330000; stroke: #FF0000; }
+        40%  { fill: #880000; stroke: #FF0000; }
+        60%  { fill: #FF0000; stroke: #FF0000; }
+        80%  { fill: #880000; stroke: #FF0000; }
+        100% { fill: #000000; stroke: #FFFFFF; }
+      }
+      
+      @keyframes abilityStateChange {
+        0%   { stroke: #333333; }
+        30%  { stroke: #FF0000; }  /* Missing buff */
+        60%  { stroke: #00FF00; }  /* Buff applied */
+        100% { stroke: #333333; }  /* Combat drops */
+      }
+
+      @keyframes audioFlash {
+        0%   { fill: #333333; }
+        30%  { fill: #FF0000; }    /* Alarm playing */
+        60%  { fill: #33CC33; }    /* Buff applied, back to green ready state */
+        100% { fill: #333333; }
+      }
+
+      .combat-square {
+        animation: combatPulse 4s infinite;
+      }
+      .tracker-border {
+        animation: abilityStateChange 8s infinite;
+        stroke-width: 2;
+        fill: none;
+      }
+      .audio-btn {
+        animation: audioFlash 8s infinite;
+      }
+    </style>
+  </defs>
+
+  <!-- Background Image Mock -->
+  <rect width="600" height="300" fill="#1a1a1a"/>
+  
+  <!-- Text Label -->
+  <text x="20" y="30" font-family="Arial Black, sans-serif" font-size="24" fill="#FFFFFF">MacUI</text>
+  <text x="20" y="55" font-family="Arial, sans-serif" font-size="12" fill="#888888">Dynamic Combat Simulation</text>
+
+  <!-- Legacy Square Tracker -->
+  <rect class="combat-square" x="280" y="130" width="40" height="40" rx="0"/>
+  <text x="300" y="115" font-family="Arial, sans-serif" font-size="10" fill="#888888" text-anchor="middle">Legacy Core</text>
+
+  <!-- New Ability Tracker -->
+  <text x="450" y="115" font-family="Arial, sans-serif" font-size="10" fill="#888888" text-anchor="middle">Modular Tracker</text>
+  <rect x="430" y="130" width="40" height="40" fill="#1a3a6a"/>
+  <text x="450" y="155" font-family="Arial Black, sans-serif" font-size="14" fill="#6699CC" text-anchor="middle">SB</text>
+  <rect class="tracker-border" x="430" y="130" width="40" height="40"/>
+
+  <!-- Audio Component -->
+  <rect class="audio-btn" x="475" y="130" width="16" height="16" rx="0" stroke="#000" stroke-width="1"/>
+  <text x="483" y="142" font-family="Arial Black, sans-serif" font-size="10" font-weight="900" fill="#000000" text-anchor="middle">A</text>
+
+  <!-- Explanation Text -->
+  <text x="450" y="200" font-family="Courier, monospace" font-size="12" fill="#AAAAAA" text-anchor="middle">State: In Combat</text>
+  <text x="450" y="220" font-family="Courier, monospace" font-size="12" fill="#AAAAAA" text-anchor="middle">Buff: Missing -> Active</text>
+
+</svg>

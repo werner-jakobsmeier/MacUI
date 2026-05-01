@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="260" height="360" viewBox="0 0 260 360">
+  <!-- Background -->
+  <rect width="260" height="360" fill="#0a0a0a" rx="0"/>
+
+  <!-- Title: MAC (bold) + UI (thin) -->
+  <text x="16" y="32" font-family="Arial Black, Helvetica, sans-serif" font-size="22" font-weight="900" fill="#FFFFFF">MAC</text>
+  <text x="82" y="32" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="300" fill="#AAAAAA">UI</text>
+
+  <!-- Close button × -->
+  <text x="237" y="28" font-family="Arial, sans-serif" font-size="18" fill="#FFFFFF" text-anchor="middle">×</text>
+
+  <!-- UNLOCK button (white fill, black text) -->
+  <rect x="20" y="55" width="105" height="32" fill="#FFFFFF" rx="0"/>
+  <text x="72" y="76" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">UNLOCK</text>
+
+  <!-- LOCK button (white fill, black text) -->
+  <rect x="135" y="55" width="105" height="32" fill="#FFFFFF" rx="0"/>
+  <text x="187" y="76" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">LOCK</text>
+
+  <!-- FONT SIZE label (Compact) -->
+  <text x="20" y="108" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#888888" letter-spacing="1">FONT SIZE:</text>
+  <text x="80" y="108" font-family="Arial Black, Helvetica, sans-serif" font-size="10" font-weight="900" fill="#FFFFFF">14</text>
+
+  <!-- Compact Slider track -->
+  <rect x="20" y="120" width="220" height="2" fill="#666666" rx="1"/>
+
+  <!-- Compact Slider thumb -->
+  <rect x="82" y="116" width="10" height="10" fill="#FFFFFF" rx="0"/>
+
+  <!-- ABILITIES label (Moved up to be prominent) -->
+  <text x="20" y="152" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#888888" letter-spacing="1">ABILITIES</text>
+
+  <!-- Separator line -->
+  <rect x="20" y="160" width="220" height="1" fill="#333333"/>
+
+  <!-- Checkbox Row 1: Shield Block (checked, audio on) -->
+  <rect x="20" y="173" width="14" height="14" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1" rx="0"/>
+  <text x="27" y="184" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#000000" text-anchor="middle">✓</text>
+  <rect x="42" y="172" width="16" height="16" fill="#1a3a6a" rx="1"/>
+  <text x="50" y="184" font-family="Arial Black, sans-serif" font-size="7" fill="#6699CC" text-anchor="middle">SB</text>
+  <text x="66" y="184" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#FFFFFF">Shield Block</text>
+  <!-- Audio Button (ON - Green) -->
+  <rect x="224" y="172" width="16" height="16" fill="#33CC33" stroke="#00FF00" stroke-width="1" rx="0"/>
+  <text x="232" y="184" font-family="Arial Black, sans-serif" font-size="10" font-weight="900" fill="#000000" text-anchor="middle">A</text>
+
+  <!-- Checkbox Row 2: Spell Reflect (unchecked, audio off) -->
+  <rect x="20" y="197" width="14" height="14" fill="#262626" stroke="#808080" stroke-width="1" rx="0"/>
+  <rect x="42" y="196" width="16" height="16" fill="#2a2a4a" rx="1"/>
+  <text x="50" y="208" font-family="Arial Black, sans-serif" font-size="7" fill="#6666AA" text-anchor="middle">SR</text>
+  <text x="66" y="208" font-family="Arial, Helvetica, sans-serif" font-size="11" fill="#FFFFFF">Spell Reflect</text>
+  <!-- Audio Button (OFF - Gray) -->
+  <rect x="224" y="196" width="16" height="16" fill="#262626" stroke="#808080" stroke-width="1" rx="0"/>
+  <text x="232" y="208" font-family="Arial Black, sans-serif" font-size="10" font-weight="900" fill="#808080" text-anchor="middle">A</text>
+
+  <!-- Dropdown Menu (Opened off Row 1) -->
+  <rect x="140" y="190" width="100" height="84" fill="#000000" stroke="#808080" stroke-width="1" rx="0" fill-opacity="0.95"/>
+  <text x="145" y="204" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#FFFFFF">None</text>
+  
+  <!-- Hover/Selected State on Warning -->
+  <rect x="141" y="208" width="98" height="20" fill="#FFFFFF" fill-opacity="0.2"/>
+  <text x="145" y="224" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#00FF00">Warning</text>
+  
+  <text x="145" y="244" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#FFFFFF">Ready Check</text>
+  <text x="145" y="264" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#FFFFFF">Ping</text>
+  <text x="145" y="284" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#FFFFFF">Coin</text>
+
+</svg>

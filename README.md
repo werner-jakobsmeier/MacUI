@@ -1,24 +1,45 @@
 # MacUI
 
-A sleek, lightweight, and highly optimized custom user interface for World of Warcraft (Midnight 12.0.5+ API compliant).
+A sleek, lightweight, and highly optimized custom user interface for World of Warcraft (Midnight 12.0.5+ API compliant). Designed for power users who want a brutalist, distraction-free combat tracking system with zero external dependencies.
 
 ## Features
-- **Zero External Dependencies**: Built entirely using pure Vanilla WoW API templates. No need to download heavy libraries like Ace3.
-- **In-Game Configuration Menu**: Type `/macui` to open a native-feeling UI panel where you can lock/unlock frames and globally scale your text sizes.
-- **Persistent Layouts**: Move any UI element on your screen and lock it. Your exact layout coordinates are automatically saved to your `SavedVariables` across game sessions.
-- **Player Health Tracker**: A clean, universally available player health tracker that updates instantly and displays as a percentage.
-- **Warrior Tracker Module**: A class-specific module that tracks Rage, Ignore Pain absorbs, and Shield Block charges/duration with extreme efficiency and frame throttling.
+
+### Dynamic Ability Tracker
+A modular, class and spec-aware tracking system. Tracks abilities using real spell icons with a built-in state machine:
+- 🟢 **Green Border:** Ability/Buff is currently active on you.
+- 🔴 **Red Border (Desaturated Icon):** Mitigation missing while in combat!
+- ⚪ **Gray Border:** Out of combat / Neutral state.
+
+### Brutalist Configuration Menu
+Type `/macui` to open a minimalist, brutalist UI panel where you can lock/unlock frames, scale text sizes, and dynamically select which abilities to track.
+- **Smart Input Box:** Track *any* ability in the game. Simply click the input box and **Shift-Click** a spell from your spellbook, or type an exact Spell ID. MacUI handles the rest dynamically.
+- **Audio Alarm Dropdown:** Click the `[A]` button next to any tracked ability to open a custom dropdown. Assign sounds like "Raid Warning", "Ready Check Ping", or "Coin Drop". If you are in combat and missing that buff, the addon will pulse the alarm exactly once every 3 seconds to save your life.
+
+### Class Modules
+- **Warrior Module**: Tracks Rage, Ignore Pain absorbs, and Shield Block charges/duration.
+- **Paladin Module**: Tracks Holy Power, Shield of the Righteous duration, and active Consecration.
+- **Extreme Efficiency**: All trackers utilize `OnUpdate` throttling, caching, and dynamic script detachment to ensure 0 CPU waste.
+
+### Persistent Layouts
+Move any UI element on your screen and lock it. Your exact layout coordinates, tracked abilities, and audio alarm settings are automatically saved to your `SavedVariables` across game sessions.
+
+---
 
 ## Previews
 
-### In-Game Options Menu
-![MacUI Options Panel](preview/macui_options_panel.png)
+### Live Combat Simulation
+![MacUI Animated Demo](preview/macui_animated_demo.svg)
+*A live simulation of the MacUI state machine reacting to entering combat, taking damage, applying a buff, and triggering an audio alarm.*
 
-### Unlocked Layout Mode
-![MacUI Unlocked Layout](preview/macui_unlocked_state.png)
+### Brutalist Config & Smart Input
+![MacUI Config Panel](preview/config_ui_v4_rebalanced.svg)
+*The updated `/macui` config panel featuring a compressed font scale slider, dynamic ability selection, the custom Audio Dropdown menu, and the Smart Input Box at the bottom.*
 
-### Active Combat Warning
-![MacUI Combat Warning](preview/macui_combat_warning.png)
+### Full Layout Overview
+![MacUI Full Layout](preview/macui_full_layout.svg)
+*The complete layout, featuring the configuration panel (left), center resource trackers, and the icon-based ability indicators on the right.*
+
+---
 
 ## Installation
 1. Download or clone this repository.

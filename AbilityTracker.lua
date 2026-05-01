@@ -5,7 +5,11 @@ local UIParent = UIParent
 local C_UnitAuras = C_UnitAuras
 local UnitAffectingCombat = UnitAffectingCombat
 local ipairs = ipairs
+local pairs = pairs
 local table = table
+local PlaySound = PlaySound
+local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
+local GetSpellInfo = C_Spell and C_Spell.GetSpellInfo or GetSpellInfo
 
 -- Cache player class at load time
 local playerClass = addonTable.playerClass
@@ -51,6 +55,8 @@ local function CreateIndicatorRow(parent)
     row.icon = icon
     row.spellID = nil
     row.abilityType = nil
+    row.isRed = false
+    row.audioTimer = 0
 
     return row
 end
@@ -60,6 +66,7 @@ local function SetIndicatorGreen(indicator)
     indicator.border:SetBackdropBorderColor(0, 1, 0, 1)
     indicator.icon:SetDesaturated(false)
     indicator.icon:SetAlpha(1)
+    indicator.isRed = false
 end
 
 -- Set indicator to red (missing/on cooldown)
@@ -67,6 +74,10 @@ local function SetIndicatorRed(indicator)
     indicator.border:SetBackdropBorderColor(1, 0, 0, 1)
     indicator.icon:SetDesaturated(true)
     indicator.icon:SetAlpha(0.6)
+    if not indicator.isRed then
+        indicator.audioTimer = 3 -- Force immediate play on transition
+    end
+    indicator.isRed = true
 end
 
 -- Set indicator to gray (out of combat / neutral)
@@ -74,6 +85,7 @@ local function SetIndicatorGray(indicator)
     indicator.border:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
     indicator.icon:SetDesaturated(false)
     indicator.icon:SetAlpha(0.8)
+    indicator.isRed = false
 end
 
 -- Update a single indicator based on current game state
@@ -105,8 +117,37 @@ end
 
 -- Update ALL indicators
 local function UpdateAllIndicators()
+    local needsAudioUpdate = false
+
     for _, indicator in ipairs(indicatorFrames) do
         UpdateIndicator(indicator)
+        if indicator.isRed and MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[indicator.spellID] then
+            needsAudioUpdate = true
+        end
+    end
+
+    -- Dynamically enable/disable OnUpdate throttle for audio to save CPU
+    if needsAudioUpdate then
+        if not trackerGroup.onUpdateActive then
+            trackerGroup:SetScript("OnUpdate", function(self, elapsed)
+                for _, ind in ipairs(indicatorFrames) do
+                    if ind.isRed and MacUIDB.audioAlerts[ind.spellID] then
+                        ind.audioTimer = (ind.audioTimer or 0) + elapsed
+                        if ind.audioTimer >= 3.0 then
+                            -- audioAlerts[spellID] stores the specific sound ID (e.g. 8959, 8960, etc.)
+                            PlaySound(MacUIDB.audioAlerts[ind.spellID])
+                            ind.audioTimer = 0
+                        end
+                    end
+                end
+            end)
+            trackerGroup.onUpdateActive = true
+        end
+    else
+        if trackerGroup.onUpdateActive then
+            trackerGroup:SetScript("OnUpdate", nil)
+            trackerGroup.onUpdateActive = false
+        end
     end
 end
 
@@ -150,6 +191,35 @@ local function RebuildTrackerUI()
 
             row:Show()
             table.insert(indicatorFrames, row)
+        end
+    end
+    
+    -- Process Custom Abilities
+    if MacUIDB and MacUIDB.customAbilities then
+        for spellID, isCustomTracked in pairs(MacUIDB.customAbilities) do
+            -- Only render if the user has checked the box in the config UI to track it
+            if MacUIDB.trackedAbilities and MacUIDB.trackedAbilities[spellID] then
+                index = index + 1
+                
+                local row = table.remove(framePool) or CreateIndicatorRow(trackerGroup)
+                row:ClearAllPoints()
+                row:SetPoint("TOPLEFT", trackerGroup, "TOPLEFT", 0, -((index - 1) * (ICON_SIZE + PADDING)))
+                row.spellID = spellID
+                row.abilityType = "buff" -- Default custom tracking to 'buff' type
+                
+                local iconTexture = GetSpellTexture(spellID)
+                if not iconTexture then
+                    local _, _, icon = GetSpellInfo(spellID)
+                    iconTexture = icon
+                end
+                
+                if iconTexture then
+                    row.icon:SetTexture(iconTexture)
+                end
+                
+                row:Show()
+                table.insert(indicatorFrames, row)
+            end
         end
     end
 

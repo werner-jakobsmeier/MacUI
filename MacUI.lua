@@ -2,8 +2,10 @@ local addonName, addonTable = ...
 
 local CreateFrame = CreateFrame
 local print = print
+local UIParent = UIParent
 local UnitClass = UnitClass
 local GetSpecialization = GetSpecialization
+local table = table
 
 -- Cache player class at load time (never changes)
 local _, playerClass = UnitClass("player")
@@ -37,9 +39,9 @@ frame:SetScript("OnEvent", function(self, event, arg1)
         print("|cFF33FF99" .. addonName .. "|r has been successfully loaded!")
         
         -- Initialize SavedVariables if needed
-        if not MacUIDB then
-            MacUIDB = {}
-        end
+        if not MacUIDB then MacUIDB = {} end
+        if not MacUIDB.audioAlerts then MacUIDB.audioAlerts = {} end
+        if not MacUIDB.customAbilities then MacUIDB.customAbilities = {} end
         
         -- Unregister the event since we only need it once
         self:UnregisterEvent("ADDON_LOADED")

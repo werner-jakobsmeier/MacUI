@@ -10,7 +10,10 @@ addonTable.AbilityRegistry = {
         { spellID = 23920,  name = "Spell Reflect",  type = "buff"              },
         { spellID = 190456, name = "Ignore Pain",    type = "absorb", spec = 3 },
     },
+    PALADIN = {
+        -- Protection Paladin (spec = 2)
+        { spellID = 132403, name = "Shield of the Righteous", type = "buff", spec = 2 },
+    },
     -- Future classes can be added here:
-    -- PALADIN = { ... },
     -- DEATHKNIGHT = { ... },
 }

@@ -1,5 +1,7 @@
 local addonName, addonTable = ...
 
+local UnitClass = UnitClass
+
 -- Only load if playing a Protection Warrior (spec 3)
 local _, playerClass = UnitClass("player")
 if playerClass ~= "WARRIOR" then return end

@@ -52,6 +52,7 @@ MacUI/
 1. Place `MacUI` in `_retail_/Interface/AddOns/`.
 2. Use `/macui` or the minimap icon to open the panel.
 3. **Shift-Click** spells from your spellbook into the input box to add custom tracking.
+4. **Developers**: Use `./build_release.sh` to generate a clean, production-ready `MacUI` folder in the parent `release/` directory.
 
 ## License
 [MIT](LICENSE)

@@ -2,7 +2,6 @@ local addonName, addonTable = ...
 
 local CreateFrame = CreateFrame
 local UIParent = UIParent
-local InCombatLockdown = InCombatLockdown
 local table = table
 local ipairs = ipairs
 local IsPlayerSpell = IsPlayerSpell

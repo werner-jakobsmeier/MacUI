@@ -2,7 +2,6 @@ local addonName, addonTable = ...
 
 local CreateFrame = CreateFrame
 local print = print
-local UIParent = UIParent
 local UnitClass = UnitClass
 local GetSpecialization = GetSpecialization
 local ipairs = ipairs
@@ -114,14 +113,14 @@ addonTable.DefaultAbilities = {
     WARRIOR = {
         [3] = { -- Protection
             { spellID = 329121, type = "buff", name = "Spell Block" },
-            { spellID = 12975, type = "buff", name = "Last Stand" },
-            { spellID = 871, type = "buff", name = "Shield Wall" },
+            { spellID = 12975, type = "buff", name = "Last Stand", isBaseline = true },
+            { spellID = 871, type = "buff", name = "Shield Wall", isBaseline = true },
         }
     },
     PALADIN = {
         [2] = { -- Protection
-            { spellID = 86659, type = "buff", name = "Guardian of Ancient Kings" },
-            { spellID = 31850, type = "buff", name = "Ardent Defender" },
+            { spellID = 86659, type = "buff", name = "Guardian of Ancient Kings", isBaseline = true },
+            { spellID = 31850, type = "buff", name = "Ardent Defender", isBaseline = true },
             { spellID = 389539, type = "buff", name = "Sentinel" },
             { spellID = 31884, type = "buff", name = "Avenging Wrath" },
         }

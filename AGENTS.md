@@ -12,3 +12,4 @@ Key constraints:
 - Every frame that can be moved must register in `addonTable.MovableFrames`
 - **Zero-Waste Engineering:** Do NOT add unused upvalues or variables 'just in case'.
 - **Redundancy Sweep:** Always perform a final pass to remove orphaned code and unused locals before finishing a task.
+- **Release Workflow:** When asked to 'compile release' or prepare for release, run `sh build_release.sh` to generate a clean addon folder in `../release/MacUI/`. Always perform a Redundancy Sweep before running the release build.

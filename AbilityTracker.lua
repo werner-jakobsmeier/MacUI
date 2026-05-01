@@ -15,7 +15,6 @@ local GetSpellTexture = C_Spell and C_Spell.GetSpellTexture or GetSpellTexture
 local ipairs = ipairs
 local pairs = pairs
 local table = table
-local PlaySound = PlaySound
 local IsPlayerSpell = IsPlayerSpell
 
 -- Invisible event-only frame

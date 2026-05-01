@@ -107,7 +107,7 @@ addonTable.ClassMechanics = {
     PALADIN = {
         [2] = { -- Protection
             { id = 132403, type = "buff", label = "SotR Buff", color = {1, 1, 0}, point = {0, -150} },
-            { id = 188370, type = "active", label = "Consecration", color = {1, 1, 0}, point = {0, -175} },
+            { id = 188370, type = "totem", label = "Cons Duration", color = {0.97, 0.72, 0.19}, point = {0, -175} },
         }
     }
 }
@@ -120,6 +120,15 @@ addonTable.DefaultAbilities = {
             { spellID = 329121, type = "buff", name = "Spell Block" },
             { spellID = 12975, type = "buff", name = "Last Stand" },
             { spellID = 871, type = "buff", name = "Shield Wall" },
+        }
+    },
+    PALADIN = {
+        [2] = { -- Protection
+            { spellID = 132403, type = "buff", name = "Shield of the Righteous" },
+            { spellID = 188370, type = "buff", name = "Consecration" },
+            { spellID = 86659, type = "buff", name = "Guardian of Ancient Kings" },
+            { spellID = 31850, type = "buff", name = "Ardent Defender" },
+            { spellID = 209202, type = "buff", name = "Eye of Tyr" },
         }
     }
 }

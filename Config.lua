@@ -178,11 +178,11 @@ titleThin:SetText("UI")
 -- Introductory Description
 local descText = optionsPanel:CreateFontString(nil, "OVERLAY")
 descText:SetFont("Fonts\\ARIALN.TTF", 9)
-descText:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -48) -- 20px margin, 24px gap from logo
+descText:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -48) -- 20px margin
 descText:SetWidth(260)
 descText:SetJustifyH("LEFT")
 descText:SetTextColor(0.42, 0.45, 0.50) -- Slate
-descText:SetText("Minimalist combat tracking for critical player stats, resources, and active defensive abilities.")
+descText:SetText("Minimalist combat tracking for critical player stats, resources, and active defensive abilities. Health and mana percentages are restricted by Blizzard security policy.")
 
 -- Top Right System Buttons (LOCK / RELOAD / CLOSE)
 local btnToggleLock = CreateFrame("Button", nil, optionsPanel, "BackdropTemplate")

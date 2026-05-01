@@ -63,7 +63,8 @@ local function UpdateHealth()
     local health = UnitHealth("player")
     if health then
         healthFrame.text:SetTextColor(0, 1, 0)
-        healthFrame.text:SetText(health)
+        -- AbbreviateLargeNumbers is secure-safe and provides the '250k' look
+        healthFrame.text:SetText(AbbreviateLargeNumbers(health))
     end
 end
 
@@ -74,7 +75,8 @@ local function UpdateResource()
     if val then
         local c = classInfo.resource.color
         resourceFrame.text:SetTextColor(c[1], c[2], c[3])
-        resourceFrame.text:SetText(val)
+        -- Safe abbreviation (e.g. 250k)
+        resourceFrame.text:SetText(AbbreviateLargeNumbers(val))
     end
 end
 
@@ -83,20 +85,21 @@ local function UpdatePower()
     
     local val
     if classInfo.power.name == "Ignore Pain" then
-        -- Use aura points to avoid "Secret Number" taint (UnitGetTotalAbsorbs is protected)
         local auraData = GetPlayerAuraBySpellID(190456)
         val = (auraData and auraData.points and auraData.points[1]) or 0
     else
-        val = resourceFrame.pType and UnitPower("player", resourceFrame.pType)
+        val = powerFrame.pType and UnitPower("player", powerFrame.pType)
     end
     
     if val then
         local c = classInfo.power.color
         powerFrame.text:SetTextColor(c[1], c[2], c[3])
+        
         if classInfo.power.name == "Ignore Pain" then
             powerFrame.text:SetText(addonTable.FormatNumber(val))
         else
-            powerFrame.text:SetText(val)
+            -- Safe abbreviation (e.g. 250k)
+            powerFrame.text:SetText(AbbreviateLargeNumbers(val))
         end
     end
 end

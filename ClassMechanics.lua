@@ -83,10 +83,21 @@ local function UpdateAuras()
         local c = mech.color
         local hexColor = string.format("%02x%02x%02x", c[1]*255, c[2]*255, c[3]*255)
         
-        if mech.type == "absorb" or mech.type == "buff" or mech.type == "active" then
-            local auraData = GetPlayerAuraBySpellID(mech.id)
+        if mech.type == "absorb" or mech.type == "buff" or mech.type == "active" or mech.type == "totem" then
+            local auraData = (mech.type ~= "totem") and GetPlayerAuraBySpellID(mech.id)
             
-            if mech.type == "absorb" then
+            if mech.type == "totem" then
+                local haveTotem, name, startTime, duration = GetTotemInfo(1)
+                local durationStr = "0.0"
+                if haveTotem and duration > 0 then
+                    local remaining = (startTime + duration) - GetTime()
+                    if remaining > 0 then
+                        durationStr = string.format("%.1f", remaining)
+                        needsOnUpdate = true
+                    end
+                end
+                frame.text:SetText(string.format("|cFF%s%s|r", hexColor, durationStr))
+            elseif mech.type == "absorb" then
                 local absorb = (auraData and auraData.points and auraData.points[1]) or 0
                 if absorb > 0 then
                     frame.text:SetText(string.format("|cFF%s%s|r", hexColor, addonTable.FormatNumber(absorb)))

@@ -19,9 +19,9 @@ local playerClass = addonTable.playerClass
 -- Invisible event-only frame (no visual footprint, just handles events and audio)
 local eventFrame = CreateFrame("Frame", "MacUIAbilityTrackerEvents", UIParent)
 
--- Store references to active indicator frames (keyed by spellID for fast lookup)
-local indicatorFrames = {}
--- Pool of hidden, reusable frames
+-- Registry for active indicator frames (Array for high-performance ipairs iteration)
+local activeIndicators = {}
+-- Pool of hidden, reusable frames (Ensures zero-waste memory management)
 local framePool = {}
 
 local ICON_SIZE = 28
@@ -113,26 +113,30 @@ local function UpdateIndicator(indicator)
     end
 end
 
+
 -- Update ALL indicators
+-- PERFORMANCE: Uses ipairs for faster array traversal during combat events.
 local function UpdateAllIndicators()
-    for _, indicator in pairs(indicatorFrames) do
+    for _, indicator in ipairs(activeIndicators) do
         UpdateIndicator(indicator)
         
-        -- EDGE CASE: "Recursive Audio Triggering" (Nuclear Fix)
-        -- If a SoundID is a 'Loop' (like 10952), triggering it repeatedly creates 
-        -- multiple stacked audio instances that cannot be stopped individually.
-        -- We use 'indicator.audioPlayed' as a Hard State Lock to ensure a sound
-        -- ONLY fires once when an alert state is entered, and cannot re-fire 
-        -- until the alert is cleared and reset.
+        -- EDGE CASE: "Recursive Audio Triggering" (State Lock Fix)
+        -- Why it exists: Combat events (UNIT_AURA) fire multiple times per second.
+        -- If an alert sound is a 'Loop' (like 10952), triggering it repeatedly 
+        -- creates stacked audio instances that cannot be stopped individually.
+        -- FIX: We use 'indicator.audioPlayed' as a Hard State Lock. It ensures 
+        -- a sound ONLY fires once when the alert is triggered, and cannot 
+        -- re-fire until the alert is cleared and reset.
         if indicator.isRed then
             if not indicator.audioPlayed then
-                if MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[indicator.spellID] then
-                    addonTable.PlaySoundSafe(MacUIDB.audioAlerts[indicator.spellID])
-                    indicator.audioPlayed = true
+                local soundID = MacUIDB and MacUIDB.audioAlerts and MacUIDB.audioAlerts[indicator.spellID]
+                if soundID then
+                    addonTable.PlaySoundSafe(soundID)
+                    indicator.audioPlayed = true -- Lock the audio state
                 end
             end
         else
-            -- Reset the lock only when the alert is cleared (buff gained / combat end)
+            -- Reset the lock only when the alert is cleared (state transition)
             indicator.audioPlayed = false
         end
     end
@@ -154,88 +158,67 @@ local function ApplyIndicatorPosition(indicator, index)
     end
 end
 
--- Rebuild the tracker UI based on MacUIDB.trackedAbilities
-local function RebuildTrackerUI()
-    -- Return existing frames to the pool instead of leaking them
-    for spellID, indicator in pairs(indicatorFrames) do
-        indicator:Hide()
-        for i, mf in ipairs(addonTable.MovableFrames) do
-            if mf == indicator then
-                table.remove(addonTable.MovableFrames, i)
-                break
-            end
-        end
-        table.insert(framePool, indicator)
+
+
+-- Rebuild the tracker UI (called on spec change or tracked ability change)
+function RebuildTrackerUI()
+    -- Move active frames to the pool for reuse
+    for _, frame in ipairs(activeIndicators) do
+        frame:Hide()
+        table.insert(framePool, frame)
     end
-    indicatorFrames = {}
+    activeIndicators = {}
 
-    if not MacUIDB or not MacUIDB.trackedAbilities then return end
+    if not (MacUIDB and MacUIDB.trackedAbilities) then return end
 
+    local playerClass = addonTable.playerClass
+    local specIndex = addonTable.playerSpec
     local abilitiesToTrack = {}
-    
-    -- 1. Gather Class Defaults
-    local classDefaults = addonTable.DefaultAbilities and addonTable.DefaultAbilities[addonTable.playerClass]
-    local specDefaults = classDefaults and classDefaults[addonTable.playerSpec]
+
+    -- 1. Identify Spec Defaults
+    local classDefaults = addonTable.DefaultAbilities and addonTable.DefaultAbilities[playerClass]
+    local specDefaults = specIndex and classDefaults and classDefaults[specIndex]
     if specDefaults then
         for _, ability in ipairs(specDefaults) do
-            -- Defaults are tracked unless explicitly disabled
-            if MacUIDB.trackedAbilities[ability.spellID] ~= false then
-                table.insert(abilitiesToTrack, { spellID = ability.spellID, type = ability.type })
+            if type(ability) == "table" and MacUIDB.trackedAbilities[ability.spellID] ~= false then
+                table.insert(abilitiesToTrack, ability)
             end
         end
     end
-    
 
+    -- 2. Identify Custom Abilities
+    if MacUIDB.customAbilities then
+        local sortedCustom = {}
+        for _, ability in pairs(MacUIDB.customAbilities) do
+            -- SANITY CHECK: Ensure ability is a valid table (fixes 'boolean value' crash)
+            if type(ability) == "table" and ability.spellID and MacUIDB.trackedAbilities[ability.spellID] == true then
+                table.insert(sortedCustom, ability)
+            end
+        end
+        table.sort(sortedCustom, function(a, b) return a.name and b.name and a.name < b.name end)
+        for _, ability in ipairs(sortedCustom) do
+            table.insert(abilitiesToTrack, ability)
+        end
+    end
 
-    local index = 0
-    for _, ability in ipairs(abilitiesToTrack) do
-        local spellID = ability.spellID
-        index = index + 1
-
-        -- Reuse a pooled frame or create a new one
+    -- 3. Provision Frames
+    for i, ability in ipairs(abilitiesToTrack) do
         local row = table.remove(framePool) or CreateIndicatorRow()
-        local frameName = "MacUIIndicator_" .. spellID
-        
-        -- Since SetName is not possible, we recreate if name mismatch
-        if row:GetName() ~= frameName then
-            row:Hide()
-            row = CreateFrame("Frame", frameName, UIParent)
-            row:SetSize(ICON_SIZE, ICON_SIZE)
-            local border = CreateFrame("Frame", nil, row, "BackdropTemplate")
-            border:SetSize(ICON_SIZE + 4, ICON_SIZE + 4)
-            border:SetPoint("CENTER", row, "CENTER", 0, 0)
-            border:SetBackdrop({ edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2 })
-            border:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
-            local icon = row:CreateTexture(nil, "ARTWORK")
-            icon:SetSize(ICON_SIZE, ICON_SIZE)
-            icon:SetPoint("CENTER", row, "CENTER", 0, 0)
-            icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-            row.border = border
-            row.icon = icon
-            row.isRed = false
-            row.audioTimer = 0
-        end
-
-        row.spellID = spellID
+        row.spellID = ability.spellID
         row.abilityType = ability.type
-
-        local iconTexture = GetSpellTexture(spellID)
-        if not iconTexture then
-            local spellInfo = GetSpellInfo(spellID)
-            iconTexture = spellInfo and spellInfo.iconID
-        end
+        row.audioPlayed = false
+        row.isRed = false
+        
+        local iconTexture = GetSpellTexture(ability.spellID)
         if iconTexture then row.icon:SetTexture(iconTexture) end
-
-        ApplyIndicatorPosition(row, index)
-        table.insert(addonTable.MovableFrames, row)
+        
+        ApplyIndicatorPosition(row, i)
+        table.insert(activeIndicators, row)
         row:Show()
-        indicatorFrames[spellID] = row
     end
 
     UpdateAllIndicators()
 end
-
--- Make RebuildTrackerUI accessible to Config.lua
 addonTable.RebuildTrackerUI = RebuildTrackerUI
 
 -- Register for spec changes so we can rebuild when the player respeccs
@@ -243,33 +226,22 @@ table.insert(addonTable.OnSpecChanged, function()
     RebuildTrackerUI()
 end)
 
--- Event Registration
+-- Event Handling (Event-Driven Updates)
 eventFrame:RegisterEvent("UNIT_AURA")
 eventFrame:RegisterEvent("SPELL_UPDATE_COOLDOWN")
 eventFrame:RegisterEvent("PLAYER_REGEN_DISABLED")
 eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
--- NOTE (Guideline #8 exception): This module uses its own ADDON_LOADED handler
--- because it needs MacUIDB.trackedAbilities to exist before calling RebuildTrackerUI().
--- MacUI.lua initializes the core DB, but this module must independently verify its own
--- subset of keys before building UI elements.
 eventFrame:RegisterEvent("ADDON_LOADED")
 
--- Event Handler
 eventFrame:SetScript("OnEvent", function(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == addonName then
         if not MacUIDB then MacUIDB = {} end
         if not MacUIDB.trackedAbilities then MacUIDB.trackedAbilities = {} end
-
         RebuildTrackerUI()
         self:UnregisterEvent("ADDON_LOADED")
-    elseif event == "UNIT_AURA" and arg1 == "player" then
-        UpdateAllIndicators()
-    elseif event == "SPELL_UPDATE_COOLDOWN" then
-        UpdateAllIndicators()
-    elseif event == "PLAYER_REGEN_DISABLED" or event == "PLAYER_REGEN_ENABLED" then
-        UpdateAllIndicators()
-    elseif event == "PLAYER_ENTERING_WORLD" then
+    else
+        -- Combined high-performance handler for combat/aura events
         UpdateAllIndicators()
     end
 end)

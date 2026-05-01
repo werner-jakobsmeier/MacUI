@@ -143,13 +143,14 @@ local function UpdatePlayerSpec()
 end
 
 -- Global Helpers
+-- Global Helper: Secure-Safe Number Formatting
+-- EDGE CASE: Modern WoW (10.0+) uses 'Secret Numbers' for player health/absorbs.
+-- Addons cannot perform arithmetic (/, *, >) on these values without crashing if tainted.
+-- We use AbbreviateLargeNumbers (Blizzard global) because it is secure-safe.
 local function FormatNumber(num)
-    if num >= 1000000 then
-        return string.format("%.1fm", num / 1000000)
-    elseif num >= 1000 then
-        return string.format("%.1fk", num / 1000)
-    end
-    return tostring(num)
+    if not num then return "0" end
+    -- AbbreviateLargeNumbers handles the 250k/1.2m conversion natively and safely
+    return AbbreviateLargeNumbers(num)
 end
 addonTable.FormatNumber = FormatNumber
 

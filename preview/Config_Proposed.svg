@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" width="600" height="800">
+    <!-- Background Space -->
+    <rect width="100%" height="100%" fill="#111827" />
+    
+    <!-- Config Window (Larger 420x680 vs old 300x360) -->
+    <rect x="90" y="50" width="420" height="680" fill="#0F172A" stroke="#D1D5DB" stroke-width="2" rx="4" />
+    
+    <!-- Title -->
+    <text x="110" y="90" font-family="Arial, sans-serif" font-weight="bold" font-size="28" fill="#D1D5DB">Mac</text>
+    <text x="165" y="90" font-family="Arial, sans-serif" font-weight="normal" font-size="18" fill="#9CA3AF">UI</text>
+    
+    <!-- Top Right Buttons -->
+    <rect x="330" y="70" width="50" height="22" fill="none" stroke="#D1D5DB" stroke-width="1" rx="2" />
+    <text x="355" y="85" font-family="Arial, sans-serif" font-size="10" fill="#D1D5DB" text-anchor="middle">LOCK</text>
+    <rect x="390" y="70" width="50" height="22" fill="none" stroke="#D1D5DB" stroke-width="1" rx="2" />
+    <text x="415" y="85" font-family="Arial, sans-serif" font-size="10" fill="#D1D5DB" text-anchor="middle">RELOAD</text>
+    <rect x="450" y="70" width="50" height="22" fill="#991B1B" stroke="#D1D5DB" stroke-width="1" rx="2" />
+    <text x="475" y="85" font-family="Arial, sans-serif" font-size="10" fill="#FFF" text-anchor="middle">CLOSE</text>
+    
+    <!-- Intro Text (Larger 13pt vs old 9pt, Lighter text for readability) -->
+    <foreignObject x="110" y="110" width="380" height="60">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: Arial, sans-serif; font-size: 13px; color: #CBD5E1; line-height: 1.5;">
+            Minimalist combat tracking for critical player stats, resources, and active defensive abilities. Health and mana percentages are restricted by Blizzard security policy.
+        </div>
+    </foreignObject>
+    
+    <!-- Proposed Sub-Header Style (Larger, bright white, with blue accent line) -->
+    <text x="110" y="195" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#F8FAFC" letter-spacing="1">ACTIVE MITIGATION</text>
+    <rect x="110" y="205" width="380" height="2" fill="#3B82F6" opacity="0.8" /> <!-- Blue Accent Line -->
+    
+    <!-- Mitigation Toggle 1 (Larger Rows: 380x44 vs old 260x36) -->
+    <rect x="110" y="220" width="380" height="44" fill="#1E293B" stroke="#94A3B8" stroke-width="1" />
+    <rect x="120" y="230" width="24" height="24" fill="#EAB308" />
+    <text x="155" y="242" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#FFF">Shield of the Righteous</text>
+    <text x="155" y="255" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8">SOUND: None</text>
+    <rect x="430" y="232" width="50" height="20" fill="#22C55E" opacity="0.3" stroke="#22C55E" rx="2" />
+    <text x="455" y="246" font-family="Arial, sans-serif" font-size="10" fill="#FFF" text-anchor="middle">AUDIO</text>
+    
+    <!-- Mitigation Toggle 2 -->
+    <rect x="110" y="274" width="380" height="44" fill="#0F172A" stroke="#334155" stroke-width="1" opacity="0.7" />
+    <rect x="120" y="284" width="24" height="24" fill="#F59E0B" opacity="0.3" />
+    <text x="155" y="296" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#64748B">Consecration</text>
+    <text x="155" y="309" font-family="Arial, sans-serif" font-size="11" fill="#475569">SOUND: None</text>
+    <rect x="430" y="286" width="50" height="20" fill="none" stroke="#475569" rx="2" />
+    <text x="455" y="300" font-family="Arial, sans-serif" font-size="10" fill="#64748B" text-anchor="middle">AUDIO</text>
+    
+    <!-- Defensive Cooldowns Header -->
+    <text x="110" y="355" font-family="Arial, sans-serif" font-weight="bold" font-size="13" fill="#F8FAFC" letter-spacing="1">DEFENSIVE COOLDOWNS</text>
+    <rect x="110" y="365" width="380" height="2" fill="#3B82F6" opacity="0.8" />
+    
+    <!-- Cooldown Toggle 1 -->
+    <rect x="110" y="380" width="380" height="44" fill="#1E293B" stroke="#94A3B8" stroke-width="1" />
+    <rect x="120" y="390" width="24" height="24" fill="#3B82F6" />
+    <text x="155" y="402" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#FFF">Guardian of Ancient Kings</text>
+    <text x="155" y="415" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8">SOUND: ID 12345</text>
+    <rect x="430" y="392" width="50" height="20" fill="#22C55E" opacity="0.3" stroke="#22C55E" rx="2" />
+    <text x="455" y="406" font-family="Arial, sans-serif" font-size="10" fill="#FFF" text-anchor="middle">AUDIO</text>
+    
+    <!-- Cooldown Toggle 2 -->
+    <rect x="110" y="434" width="380" height="44" fill="#1E293B" stroke="#94A3B8" stroke-width="1" />
+    <rect x="120" y="444" width="24" height="24" fill="#EF4444" />
+    <text x="155" y="456" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#FFF">Ardent Defender</text>
+    <text x="155" y="469" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8">SOUND: None</text>
+    <rect x="430" y="446" width="50" height="20" fill="#22C55E" opacity="0.3" stroke="#22C55E" rx="2" />
+    <text x="455" y="460" font-family="Arial, sans-serif" font-size="10" fill="#FFF" text-anchor="middle">AUDIO</text>
+    
+    <!-- Cooldown Toggle 3 -->
+    <rect x="110" y="488" width="380" height="44" fill="#1E293B" stroke="#94A3B8" stroke-width="1" />
+    <rect x="120" y="498" width="24" height="24" fill="#A855F7" />
+    <text x="155" y="510" font-family="Arial, sans-serif" font-weight="bold" font-size="14" fill="#FFF">Eye of Tyr</text>
+    <text x="155" y="523" font-family="Arial, sans-serif" font-size="11" fill="#94A3B8">SOUND: None</text>
+    <rect x="430" y="500" width="50" height="20" fill="#22C55E" opacity="0.3" stroke="#22C55E" rx="2" />
+    <text x="455" y="514" font-family="Arial, sans-serif" font-size="10" fill="#FFF" text-anchor="middle">AUDIO</text>
+    
+</svg>

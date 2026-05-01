@@ -141,7 +141,7 @@ end
 
 -- Custom black panel with NO border (floating brutalist style)
 local optionsPanel = CreateFrame("Frame", "MacUIOptionsPanel", UIParent, "BackdropTemplate")
-optionsPanel:SetSize(300, 360)
+optionsPanel:SetSize(420, 560)
 optionsPanel:SetPoint("CENTER")
 optionsPanel:Hide()
 optionsPanel:SetMovable(true)
@@ -177,11 +177,11 @@ titleThin:SetText("UI")
 
 -- Introductory Description
 local descText = optionsPanel:CreateFontString(nil, "OVERLAY")
-descText:SetFont("Fonts\\ARIALN.TTF", 9)
+descText:SetFont("Fonts\\ARIALN.TTF", 12)
 descText:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, -48) -- 20px margin
-descText:SetWidth(260)
+descText:SetWidth(380)
 descText:SetJustifyH("LEFT")
-descText:SetTextColor(0.42, 0.45, 0.50) -- Slate
+descText:SetTextColor(0.8, 0.8, 0.8) -- Lighter grey for better readability
 descText:SetText("Minimalist combat tracking for critical player stats, resources, and active defensive abilities. Health and mana percentages are restricted by Blizzard security policy.")
 
 -- Top Right System Buttons (LOCK / RELOAD / CLOSE)
@@ -572,7 +572,7 @@ optionsPanel:HookScript("OnHide", function() audioDropdown:Hide() end)
 -- Helper: Create a brutalist checkbox row
 local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
     local row = CreateFrame("Button", nil, parent, "BackdropTemplate")
-    row:SetSize(260, 36) -- Wide Module Design
+    row:SetSize(380, 44) -- Wider Module Design
     row:SetPoint("TOPLEFT", parent, "TOPLEFT", 20, yOffset)
     row:SetBackdrop({
         bgFile = "Interface\\Buttons\\WHITE8x8",
@@ -588,15 +588,15 @@ local function CreateAbilityCheckbox(parent, ability, yOffset, isCustom)
 
     -- Ability Name (Top Line)
     local nameText = row:CreateFontString(nil, "OVERLAY")
-    nameText:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
-    nameText:SetPoint("TOPLEFT", icon, "TOPRIGHT", 4, -1)
+    nameText:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
+    nameText:SetPoint("TOPLEFT", icon, "TOPRIGHT", 6, -1)
     nameText:SetText(ability.name)
 
     -- Sound Name (Bottom Line / Subtitle)
     -- Anchored to the nameText to ensure a vertical stack without overlap
     local soundSubtitle = row:CreateFontString(nil, "OVERLAY")
-    soundSubtitle:SetFont("Fonts\\ARIALN.TTF", 9)
-    soundSubtitle:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -1)
+    soundSubtitle:SetFont("Fonts\\ARIALN.TTF", 10)
+    soundSubtitle:SetPoint("TOPLEFT", nameText, "BOTTOMLEFT", 0, -2)
     soundSubtitle:SetTextColor(0.42, 0.45, 0.50) -- Slate
 
     -- Right-side Audio Button
@@ -720,12 +720,21 @@ local function BuildAbilityCheckboxes()
 
     -- Helper to create a section header
     local function CreateHeader(text, yOffset)
+        -- The text itself
         local header = optionsPanel:CreateFontString(nil, "OVERLAY")
-        header:SetFont("Fonts\\ARIALN.TTF", 12, "OUTLINE")
+        header:SetFont("Fonts\\ARIALN.TTF", 14, "OUTLINE")
         header:SetPoint("TOPLEFT", optionsPanel, "TOPLEFT", 20, yOffset)
         header:SetText(text)
-        header:SetTextColor(0.6, 0.6, 0.6) -- Brutalist Grey
+        header:SetTextColor(0.9, 0.9, 0.9) -- Bright brutalist white/grey
         table.insert(sectionHeaders, header)
+        
+        -- The underline accent
+        local line = optionsPanel:CreateTexture(nil, "OVERLAY")
+        line:SetColorTexture(1, 1, 1, 0.8) -- White underline
+        line:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -4)
+        line:SetSize(380, 2)
+        table.insert(sectionHeaders, line) -- Insert as header so it gets cleared on rebuild
+        
         return header
     end
 
@@ -747,7 +756,7 @@ local function BuildAbilityCheckboxes()
                 
                 -- Normalize data structure for the checkbox builder
                 local ability = { spellID = mech.id, name = mech.label }
-                local yOffset = yOffsetBase - (visibleIndex * 40)
+                local yOffset = yOffsetBase - (visibleIndex * 46) -- Increased rhythm spacing
                 local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
                 table.insert(abilityCheckboxes, row)
                 
@@ -766,11 +775,11 @@ local function BuildAbilityCheckboxes()
     local specDefaults = classDefaults and classDefaults[addonTable.playerSpec]
     
     if specDefaults and #specDefaults > 0 then
-        CreateHeader("DEFENSIVE COOLDOWNS", yOffsetBase - (visibleIndex * 40))
+        CreateHeader("DEFENSIVE COOLDOWNS", yOffsetBase - (visibleIndex * 46))
         visibleIndex = visibleIndex + 0.6
         
         for _, ability in ipairs(specDefaults) do
-            local yOffset = yOffsetBase - (visibleIndex * 40)
+            local yOffset = yOffsetBase - (visibleIndex * 46)
             local row = CreateAbilityCheckbox(optionsPanel, ability, yOffset, false)
             table.insert(abilityCheckboxes, row)
             visibleIndex = visibleIndex + 1
